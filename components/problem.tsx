@@ -1,55 +1,54 @@
 import { Reveal } from './reveal'
 
-const stats = [
+const tasks = [
   {
-    value: '74%',
-    label:
-      'of organizations that deployed a live AI customer-service agent have had to roll it back after real-world failures.',
+    title: 'Translation & localization',
+    body: 'Translate text and adapt AI responses so they sound natural to real speakers, not textbook-perfect.',
   },
   {
-    value: '2,000+',
-    label: 'living languages are spoken across Africa — nearly none meaningfully represented in major AI models.',
+    title: 'Audio & transcription',
+    body: 'Record prompts and transcribe speech to help models understand accents and dialects across the continent.',
   },
   {
-    value: '×6',
-    label: 'unrelated meanings a single Yoruba word can carry once its diacritics are stripped away.',
+    title: 'Writing & prompts',
+    body: 'Create authentic questions, answers, and conversations in your language that teach models how people actually talk.',
+  },
+  {
+    title: 'Evaluation & review',
+    body: 'Rate and correct AI output for accuracy, tone, and cultural fit — the judgment only a native speaker can give.',
   },
 ]
 
 export function Problem() {
   return (
-    <section id="problem" className="relative bg-background py-24 md:py-36">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        {/* Chapter header */}
-        <div className="grid gap-10 border-b border-border pb-14 md:grid-cols-12 md:gap-8">
-          <Reveal className="md:col-span-3">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">01 — The problem</p>
-          </Reveal>
-          <Reveal delay={120} className="md:col-span-9">
-            <h2 className="max-w-[20ch] text-balance font-serif text-[clamp(2rem,5.2vw,3.75rem)] font-light leading-[1.04] tracking-tight text-foreground">
-              Africa&apos;s languages and land are still{' '}
-              <span className="italic text-accent">invisible</span> to the AI shaping the next decade.
+    <section id="work" className="py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="text-sm font-semibold uppercase tracking-eyebrow text-accent">
+              What you do
+            </p>
+            <h2 className="mt-3 text-balance text-3xl font-semibold tracking-display sm:text-4xl">
+              Meaningful language work — not busywork.
             </h2>
-          </Reveal>
-        </div>
+            <p className="mt-5 max-w-md text-pretty leading-relaxed text-muted-foreground">
+              Every task you complete directly shapes how AI understands African
+              languages and cultures. You choose the work that fits your skills.
+            </p>
+          </div>
 
-        {/* Data rows */}
-        <div className="mt-4">
-          {stats.map((stat, i) => (
-            <Reveal key={stat.value} delay={i * 120}>
-              <div className="grid grid-cols-1 items-start gap-4 border-b border-border py-10 md:grid-cols-12 md:gap-8 md:py-12">
-                <span className="font-mono text-xs tracking-[0.2em] text-muted-foreground md:col-span-1 md:pt-4">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="font-serif text-6xl font-light leading-none tracking-tight text-foreground md:col-span-4 md:text-7xl">
-                  {stat.value}
-                </span>
-                <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground md:col-span-7 md:pt-3">
-                  {stat.label}
-                </p>
-              </div>
-            </Reveal>
-          ))}
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2">
+            {tasks.map((task, i) => (
+              <Reveal key={task.title} delay={i * 70} className="bg-card">
+                <div className="flex h-full flex-col p-7">
+                  <h3 className="text-lg font-semibold tracking-display">{task.title}</h3>
+                  <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
+                    {task.body}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>

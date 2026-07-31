@@ -1,87 +1,53 @@
 import { Reveal } from './reveal'
 
-const arms = [
+const benefits = [
   {
-    index: 'A',
-    tag: 'Data arm',
-    name: 'Oreset Origin',
-    description:
-      'A distributed network of local collectors originates fresh African data — language, speech, and agricultural imagery — consented and licensed from the moment it is captured.',
-    points: [
-      'Collect-to-order delivery',
-      'Consent built into every submission',
-      'For AI labs, research teams, and agri-AI companies',
-    ],
+    title: 'Fair, transparent pay',
+    body: 'Clear rates before you start a task and reliable payouts in a method that works for you. You always know what you will earn.',
   },
   {
-    index: 'B',
-    tag: 'Talent arm',
-    name: 'Oreset Operators',
-    description:
-      'Certified, native-language-fluent professionals review and correct AI output — catching what is culturally or linguistically wrong before it ever reaches real users.',
-    points: [
-      'Ongoing QA for live AI products',
-      'AI drafts, but human judgment is final',
-      'For companies whose AI already serves African markets',
-    ],
+    title: 'Work on your terms',
+    body: 'No shifts, no quotas. Contribute for ten minutes or ten hours — from your phone or laptop, wherever you are.',
+  },
+  {
+    title: 'Your language, respected',
+    body: 'Your fluency is the expertise. We treat contributors as specialists, not anonymous crowd labor.',
+  },
+  {
+    title: 'Grow with the network',
+    body: 'Build a track record, unlock higher-value work, and take on review and mentoring roles as you go.',
   },
 ]
 
 export function WhatWeBuild() {
   return (
-    <section id="build" className="relative bg-ink py-24 text-ink-foreground md:py-36">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        {/* Chapter header */}
-        <div className="grid gap-10 border-b border-ink-border pb-14 md:grid-cols-12 md:gap-8">
-          <Reveal className="md:col-span-3">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">02 — The network</p>
-          </Reveal>
-          <Reveal delay={120} className="md:col-span-9">
-            <h2 className="max-w-[18ch] text-balance font-serif text-[clamp(2rem,5.2vw,3.75rem)] font-light leading-[1.04] tracking-tight">
-              Two arms, drawing from <span className="italic text-accent">one</span> network.
-            </h2>
-          </Reveal>
+    <section id="why" className="bg-primary py-20 text-primary-foreground md:py-28">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold uppercase tracking-eyebrow text-accent">
+            Why Oreset
+          </p>
+          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-display sm:text-4xl">
+            Built to respect the people behind the data.
+          </h2>
+          <p className="mt-5 text-pretty leading-relaxed text-primary-foreground/70">
+            Most language data is scraped without consent or credit. Oreset is the
+            opposite: real people, fairly paid, doing work they can be proud of.
+          </p>
         </div>
 
-        {/* Arms */}
-        <div>
-          {arms.map((arm, i) => (
-            <Reveal key={arm.name} delay={i * 140}>
-              <article className="grid grid-cols-1 gap-8 border-b border-ink-border py-12 md:grid-cols-12 md:py-16">
-                <div className="flex items-baseline gap-4 md:col-span-4">
-                  <span className="font-serif text-5xl font-light leading-none text-ink-border md:text-6xl">
-                    {arm.index}
-                  </span>
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">{arm.tag}</p>
-                    <h3 className="mt-2 font-serif text-3xl font-light tracking-tight md:text-4xl">{arm.name}</h3>
-                  </div>
-                </div>
-
-                <p className="text-pretty text-lg leading-relaxed text-ink-foreground/70 md:col-span-5">
-                  {arm.description}
+        <div className="mt-14 grid gap-x-12 gap-y-10 sm:grid-cols-2">
+          {benefits.map((benefit, i) => (
+            <Reveal key={benefit.title} delay={i * 80}>
+              <div className="border-t border-white/15 pt-6">
+                <h3 className="text-xl font-semibold tracking-display">{benefit.title}</h3>
+                <p className="mt-3 text-pretty leading-relaxed text-primary-foreground/70">
+                  {benefit.body}
                 </p>
-
-                <ul className="flex flex-col gap-3 md:col-span-3">
-                  {arm.points.map((point) => (
-                    <li key={point} className="flex items-start gap-3 border-t border-ink-border pt-3 first:border-t-0 first:pt-0 md:border-t md:pt-3 md:first:border-t">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-                      <span className="text-sm leading-relaxed text-ink-foreground/85">{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
+              </div>
             </Reveal>
           ))}
         </div>
-
-        {/* Converging statement */}
-        <Reveal delay={120}>
-          <p className="mt-16 max-w-4xl text-balance font-serif text-2xl font-light leading-snug tracking-tight md:text-4xl">
-            The same network — verified and trusted —{' '}
-            <span className="italic text-accent">feeds both</span>.
-          </p>
-        </Reveal>
       </div>
     </section>
   )

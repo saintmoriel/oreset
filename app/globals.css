@@ -28,46 +28,55 @@
   --color-ink-foreground: var(--ink-foreground);
   --color-ink-muted: var(--ink-muted);
   --color-ink-border: var(--ink-border);
-  --color-paper: var(--paper);
 
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-xl: calc(var(--radius) + 4px);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
-  --font-mono: var(--font-mono), ui-monospace, 'SFMono-Regular', monospace;
+
+  --breakpoint-2xl: 88rem;
 }
 
 :root {
   color-scheme: light;
-  --background: #f3ede2;
-  --foreground: #17253c;
-  --card: #ece4d6;
-  --card-foreground: #17253c;
-  --popover: #f3ede2;
-  --popover-foreground: #17253c;
-  --primary: #17253c;
-  --primary-foreground: #f3ede2;
-  --secondary: #e6ddcd;
-  --secondary-foreground: #17253c;
-  --muted: #e6ddcd;
-  --muted-foreground: #736b5b;
-  --accent: #c56a32;
-  --accent-foreground: #f8f4ec;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: #d8cdb9;
-  --input: #d8cdb9;
-  --ring: #c56a32;
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 
-  /* Deep ink navy used for dark editorial sections */
+  /* Clean, warm near-white paper */
+  --background: #ffffff;
+  --foreground: #16213a;
+
+  /* Slightly recessed surface for alternating sections */
+  --secondary: #f6f5f2;
+  --secondary-foreground: #16213a;
+
+  --card: #ffffff;
+  --card-foreground: #16213a;
+  --popover: #ffffff;
+  --popover-foreground: #16213a;
+
+  --muted: #f6f5f2;
+  --muted-foreground: #5c6472;
+
+  /* Deep navy — primary brand ink and buttons */
+  --primary: #16213a;
+  --primary-foreground: #ffffff;
+
+  /* Burnt copper — accent, used sparingly */
+  --accent: #c56a32;
+  --accent-foreground: #ffffff;
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #e7e5e0;
+  --input: #e7e5e0;
+  --ring: #c56a32;
+
+  /* Deep ink navy for dark contrast sections */
   --ink: #12203a;
-  --ink-foreground: #f3ede2;
+  --ink-foreground: #f4f6fa;
   --ink-muted: #9aa4b6;
-  --ink-border: rgba(243, 237, 226, 0.14);
-  --paper: #f3ede2;
+  --ink-border: rgba(244, 246, 250, 0.14);
 }
 
 @layer base {
@@ -76,7 +85,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   ::selection {
     background-color: var(--accent);
@@ -85,75 +96,25 @@
 }
 
 @layer utilities {
-  /* Reveal: fade + rise with a soft blur clear */
+  .tracking-display {
+    letter-spacing: -0.025em;
+  }
+  .tracking-eyebrow {
+    letter-spacing: 0.14em;
+  }
+
+  /* Scroll reveal */
   .reveal {
     opacity: 0;
-    transform: translateY(28px);
-    filter: blur(6px);
+    transform: translateY(16px);
     transition:
-      opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-      filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: var(--reveal-delay, 0ms);
   }
   .reveal.is-visible {
     opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-
-  /* Hero intro (runs on load, no observer) */
-  @keyframes oreset-rise {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-      filter: blur(6px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-      filter: blur(0);
-    }
-  }
-  .intro {
-    opacity: 0;
-    animation: oreset-rise 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  /* Ambient logo drift */
-  @keyframes oreset-drift {
-    0% {
-      transform: translate(0, 0) rotate(0deg);
-    }
-    50% {
-      transform: translate(-1.2%, 1.8%) rotate(3deg);
-    }
-    100% {
-      transform: translate(0, 0) rotate(0deg);
-    }
-  }
-  .drift {
-    animation: oreset-drift 24s ease-in-out infinite;
-  }
-
-  /* Language marquee */
-  @keyframes oreset-marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-  .marquee-track {
-    animation: oreset-marquee 48s linear infinite;
-  }
-  .marquee-track:hover {
-    animation-play-state: paused;
-  }
-
-  .hairline {
-    background-color: var(--border);
+    transform: none;
   }
 }
 
@@ -162,18 +123,9 @@
   .reveal.is-visible {
     opacity: 1 !important;
     transform: none !important;
-    filter: none !important;
     transition: none !important;
   }
-  .intro {
-    opacity: 1 !important;
-    animation: none !important;
-  }
-  .drift,
-  .marquee-track {
-    animation: none !important;
-  }
-  * {
+  html {
     scroll-behavior: auto !important;
   }
 }

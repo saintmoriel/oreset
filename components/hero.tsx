@@ -1,110 +1,87 @@
 import Image from 'next/image'
 
-const specs = [
-  { k: 'Data arm', v: 'Oreset Origin' },
-  { k: 'Talent arm', v: 'Oreset Operators' },
-  { k: 'Coverage', v: '2,000+ languages' },
-]
-
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden bg-ink text-ink-foreground">
-      {/* Right specimen panel (paper) — deliberate two-tone split */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-0 z-10 hidden h-full w-[38%] flex-col justify-center bg-paper md:flex lg:w-[40%]"
-      >
-        <div className="drift flex justify-center">
-          <Image
-            src="/oreset-logo.png"
-            alt=""
-            width={640}
-            height={640}
-            priority
-            className="h-[300px] w-[300px] lg:h-[380px] lg:w-[380px]"
-          />
-        </div>
-        <p className="absolute bottom-6 left-8 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
-          Fig. 001 — The Oreset mark
-        </p>
-      </div>
+    <section id="top" className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Copy */}
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
+              <span className="size-1.5 rounded-full bg-accent" />
+              Now onboarding across 20+ African languages
+            </span>
 
-      {/* Content column */}
-      <div className="relative z-20 mx-auto max-w-7xl px-5 pb-10 pt-28 md:px-8 md:pt-32">
-        <div className="md:pr-[42%] lg:pr-[44%]">
-          {/* Top metadata line */}
-          <div
-            className="intro flex items-center justify-between gap-4 border-b border-ink-border pb-5 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-ink-muted"
-            style={{ animationDelay: '80ms' }}
-          >
-            <span>Origination network</span>
-            <span>Index / 001</span>
-          </div>
-
-          {/* Headline block */}
-          <div className="flex min-h-[calc(100svh-14rem)] flex-col justify-center py-14">
-            <p
-              className="intro mb-8 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] text-accent"
-              style={{ animationDelay: '200ms' }}
-            >
-              <span className="h-px w-8 bg-accent" aria-hidden="true" />
-              African AI infrastructure
-            </p>
-
-            <h1 className="text-balance font-serif text-[clamp(2.5rem,6.5vw,5.5rem)] font-light leading-[0.96] tracking-tight">
-              <span className="intro block" style={{ animationDelay: '280ms' }}>
-                The raw material
-              </span>
-              <span className="intro block" style={{ animationDelay: '400ms' }}>
-                for African AI —
-              </span>
-              <span className="intro block italic text-accent" style={{ animationDelay: '520ms' }}>
-                originated, not scraped.
-              </span>
+            <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-display sm:text-5xl md:text-6xl">
+              Get paid for your language. Help build African AI.
             </h1>
 
-            <p
-              className="intro mt-9 max-w-xl text-pretty text-lg leading-relaxed text-ink-foreground/70"
-              style={{ animationDelay: '660ms' }}
-            >
-              We source consented African data and certify native-language operators who build, verify, and localize
-              AI systems for the continent — one trusted origination engine feeding both.
+            <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
+              Oreset is the network where African language experts contribute the data
+              and evaluations that train and improve AI. Work in your own language, on
+              your own schedule, and get paid fairly for it.
             </p>
 
-            <div
-              className="intro mt-11 flex flex-col gap-3 sm:flex-row sm:items-center"
-              style={{ animationDelay: '800ms' }}
-            >
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                href="#contact"
-                className="inline-flex items-center justify-center rounded-full bg-accent px-7 py-3.5 text-base font-medium text-accent-foreground transition-opacity hover:opacity-90"
+                href="#apply"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:-translate-y-0.5"
               >
-                Get in touch
+                Apply to join
               </a>
               <a
-                href="#build"
-                className="inline-flex items-center justify-center rounded-full border border-ink-border px-7 py-3.5 text-base font-medium text-ink-foreground transition-colors hover:border-ink-foreground/60"
+                href="#how-it-works"
+                className="inline-flex items-center justify-center rounded-lg border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
               >
-                Explore the network
+                See how it works
               </a>
             </div>
+
+            <p className="mt-6 text-sm text-muted-foreground">
+              Free to join. No experience required beyond fluency in your language.
+            </p>
           </div>
 
-          {/* Bottom spec row */}
-          <dl
-            className="intro grid grid-cols-1 gap-px border-t border-ink-border sm:grid-cols-3"
-            style={{ animationDelay: '920ms' }}
-          >
-            {specs.map((spec) => (
-              <div
-                key={spec.k}
-                className="flex items-baseline justify-between gap-4 py-5 sm:flex-col sm:items-start sm:gap-2 sm:pr-6"
-              >
-                <dt className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-ink-muted">{spec.k}</dt>
-                <dd className="font-serif text-lg tracking-tight text-ink-foreground md:text-xl">{spec.v}</dd>
+          {/* Visual */}
+          <div className="relative">
+            <div className="relative mx-auto aspect-square w-full max-w-md rounded-2xl border border-border bg-secondary p-8">
+              <div className="flex h-full flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <div className="flex size-14 items-center justify-center overflow-hidden rounded-xl bg-[#f4efe6]">
+                    <Image
+                      src="/oreset-logo.png"
+                      alt="Oreset"
+                      width={56}
+                      height={56}
+                      className="size-14"
+                      priority
+                    />
+                  </div>
+                  <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
+                    Contributor
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-border bg-card p-4">
+                    <p className="text-xs font-medium text-muted-foreground">This week</p>
+                    <p className="mt-1 text-2xl font-semibold tracking-display">142 tasks</p>
+                    <p className="text-xs text-muted-foreground">Yoruba · translation & review</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-border bg-card p-4">
+                      <p className="text-xs font-medium text-muted-foreground">Quality</p>
+                      <p className="mt-1 text-xl font-semibold tracking-display">98%</p>
+                    </div>
+                    <div className="rounded-xl border border-border bg-card p-4">
+                      <p className="text-xs font-medium text-muted-foreground">Payout</p>
+                      <p className="mt-1 text-xl font-semibold tracking-display">On time</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ))}
-          </dl>
+            </div>
+          </div>
         </div>
       </div>
     </section>
