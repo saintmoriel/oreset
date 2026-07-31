@@ -1,6 +1,6 @@
 'use client'
 
-import type { ElementType, ReactNode } from 'react'
+import type { CSSProperties, ElementType, ReactNode } from 'react'
 import { useReveal } from './use-reveal'
 import { cn } from '@/lib/utils'
 
@@ -18,7 +18,7 @@ export function Reveal({ children, className, delay = 0, as: Tag = 'div' }: Reve
     <Tag
       ref={ref}
       className={cn('reveal', isVisible && 'is-visible', className)}
-      style={{ animationDelay: `${delay}ms` }}
+      style={{ '--reveal-delay': `${delay}ms` } as CSSProperties}
     >
       {children}
     </Tag>
