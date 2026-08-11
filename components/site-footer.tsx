@@ -8,7 +8,7 @@ const columns = [
     title: 'Origin',
     links: [
       { label: 'Overview', href: '#arms' },
-      { label: '10-stage pipeline', href: '#origin' },
+      { label: 'Origin pipeline', href: '#origin' },
       { label: 'Commission data', href: '#contact' },
     ],
   },
@@ -17,7 +17,6 @@ const columns = [
     links: [
       { label: 'Overview', href: '#arms' },
       { label: '6-stage lifecycle', href: '#operators' },
-      { label: 'Foundry curriculum', href: '#foundry' },
       { label: 'Hire operators', href: '#contact' },
     ],
   },
@@ -72,10 +71,10 @@ export function SiteFooter() {
               Abuja, Nigeria
             </p>
             <a
-              href="mailto:hello@oreset.com"
+              href="mailto:hello@oreset.africa"
               className="mt-4 inline-block text-body-sm text-ink-muted transition-colors hover:text-copper-300"
             >
-              hello@oreset.com
+              hello@oreset.africa
             </a>
           </div>
 
@@ -100,9 +99,6 @@ export function SiteFooter() {
         <div className="flex flex-col gap-3 border-t border-ink-border py-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-caption uppercase tracking-wider text-ink-muted">
             © {new Date().getFullYear()} Oreset Africa Hub. All rights reserved.
-          </p>
-          <p className="text-caption text-ink-muted">
-            CAC-registered · iDICE Founders Lab Stage 2
           </p>
         </div>
       </div>

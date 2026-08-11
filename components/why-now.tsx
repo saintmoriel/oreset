@@ -34,7 +34,7 @@ export function WhyNow() {
                   At the same time, enterprises shipping AI products into African markets need
                   ongoing native-language QA they can trust, not anonymous gig queues. Oreset
                   treats both sides as one network: raw field data refined through a provenance
-                  pipeline, and raw fluency refined through Foundry certification, under a Shared
+                  pipeline, and raw fluency refined through certification, under a Shared
                   Trust Ledger that makes reliability visible before stakes rise.
                 </p>
                 <div className="border-l-2 border-accent pl-5">
@@ -43,12 +43,6 @@ export function WhyNow() {
                     text="Ore: raw material. Reset: how African AI gets its data and its people."
                   />
                 </div>
-                <p className="text-body-sm text-muted-foreground">
-                  Oreset Africa Hub is CAC-registered in Abuja, Nigeria, building partner
-                  conversations before scale. Selected for Stage 2 of the iDICE Founders Lab.
-                  The work ahead is rigor first: pipelines you can inspect, not metrics you have
-                  to take on faith.
-                </p>
               </div>
             </MotionReveal>
           </div>

@@ -77,13 +77,13 @@ export default function OperatorsJoinPage() {
               Apply to the native language operator cohort.
             </h1>
             <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-              We are accepting applications from African native speakers for Foundry
-              training, certification, and placement on AI review and QA workflows.
+              We are accepting applications from African native speakers for training,
+              certification, and placement on AI review and QA workflows.
             </p>
             <ul className="mt-8 space-y-3 text-body-sm text-muted-foreground">
               {[
                 'Native fluency with dialect baselines',
-                'Foundry curriculum and timed certification',
+                'Training and timed certification',
                 'Paid placement on enterprise review benches',
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">

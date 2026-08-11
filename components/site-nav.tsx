@@ -52,9 +52,9 @@ const navItems: NavItem[] = [
     href: '#origin',
     children: [
       {
-        label: '10-stage Origin lifecycle',
+        label: 'Origin pipeline',
         href: '#origin',
-        hint: 'Intake through Handoff',
+        hint: 'Field capture to delivery',
       },
       {
         label: 'Shared Trust Ledger',
@@ -84,7 +84,7 @@ const navItems: NavItem[] = [
       {
         label: 'About Oreset',
         href: '#about',
-        hint: 'Thesis, Abuja roots, stage',
+        hint: 'Thesis and approach',
       },
       {
         label: 'FAQ',

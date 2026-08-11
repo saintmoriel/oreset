@@ -20,7 +20,7 @@ const faqs = [
   {
     audience: 'Buyers',
     q: 'How are operators certified?',
-    a: 'Operators move through Scout → Foundry → Certify before joining the Bench. Foundry covers dialect baselines, error taxonomy (ERR-01-04), calibration scoring, and timed sprints. Higher-stakes placement requires earned reliability scorecards.',
+    a: 'Operators move through Scout → Foundry → Certify before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes placement requires earned reliability scorecards.',
   },
   {
     audience: 'Contributors',
@@ -35,7 +35,7 @@ const faqs = [
   {
     audience: 'Everyone',
     q: 'Where is Oreset based?',
-    a: 'Oreset Africa Hub is CAC-registered in Abuja, Nigeria. The network is designed for distributed field collection and operator placement across African language communities.',
+    a: 'Oreset Africa Hub is based in Abuja, Nigeria. The network is designed for distributed field collection and operator placement across African language communities.',
   },
 ]
 

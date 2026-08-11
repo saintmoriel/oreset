@@ -3,26 +3,17 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { MotionReveal, MotionStagger, MotionStaggerItem } from './motion-reveal'
+import { MotionReveal } from './motion-reveal'
 import { SiteImage } from './site-image'
 
 export const OPERATOR_STAGES = [
   { name: 'Scout', detail: 'Source native-language professionals with dialect and domain baselines.' },
-  { name: 'Foundry', detail: 'Train through the Foundry curriculum: fluency, taxonomy, live sprints.' },
+  { name: 'Foundry', detail: 'Train on fluency baselines, error taxonomy, and live evaluation sprints.' },
   { name: 'Certify', detail: 'Timed evaluation with calibration thresholds before badge issuance.' },
   { name: 'Bench', detail: 'Certified operators wait on an availability bench by language and domain.' },
   { name: 'Match', detail: 'Pair operators to enterprise accounts by shift, language, and specialty.' },
   { name: 'Oversight', detail: 'Ongoing telemetry, escalation queues, and account management.' },
 ] as const
-
-const foundryModules = [
-  { n: '01', title: 'Language & dialect baseline', detail: 'Fluency capture across regional variants.' },
-  { n: '02', title: 'AI product literacy', detail: 'How live model outputs fail in practice.' },
-  { n: '03', title: 'Error taxonomy', detail: 'ERR-01 Factual through ERR-04 Domain.' },
-  { n: '04', title: 'Calibration scoring', detail: '5-point scale with explicit pass thresholds.' },
-  { n: '05', title: 'Domain specialization', detail: 'Banking, agri, healthcare, and more.' },
-  { n: '06', title: 'Timed sprint practice', detail: 'Unassisted prompt-response evaluations.' },
-]
 
 export function OperatorsDeepDive() {
   const [active, setActive] = useState(0)
@@ -84,25 +75,6 @@ export function OperatorsDeepDive() {
                 </p>
               </motion.div>
             </MotionReveal>
-
-            <div id="foundry" className="mt-12">
-              <MotionReveal>
-                <p className="text-eyebrow text-accent">Foundry curriculum</p>
-                <h3 className="text-h2 mt-3 text-foreground">Six modules before the bench.</h3>
-              </MotionReveal>
-
-              <MotionStagger className="mt-6 grid gap-3 sm:grid-cols-2" stagger={0.05}>
-                {foundryModules.map((mod) => (
-                  <MotionStaggerItem key={mod.n}>
-                    <div className="rounded-xl border border-border/70 bg-card p-4">
-                      <span className="font-mono text-[10px] font-semibold text-accent">{mod.n}</span>
-                      <p className="mt-1 text-body-sm font-semibold text-foreground">{mod.title}</p>
-                      <p className="mt-1 text-caption text-muted-foreground">{mod.detail}</p>
-                    </div>
-                  </MotionStaggerItem>
-                ))}
-              </MotionStagger>
-            </div>
           </div>
 
           <div className="order-1 lg:order-2 lg:col-span-5">
@@ -122,8 +94,8 @@ export function OperatorsDeepDive() {
                 <div className="photo-brand photo-brand-soft relative aspect-[4/3] overflow-hidden">
                   <SiteImage
                     data-scroll-media
-                    src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80"
-                    alt="Professionals at a review workstation, illustrative of Foundry and QA contexts"
+                    src="https://images.unsplash.com/photo-1612299273045-362a39972259?auto=format&fit=crop&w=1200&q=80"
+                    alt="Black professional working on a laptop, illustrative of operator review work"
                     fill
                     sizes="(max-width: 1024px) 100vw, 40vw"
                     className="will-change-transform"
@@ -131,7 +103,7 @@ export function OperatorsDeepDive() {
                 </div>
                 <figcaption className="flex items-center gap-2 border-t border-border/60 px-4 py-3 text-caption text-muted-foreground">
                   <span className="motif-dot" aria-hidden="true" />
-                  Foundry training & review workstations
+                  Native-language review at the workstation
                 </figcaption>
               </figure>
             </MotionReveal>

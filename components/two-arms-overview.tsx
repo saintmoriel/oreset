@@ -10,12 +10,12 @@ const arms = [
     href: '#origin',
     label: 'Oreset Origin',
     arm: 'Data arm',
-    stages: '10-stage pipeline',
+    stages: 'Field-to-delivery pipeline',
     summary:
       'Local collectors originate fresh African speech, language, and agri imagery, with consent and licensing built in from capture.',
     image:
-      'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'Hands working soil in an agricultural field, illustrative of Origin capture contexts',
+      'https://images.unsplash.com/photo-1602788526767-f09470bb8e0b?auto=format&fit=crop&w=1200&q=80',
+    imageAlt: 'African collectors in a maize field capturing crop imagery on a smartphone',
   },
   {
     id: 'operators-card',
@@ -26,8 +26,8 @@ const arms = [
     summary:
       'Native-language professionals trained and certified for AI-assisted review, correction, and ongoing product QA.',
     image:
-      'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'Team collaborating at workstations, illustrative of operator review work',
+      'https://images.unsplash.com/photo-1612299273045-362a39972259?auto=format&fit=crop&w=1200&q=80',
+    imageAlt: 'Black professional working on a laptop for operator review work',
   },
 ]
 

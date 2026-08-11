@@ -116,7 +116,7 @@ const originSubsections = [
 const operatorSubsections = [
   {
     title: '3.1 & 3.2 LMS, Training & Certification Engine',
-    description: 'Rigorous vetting, 6-module curriculum, and timed evaluation workbench.',
+    description: 'Rigorous vetting, training modules, and timed evaluation workbench.',
     image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
     imageAlt: 'Certified African AI operator training and evaluation',
     cards: [
@@ -124,7 +124,7 @@ const operatorSubsections = [
         icon: GraduationCap,
         name: 'Talent Onboarding & LMS',
         details:
-          'Captures regional language fluency baselines (e.g., Yoruba Native, Hausa Level 4), regional dialect variations, and operational English proficiency. Features a 6-module curriculum player with native-language audio walkthroughs and downloadable job aids.',
+          'Captures regional language fluency baselines (e.g., Yoruba Native, Hausa Level 4), regional dialect variations, and operational English proficiency. Features a training module player with native-language audio walkthroughs and downloadable job aids.',
       },
       {
         icon: Clock,
