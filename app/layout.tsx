@@ -22,10 +22,9 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Oreset — A Data-and-Talent Origination Network for African AI',
+  title: 'Oreset | High-Fidelity Field Data Origination for African AI Models',
   description:
-    'Source consented African data and connect with certified native-language AI operators to build, verify, and localize African AI systems.',
-  generator: 'v0.app',
+    'Collect-to-Order speech, image, and text origination across Africa with opt-in consent, on-device quality checks, and certified native operator workflows.',
 }
 
 export const viewport: Viewport = {
@@ -50,4 +49,3 @@ export default function RootLayout({
     </html>
   )
 }
-

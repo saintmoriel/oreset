@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
-import { useInView, animate } from 'framer-motion'
+import { useInView, animate, useReducedMotion } from 'framer-motion'
 
 interface AnimatedCounterProps {
   target: number
@@ -19,32 +19,37 @@ export function AnimatedCounter({
   className,
 }: AnimatedCounterProps) {
   const ref = useRef<HTMLSpanElement>(null)
+  const reduceMotion = useReducedMotion()
   const isInView = useInView(ref, { once: true, margin: '0px 0px -10% 0px' })
-  const [display, setDisplay] = useState('0')
+  const [display, setDisplay] = useState(() =>
+    reduceMotion ? formatNumber(target) : '0',
+  )
 
   useEffect(() => {
+    if (reduceMotion) {
+      setDisplay(formatNumber(target))
+      return
+    }
     if (!isInView) return
 
     const controls = animate(0, target, {
       duration,
       ease: [0.22, 1, 0.36, 1],
-      onUpdate: (v) => {
-        if (target >= 1_000_000) {
-          setDisplay(`${(v / 1_000_000).toFixed(v >= target * 0.95 ? 0 : 1)}`)
-        } else if (target >= 1000) {
-          setDisplay(Math.round(v).toLocaleString())
-        } else {
-          setDisplay(Math.round(v).toString())
-        }
-      },
+      onUpdate: (v) => setDisplay(formatNumber(Math.round(v))),
     })
 
     return () => controls.stop()
-  }, [isInView, target, duration])
+  }, [isInView, target, duration, reduceMotion])
 
   return (
     <span ref={ref} className={className}>
-      {prefix}{display}{suffix}
+      {prefix}
+      {display}
+      {suffix}
     </span>
   )
+}
+
+function formatNumber(n: number) {
+  return n.toLocaleString('en-US')
 }

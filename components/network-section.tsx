@@ -178,7 +178,7 @@ const tabs = [
   {
     id: 'origin',
     label: 'Oreset Origin',
-    eyebrow: 'Data Arm — 10-Stage Lifecycle',
+    eyebrow: 'Data Arm, 10-Stage Lifecycle',
     icon: Database,
     description:
       'The Origin web portal operationalizes the complete 10-stage data origination lifecycle: Scoping, Task Design, Pool Activation, Data Collection, Automated Validation, Quality Review, Contributor Payment, Aggregation, Consent & Licensing, and Delivery.',
@@ -188,10 +188,10 @@ const tabs = [
   {
     id: 'operators',
     label: 'Oreset Operators',
-    eyebrow: 'Talent Arm — 6-Stage Lifecycle',
+    eyebrow: 'Talent Arm, 6-Stage Lifecycle',
     icon: Users,
     description:
-      'The Operators web portal operationalizes the 6-stage talent lifecycle: Sourcing, Training, Certification, Bench, Placement, and Account Management — providing enterprise-grade native AI evaluation.',
+      'The Operators web portal operationalizes the 6-stage talent lifecycle: Sourcing, Training, Certification, Bench, Placement, and Account Management, providing enterprise-grade native AI evaluation.',
     lifecycle: operatorLifecycle,
     subsections: operatorSubsections,
   },

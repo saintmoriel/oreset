@@ -1,124 +1,269 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { AnnouncementBar } from './announcement-bar'
+import { openPilotModal } from './pilot-scoping-modal'
 
-const links = [
-  { label: 'Origin', href: '#origin' },
-  { label: 'Operators', href: '#operators' },
-  { label: 'About', href: '#about' },
+type NavChild = { label: string; href: string; hint: string; action?: 'pilot' }
+
+type NavItem =
+  | { label: string; href: string }
+  | {
+      label: string
+      href: string
+      children: NavChild[]
+    }
+
+const navItems: NavItem[] = [
+  {
+    label: 'Solutions',
+    href: '#arms',
+    children: [
+      {
+        label: 'Speech & ASR origination',
+        href: '#origin',
+        hint: 'Collect-to-Order voice corpora',
+      },
+      {
+        label: 'Agri image capture',
+        href: '#origin',
+        hint: 'Field imagery with consent locks',
+      },
+      {
+        label: 'Language text datasets',
+        href: '#origin',
+        hint: 'Dialect-aware text & annotation',
+      },
+      {
+        label: 'Pilot batches',
+        href: '#contact',
+        hint: 'Scoped deliverables for labs',
+        action: 'pilot',
+      },
+    ],
+  },
+  {
+    label: 'Platform',
+    href: '#origin',
+    children: [
+      {
+        label: '10-stage Origin lifecycle',
+        href: '#origin',
+        hint: 'Intake through Handoff',
+      },
+      {
+        label: 'Shared Trust Ledger',
+        href: '#trust',
+        hint: 'Consent, scorecards, wage floor',
+      },
+      {
+        label: 'Capture gatekeeping',
+        href: '#trust',
+        hint: '4-tier error taxonomy',
+      },
+      {
+        label: 'Provenance & licensing',
+        href: '#trust',
+        hint: 'Audit-ready delivery packages',
+      },
+    ],
+  },
+  {
+    label: 'Talent Network',
+    href: '#operators',
+  },
+  {
+    label: 'Company',
+    href: '#about',
+    children: [
+      {
+        label: 'About Oreset',
+        href: '#about',
+        hint: 'Thesis, Abuja roots, stage',
+      },
+      {
+        label: 'FAQ',
+        href: '#faq',
+        hint: 'Straight answers for buyers',
+      },
+      {
+        label: 'Operator applications',
+        href: '/operators/join',
+        hint: 'African cohorts',
+      },
+      {
+        label: 'Contact',
+        href: '#contact',
+        hint: 'Partnership inquiries',
+      },
+    ],
+  },
 ]
 
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const [mobileExpand, setMobileExpand] = useState<string | null>(null)
+  const reduceMotion = useReducedMotion()
+  const navRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
+    const onScroll = () => setScrolled(window.scrollY > 24)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  return (
-    <div className="fixed inset-x-0 top-0 z-50 pointer-events-none">
-      {/* ── Announcement Banner ── */}
-      <AnimatePresence>
-        {!scrolled && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="pointer-events-auto overflow-hidden bg-ink/90 backdrop-blur-md text-ink-foreground"
-          >
-            <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-6 py-2">
-              <span className="size-1.5 rounded-full bg-accent" />
-              <a
-                href="#contact"
-                className="text-xs font-medium tracking-wide transition-colors hover:text-accent sm:text-sm"
-              >
-                Oreset is now accepting operator applications
-                <span className="ml-1.5 inline-block transition-transform hover:translate-x-0.5">→</span>
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    window.dispatchEvent(
+      new CustomEvent(mobileOpen ? 'oreset:scroll-stop' : 'oreset:scroll-start'),
+    )
+    return () => {
+      document.body.style.overflow = ''
+      window.dispatchEvent(new CustomEvent('oreset:scroll-start'))
+    }
+  }, [mobileOpen])
 
-      {/* ── Main Nav ── */}
-      <header
+  useEffect(() => {
+    function onPointerDown(e: PointerEvent) {
+      if (!navRef.current?.contains(e.target as Node)) setOpenMenu(null)
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setOpenMenu(null)
+        setMobileOpen(false)
+      }
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [])
+
+  const onDark = !scrolled && !mobileOpen
+
+  function handleChildClick(child: NavChild, close: () => void) {
+    close()
+    setMobileOpen(false)
+    if (child.action === 'pilot') {
+      openPilotModal()
+    }
+  }
+
+  return (
+    <header className="fixed inset-x-0 top-0 z-50">
+      <AnnouncementBar />
+      <div
         className={cn(
-          'pointer-events-auto transition-all duration-300',
-          scrolled
-            ? 'border-b border-border/50 bg-background/80 backdrop-blur-md shadow-xs'
+          'transition-[background,box-shadow,border-color,backdrop-filter] duration-300',
+          scrolled || mobileOpen
+            ? 'border-b border-border/70 bg-background/90 shadow-[0_1px_0_rgba(22,33,58,0.04)] backdrop-blur-xl'
             : 'border-b border-transparent bg-transparent',
         )}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:h-[4.5rem]">
-          <motion.a
-            href="#top"
-            className="flex items-center gap-2.5"
-            aria-label="Oreset home"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <span className="flex size-9 items-center justify-center overflow-hidden rounded-lg bg-[#f4efe6]">
+        <div
+          ref={navRef}
+          className="container-wide flex h-16 items-center justify-between md:h-[4.25rem]"
+        >
+          <a href="#top" className="flex items-center gap-2.5 rounded-md" aria-label="Oreset home">
+            <span
+              className={cn(
+                'flex size-8 items-center justify-center overflow-hidden rounded-md sm:size-9 sm:rounded-lg',
+                onDark ? 'bg-white/10 ring-1 ring-white/20' : 'bg-paper-200',
+              )}
+            >
               <Image
                 src="/oreset-logo.png"
                 alt=""
                 width={36}
                 height={36}
-                className="size-9"
-                loading='eager'
+                className={cn('size-8 sm:size-9', onDark && 'brightness-200')}
                 priority
               />
             </span>
-            <span className="text-lg font-semibold tracking-display">Oreset</span>
-          </motion.a>
-
-          <motion.nav
-            className="hidden items-center gap-10 md:flex"
-            aria-label="Primary"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            {links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </a>
-            ))}
-          </motion.nav>
-
-          <motion.div
-            className="flex items-center gap-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <a
-              href="#contact"
-              className="hidden rounded-full border border-foreground/20 bg-transparent px-6 py-2 text-sm font-semibold text-foreground transition-all duration-200 hover:border-foreground/40 hover:bg-foreground hover:text-background sm:block"
+            <span
+              className={cn(
+                'font-display text-lg font-semibold tracking-display transition-colors',
+                onDark ? 'text-white' : 'text-foreground',
+              )}
             >
-              Contact Us
-            </a>
-            {/* Mobile menu button */}
+              Oreset
+            </span>
+          </a>
+
+          <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
+            {navItems.map((item) =>
+              'children' in item ? (
+                <DesktopDropdown
+                  key={item.label}
+                  item={item}
+                  open={openMenu === item.label}
+                  onOpen={() => setOpenMenu(item.label)}
+                  onClose={() => setOpenMenu(null)}
+                  onDark={onDark}
+                  onChildClick={(child) =>
+                    handleChildClick(child, () => setOpenMenu(null))
+                  }
+                />
+              ) : (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className={cn(
+                    'rounded-md px-3 py-2 text-body-sm font-medium transition-colors',
+                    onDark
+                      ? 'text-white/70 hover:text-white'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {item.label}
+                </a>
+              ),
+            )}
+          </nav>
+
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="flex size-9 items-center justify-center rounded-lg text-foreground md:hidden"
-              aria-label="Toggle menu"
+              type="button"
+              onClick={() => openPilotModal()}
+              className={cn(
+                'rounded-md px-3.5 py-2 text-body-sm font-semibold transition-[transform,background-color] duration-200 hover:-translate-y-px sm:px-4',
+                onDark
+                  ? 'bg-accent text-accent-foreground hover:bg-copper-600'
+                  : 'bg-primary text-primary-foreground hover:bg-navy-700',
+              )}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              Scope a Pilot
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              className={cn(
+                'inline-flex size-9 items-center justify-center rounded-md lg:hidden',
+                onDark ? 'text-white' : 'text-foreground',
+              )}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 {mobileOpen ? (
-                  <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <path
+                    d="M5 5L15 15M15 5L5 15"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
                 ) : (
                   <>
                     <path d="M3 5.5H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -128,40 +273,211 @@ export function SiteNav() {
                 )}
               </svg>
             </button>
-          </motion.div>
+          </div>
         </div>
+      </div>
 
-        {/* Mobile menu */}
+      <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
+            id="mobile-nav"
+            initial={reduceMotion ? false : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-border bg-background/95 backdrop-blur-md md:hidden"
+            exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="max-h-[calc(100svh-4rem)] overflow-y-auto border-b border-border bg-background/98 backdrop-blur-xl lg:hidden"
           >
-            <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4">
-              {links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                >
-                  {link.label}
-                </a>
-              ))}
-              <a
-                href="#contact"
-                onClick={() => setMobileOpen(false)}
-                className="mt-2 rounded-full border border-foreground/20 px-5 py-2.5 text-center text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background"
-              >
-                Contact Us
-              </a>
+            <nav className="container-wide flex flex-col gap-1 py-4" aria-label="Mobile">
+              {navItems.map((item) =>
+                'children' in item ? (
+                  <div key={item.label} className="border-b border-border/50 py-1">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMobileExpand((v) => (v === item.label ? null : item.label))
+                      }
+                      className="flex w-full items-center justify-between rounded-md px-3 py-3 text-left text-body font-medium text-foreground"
+                      aria-expanded={mobileExpand === item.label}
+                    >
+                      <span className="inline-flex items-center gap-1">
+                        {item.label}
+                        <span className="text-muted-foreground/60" aria-hidden="true">
+                          ▾
+                        </span>
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          'size-4 text-muted-foreground transition-transform',
+                          mobileExpand === item.label && 'rotate-180',
+                        )}
+                      />
+                    </button>
+                    {mobileExpand === item.label && (
+                      <div className="mb-2 ml-2 flex flex-col gap-0.5 border-l border-border pl-3">
+                        {item.children.map((child) =>
+                          child.action === 'pilot' ? (
+                            <button
+                              key={child.label}
+                              type="button"
+                              onClick={() => handleChildClick(child, () => setOpenMenu(null))}
+                              className="rounded-md px-3 py-2.5 text-left"
+                            >
+                              <span className="block text-body-sm font-medium text-foreground">
+                                {child.label}
+                              </span>
+                              <span className="text-caption text-muted-foreground">
+                                {child.hint}
+                              </span>
+                            </button>
+                          ) : child.href.startsWith('/') ? (
+                            <Link
+                              key={child.label}
+                              href={child.href}
+                              onClick={() => setMobileOpen(false)}
+                              className="rounded-md px-3 py-2.5"
+                            >
+                              <span className="block text-body-sm font-medium text-foreground">
+                                {child.label}
+                              </span>
+                              <span className="text-caption text-muted-foreground">
+                                {child.hint}
+                              </span>
+                            </Link>
+                          ) : (
+                            <a
+                              key={child.label}
+                              href={child.href}
+                              onClick={() => setMobileOpen(false)}
+                              className="rounded-md px-3 py-2.5"
+                            >
+                              <span className="block text-body-sm font-medium text-foreground">
+                                {child.label}
+                              </span>
+                              <span className="text-caption text-muted-foreground">
+                                {child.hint}
+                              </span>
+                            </a>
+                          ),
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-md px-3 py-3 text-body font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    {item.label}
+                  </a>
+                ),
+              )}
             </nav>
           </motion.div>
         )}
-      </header>
-    </div>
+      </AnimatePresence>
+    </header>
   )
 }
 
+function DesktopDropdown({
+  item,
+  open,
+  onOpen,
+  onClose,
+  onDark,
+  onChildClick,
+}: {
+  item: Extract<NavItem, { children: unknown[] }>
+  open: boolean
+  onOpen: () => void
+  onClose: () => void
+  onDark: boolean
+  onChildClick: (child: NavChild) => void
+}) {
+  const id = useId()
+
+  return (
+    <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-controls={id}
+        onClick={() => (open ? onClose() : onOpen())}
+        className={cn(
+          'inline-flex items-center gap-1 rounded-md px-3 py-2 text-body-sm font-medium transition-colors',
+          onDark ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground',
+        )}
+      >
+        {item.label}
+        <span className="text-[10px] opacity-70" aria-hidden="true">
+          ▾
+        </span>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id={id}
+            role="menu"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute left-0 top-full z-50 w-80 pt-2"
+          >
+            <div className="card-surface-raised overflow-hidden p-2">
+              <p className="px-3 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-eyebrow text-muted-foreground">
+                {item.label}
+              </p>
+              {item.children.map((child) =>
+                child.action === 'pilot' ? (
+                  <button
+                    key={child.label}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => onChildClick(child)}
+                    className="block w-full rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-secondary"
+                  >
+                    <span className="block text-body-sm font-semibold text-foreground">
+                      {child.label}
+                    </span>
+                    <span className="text-caption text-muted-foreground">{child.hint}</span>
+                  </button>
+                ) : child.href.startsWith('/') ? (
+                  <Link
+                    key={child.label}
+                    href={child.href}
+                    role="menuitem"
+                    onClick={onClose}
+                    className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-secondary"
+                  >
+                    <span className="block text-body-sm font-semibold text-foreground">
+                      {child.label}
+                    </span>
+                    <span className="text-caption text-muted-foreground">{child.hint}</span>
+                  </Link>
+                ) : (
+                  <a
+                    key={child.label}
+                    href={child.href}
+                    role="menuitem"
+                    onClick={onClose}
+                    className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-secondary"
+                  >
+                    <span className="block text-body-sm font-semibold text-foreground">
+                      {child.label}
+                    </span>
+                    <span className="text-caption text-muted-foreground">{child.hint}</span>
+                  </a>
+                ),
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}

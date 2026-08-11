@@ -1,22 +1,15 @@
 'use client'
 
-import { type ReactNode } from 'react'
-import { motion, type Variant } from 'framer-motion'
+import { useRef, type ReactNode } from 'react'
+import { useGSAP } from '@gsap/react'
+import { gsap, registerGsap, prefersReducedMotion, ScrollTrigger } from '@/lib/gsap'
+import { cn } from '@/lib/utils'
 
-interface MotionRevealProps {
-  children: ReactNode
-  className?: string
-  delay?: number
-  direction?: 'up' | 'down' | 'left' | 'right' | 'none'
-  distance?: number
-  duration?: number
-  once?: boolean
-}
+registerGsap()
 
-const directionOffset = (
-  direction: MotionRevealProps['direction'],
-  distance: number,
-): { x?: number; y?: number } => {
+type Direction = 'up' | 'down' | 'left' | 'right' | 'none'
+
+const offset = (direction: Direction, distance: number) => {
   switch (direction) {
     case 'up':
       return { y: distance }
@@ -36,88 +29,134 @@ export function MotionReveal({
   className,
   delay = 0,
   direction = 'up',
-  distance = 24,
-  duration = 0.7,
+  distance = 28,
+  duration = 0.85,
   once = true,
-}: MotionRevealProps) {
-  const hidden: Variant = {
-    opacity: 0,
-    ...directionOffset(direction, distance),
-  }
-  const visible: Variant = {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    transition: {
-      duration,
-      delay,
-      ease: [0.22, 1, 0.36, 1],
+}: {
+  children: ReactNode
+  className?: string
+  delay?: number
+  direction?: Direction
+  distance?: number
+  duration?: number
+  once?: boolean
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      const el = ref.current
+      if (!el) return
+
+      if (prefersReducedMotion()) {
+        gsap.set(el, { clearProps: 'all', autoAlpha: 1 })
+        return
+      }
+
+      const isMobile = window.matchMedia('(max-width: 767px)').matches
+      const dist = isMobile ? Math.min(distance, 18) : distance
+
+      gsap.fromTo(
+        el,
+        { autoAlpha: 0, ...offset(direction, dist), force3D: true },
+        {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          duration: isMobile ? Math.min(duration, 0.65) : duration,
+          delay,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 92%',
+            toggleActions: once ? 'play none none none' : 'play none none reverse',
+          },
+          onComplete: () => {
+            gsap.set(el, { clearProps: 'transform' })
+          },
+        },
+      )
     },
-  }
+    { dependencies: [delay, direction, distance, duration, once], revertOnUpdate: true },
+  )
 
   return (
-    <motion.div
-      className={className}
-      initial={hidden}
-      whileInView={visible}
-      viewport={{ once, margin: '0px 0px -10% 0px' }}
-    >
+    <div ref={ref} className={cn('invisible', className)}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
-/* Stagger container — wrap children in MotionReveal for auto-stagger */
 export function MotionStagger({
   children,
   className,
-  stagger = 0.08,
+  stagger = 0.07,
 }: {
   children: ReactNode
   className?: string
   stagger?: number
 }) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      const el = ref.current
+      if (!el) return
+      const items = el.querySelectorAll<HTMLElement>('[data-stagger-item]')
+
+      if (prefersReducedMotion()) {
+        gsap.set(items, { clearProps: 'all', autoAlpha: 1 })
+        return
+      }
+
+      const isMobile = window.matchMedia('(max-width: 767px)').matches
+
+      gsap.fromTo(
+        items,
+        { autoAlpha: 0, y: isMobile ? 16 : 28, force3D: true },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: isMobile ? 0.55 : 0.8,
+          stagger: isMobile ? Math.min(stagger, 0.05) : stagger,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+          },
+          onComplete: () => {
+            gsap.set(items, { clearProps: 'transform' })
+          },
+        },
+      )
+    },
+    { dependencies: [stagger], revertOnUpdate: true },
+  )
+
   return (
-    <motion.div
-      className={className}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-      variants={{
-        hidden: {},
-        visible: { transition: { staggerChildren: stagger } },
-      }}
-    >
+    <div ref={ref} className={className}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
 export function MotionStaggerItem({
   children,
   className,
-  direction = 'up',
-  distance = 24,
 }: {
   children: ReactNode
   className?: string
-  direction?: 'up' | 'down' | 'left' | 'right' | 'none'
+  direction?: Direction
   distance?: number
 }) {
   return (
-    <motion.div
-      className={className}
-      variants={{
-        hidden: { opacity: 0, ...directionOffset(direction, distance) },
-        visible: {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-        },
-      }}
-    >
+    <div data-stagger-item className={cn('invisible', className)}>
       {children}
-    </motion.div>
+    </div>
   )
+}
+
+export function refreshScrollTriggers() {
+  ScrollTrigger.refresh()
 }

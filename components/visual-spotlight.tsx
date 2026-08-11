@@ -7,7 +7,7 @@ import { Award, CheckCircle2, MapPin, Sparkles } from 'lucide-react'
 const spotlights = [
   {
     name: 'Amina Bello',
-    role: 'Certified AI Operator — Hausa Track',
+    role: 'Certified AI Operator. Hausa Track',
     location: 'Kano, Nigeria',
     language: 'Hausa (Native)',
     domain: 'Agriculture & NLP',
@@ -18,7 +18,7 @@ const spotlights = [
   },
   {
     name: 'Kofi Mensah',
-    role: 'Senior Data Lead — Twi & Ewe Track',
+    role: 'Senior Data Lead. Twi & Ewe Track',
     location: 'Accra, Ghana',
     language: 'Twi / Ewe (Native)',
     domain: 'Banking & Fintech QA',
@@ -40,7 +40,7 @@ const spotlights = [
   },
   {
     name: 'Tariq Al-Mansoor',
-    role: 'Certified AI Operator — Arabic Track',
+    role: 'Certified AI Operator. Arabic Track',
     location: 'Cairo, Egypt',
     language: 'Arabic (Egyptian Native)',
     domain: 'Medical & Healthcare QA',
