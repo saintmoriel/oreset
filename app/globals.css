@@ -27,7 +27,7 @@
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --color-ink-muted: var(--ink-muted);
-  --color-ink-border: var(--ink-border);
+  --color-ink-border: rgba(244, 246, 250, 0.14);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -35,6 +35,8 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-plus-jakarta), var(--font-sans);
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   --breakpoint-2xl: 88rem;
 }
@@ -43,12 +45,12 @@
   color-scheme: light;
   --radius: 0.75rem;
 
-  /* Clean, warm near-white paper */
-  --background: #ffffff;
+  /* Warm cream / off-white background */
+  --background: #faf8f4;
   --foreground: #16213a;
 
-  /* Slightly recessed surface for alternating sections */
-  --secondary: #f6f5f2;
+  /* Slightly deeper cream for alternating sections */
+  --secondary: #f3f0ea;
   --secondary-foreground: #16213a;
 
   --card: #ffffff;
@@ -56,20 +58,20 @@
   --popover: #ffffff;
   --popover-foreground: #16213a;
 
-  --muted: #f6f5f2;
+  --muted: #f3f0ea;
   --muted-foreground: #5c6472;
 
   /* Deep navy — primary brand ink and buttons */
   --primary: #16213a;
   --primary-foreground: #ffffff;
 
-  /* Burnt copper — accent, used sparingly */
+  /* Burnt copper — accent, used for CTAs and highlights */
   --accent: #c56a32;
   --accent-foreground: #ffffff;
 
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #e7e5e0;
-  --input: #e7e5e0;
+  --border: #e2dfd8;
+  --input: #e2dfd8;
   --ring: #c56a32;
 
   /* Deep ink navy for dark contrast sections */
@@ -82,6 +84,10 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
   }
   body {
     @apply bg-background text-foreground;
@@ -96,14 +102,18 @@
 }
 
 @layer utilities {
+  /* ── Scale-style tracking ── */
   .tracking-display {
     letter-spacing: -0.025em;
+  }
+  .tracking-tight {
+    letter-spacing: -0.03em;
   }
   .tracking-eyebrow {
     letter-spacing: 0.14em;
   }
 
-  /* Scroll reveal */
+  /* ── Scroll reveal (legacy — kept for backward compat) ── */
   .reveal {
     opacity: 0;
     transform: translateY(16px);
@@ -116,14 +126,91 @@
     opacity: 1;
     transform: none;
   }
+
+  /* ── Scale-style thin-border glass card ── */
+  .card-glass {
+    background: var(--card);
+    border: 1px solid rgba(22, 33, 58, 0.08);
+    border-radius: var(--radius-lg);
+  }
+  .card-glass-dark {
+    background: rgba(18, 32, 58, 0.6);
+    border: 1px solid rgba(244, 246, 250, 0.08);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ── Section divider lines ── */
+  .divider-thin {
+    border-top: 1px solid rgba(22, 33, 58, 0.08);
+  }
+  .divider-thin-dark {
+    border-top: 1px solid rgba(244, 246, 250, 0.08);
+  }
+
+  /* ── Gradient fade masks ── */
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 70%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent);
+  }
 }
 
+/* ── Marquee animation ── */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 45s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Scroll indicator bounce ── */
+@keyframes scroll-bounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+.scroll-indicator {
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+/* ── Geometric grid dot pattern ── */
+.dot-pattern {
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal.is-visible {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+  .marquee-track {
+    animation: none !important;
+  }
+  .scroll-indicator {
+    animation: none !important;
   }
   html {
     scroll-behavior: auto !important;

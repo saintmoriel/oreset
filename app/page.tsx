@@ -1,8 +1,11 @@
 import { SiteNav } from '@/components/site-nav'
 import { Hero } from '@/components/hero'
+import { ScrollNarrative } from '@/components/scroll-narrative'
+import { StatsSection } from '@/components/stats-section'
 import { LanguageMarquee } from '@/components/language-marquee'
-import { Problem } from '@/components/problem'
-import { WhatWeBuild } from '@/components/what-we-build'
+import { NetworkSection } from '@/components/network-section'
+import { VisualSpotlight } from '@/components/visual-spotlight'
+import { TrustLedger } from '@/components/trust-ledger'
 import { Contact } from '@/components/contact'
 import { SiteFooter } from '@/components/site-footer'
 
@@ -12,9 +15,12 @@ export default function Page() {
       <SiteNav />
       <main>
         <Hero />
+        <ScrollNarrative />
+        <StatsSection />
         <LanguageMarquee />
-        <Problem />
-        <WhatWeBuild />
+        <NetworkSection />
+        <VisualSpotlight />
+        <TrustLedger />
         <Contact />
       </main>
       <SiteFooter />
