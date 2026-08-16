@@ -19,12 +19,12 @@ const ORIGIN_STAGES = [
 ] as const
 
 const OPERATOR_STAGES = [
-  'Scout',
-  'Foundry',
-  'Certify',
+  'Sourcing',
+  'Training',
+  'Certification',
   'Bench',
-  'Match',
-  'Oversight',
+  'Placement',
+  'Account Management',
 ] as const
 
 const arms = [

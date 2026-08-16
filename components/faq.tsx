@@ -20,7 +20,7 @@ const faqs = [
   {
     audience: 'Buyers',
     q: 'How are operators certified?',
-    a: 'Operators move through Scout → Foundry → Certify before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes placement requires earned reliability scorecards.',
+    a: 'Operators move through Sourcing → Training → Certification before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes placement requires earned reliability scorecards.',
   },
   {
     audience: 'Contributors',

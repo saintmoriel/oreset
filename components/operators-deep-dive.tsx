@@ -7,12 +7,12 @@ import { MotionReveal } from './motion-reveal'
 import { SiteImage } from './site-image'
 
 export const OPERATOR_STAGES = [
-  { name: 'Scout', detail: 'Source native-language professionals with dialect and domain baselines.' },
-  { name: 'Foundry', detail: 'Train on fluency baselines, error taxonomy, and live evaluation sprints.' },
-  { name: 'Certify', detail: 'Timed evaluation with calibration thresholds before badge issuance.' },
+  { name: 'Sourcing', detail: 'Source native-language professionals with dialect and domain baselines.' },
+  { name: 'Training', detail: 'Train on fluency baselines, error taxonomy, and live evaluation sprints.' },
+  { name: 'Certification', detail: 'Timed evaluation with calibration thresholds before badge issuance.' },
   { name: 'Bench', detail: 'Certified operators wait on an availability bench by language and domain.' },
-  { name: 'Match', detail: 'Pair operators to enterprise accounts by shift, language, and specialty.' },
-  { name: 'Oversight', detail: 'Ongoing telemetry, escalation queues, and account management.' },
+  { name: 'Placement', detail: 'Pair operators to enterprise accounts by shift, language, and specialty.' },
+  { name: 'Account Management', detail: 'Ongoing telemetry, escalation queues, and dedicated account oversight.' },
 ] as const
 
 export function OperatorsDeepDive() {

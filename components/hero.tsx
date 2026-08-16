@@ -25,12 +25,12 @@ const proof = [
   {
     value: '4-tier',
     label: 'Error taxonomy',
-    detail: 'Automated capture gatekeeping',
+    detail: 'Shared standard, origination to review',
   },
   {
-    value: 'C2O',
-    label: 'Collect-to-Order',
-    detail: 'On-demand cohort deployment',
+    value: '6-stage',
+    label: 'Certified track',
+    detail: 'Calibrated before placement',
   },
 ] as const
 
@@ -151,17 +151,17 @@ export function Hero() {
               data-hero-item
               className="mt-5 text-balance font-display text-[clamp(1.85rem,5.2vw,3.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-white sm:mt-6"
             >
-              High-Fidelity Field Data Origination for African AI&nbsp;Models
+              Consented Data. Certified Review. Built for African&nbsp;AI.
             </h1>
 
             <p
               data-hero-item
               className="mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/70 sm:mt-5 sm:text-base md:text-lg"
             >
-              AI models fail when trained on scraped or noisy web data. Oreset provides
-              structured Collect-to-Order speech, image, and text origination across
-              Africa, combining on-device automated quality checks with verified native
-              operator workflows.
+              AI models fail when trained on scraped or noisy web data. Oreset originates
+              consented field data across Africa and certifies the native-language operators
+              who verify it — structured origination on one side, calibrated review on the
+              other.
             </p>
 
             <div
@@ -180,7 +180,7 @@ export function Hero() {
                 href="#origin"
                 className="inline-flex h-12 w-full items-center justify-center rounded-md border border-white/25 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur-sm transition-[background-color,border-color] duration-200 hover:border-white/45 hover:bg-white/12 sm:w-auto"
               >
-                View 10-Stage Lifecycle
+                How Origin works
               </a>
             </div>
           </div>

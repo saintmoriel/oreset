@@ -14,8 +14,8 @@ const arms = [
     summary:
       'Local collectors originate fresh African speech, language, and agri imagery, with consent and licensing built in from capture.',
     image:
-      'https://images.unsplash.com/photo-1602788526767-f09470bb8e0b?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'African collectors in a maize field capturing crop imagery on a smartphone',
+      'https://images.unsplash.com/photo-1741874299706-2b8e16839aaa?auto=format&fit=crop&w=1200&q=80',
+    imageAlt: 'African farmer tending crops in a field, illustrative of Origin field capture contexts',
   },
   {
     id: 'operators-card',
@@ -26,8 +26,8 @@ const arms = [
     summary:
       'Native-language professionals trained and certified for AI-assisted review, correction, and ongoing product QA.',
     image:
-      'https://images.unsplash.com/photo-1612299273045-362a39972259?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'Black professional working on a laptop for operator review work',
+      'https://images.unsplash.com/photo-1622295023876-0cdf583c41f6?auto=format&fit=crop&w=1200&q=80',
+    imageAlt: 'African professional reviewing work on a laptop, illustrative of operator review work',
   },
 ]
 
@@ -55,7 +55,7 @@ export function TwoArmsOverview() {
         <MotionStagger className="mt-10 grid gap-5 sm:mt-12 sm:gap-6 lg:grid-cols-2 lg:gap-8" stagger={0.12}>
           {arms.map((arm) => (
             <MotionStaggerItem key={arm.id}>
-              <article className="card-surface-raised group flex h-full flex-col overflow-hidden">
+              <article className="card-surface-raised group flex h-full flex-col overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-[0_24px_60px_rgba(22,33,58,0.16)]">
                 <div className="photo-brand photo-brand-soft relative aspect-[16/10] overflow-hidden">
                   <SiteImage
                     data-scroll-media

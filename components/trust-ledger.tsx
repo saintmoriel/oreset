@@ -88,6 +88,42 @@ function TrustDiagram() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
             />
+            {!reduceMotion && (
+              <>
+                <motion.path
+                  d="M70 0 C70 28, 140 28, 140 64"
+                  stroke="var(--accent)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeDasharray="6 14"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 0.5, 0], strokeDashoffset: [20, 0] }}
+                  transition={{
+                    duration: 2.2,
+                    delay: 1.1,
+                    repeat: Infinity,
+                    repeatType: 'loop',
+                    ease: 'linear',
+                  }}
+                />
+                <motion.path
+                  d="M210 0 C210 28, 140 28, 140 64"
+                  stroke="var(--accent)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeDasharray="6 14"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 0.5, 0], strokeDashoffset: [20, 0] }}
+                  transition={{
+                    duration: 2.2,
+                    delay: 1.4,
+                    repeat: Infinity,
+                    repeatType: 'loop',
+                    ease: 'linear',
+                  }}
+                />
+              </>
+            )}
             <motion.circle
               cx="140"
               cy="64"
@@ -98,6 +134,17 @@ function TrustDiagram() {
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: 0.75 }}
             />
+            {!reduceMotion && (
+              <motion.circle
+                cx="140"
+                cy="64"
+                r="3.5"
+                fill="var(--accent)"
+                initial={{ scale: 1, opacity: 0.6 }}
+                animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
+                transition={{ duration: 2, delay: 1.6, repeat: Infinity, ease: 'easeOut' }}
+              />
+            )}
           </svg>
         </div>
 
