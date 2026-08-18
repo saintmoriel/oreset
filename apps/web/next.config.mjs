@@ -3,6 +3,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  transpilePackages: ['@oreset/shared'],
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [

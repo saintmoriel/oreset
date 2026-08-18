@@ -1,0 +1,21 @@
+{
+  "name": "oreset",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter @oreset/web dev",
+    "dev:api": "pnpm --filter @oreset/api dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "db:generate": "pnpm --filter @oreset/api db:generate",
+    "db:migrate": "pnpm --filter @oreset/api db:migrate",
+    "db:seed": "pnpm --filter @oreset/api db:seed"
+  },
+  "pnpm": {
+    "overrides": {
+      "hono": "4.12.25"
+    },
+    "onlyBuiltDependencies": ["argon2"]
+  }
+}
