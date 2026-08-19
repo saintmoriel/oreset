@@ -1,7 +1,7 @@
 import 'dotenv/config'
-import { Pool } from '@neondatabase/serverless'
-import { drizzle } from 'drizzle-orm/neon-serverless'
-import { migrate } from 'drizzle-orm/neon-serverless/migrator'
+import { Pool } from 'pg'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { migrate } from 'drizzle-orm/node-postgres/migrator'
 
 async function main() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL })

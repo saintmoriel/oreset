@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import { Pool } from '@neondatabase/serverless'
-import { drizzle } from 'drizzle-orm/neon-serverless'
+import { Pool } from 'pg'
+import { drizzle } from 'drizzle-orm/node-postgres'
 import argon2 from 'argon2'
 import * as schema from './schema'
 
