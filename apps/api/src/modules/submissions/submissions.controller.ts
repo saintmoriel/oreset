@@ -25,3 +25,8 @@ export async function create(req: Request, res: Response) {
   })
   res.status(201).json(result)
 }
+
+export async function listMine(req: Request, res: Response) {
+  const submissions = await submissionsService.listMySubmissions(req.user!.sub)
+  res.status(200).json({ submissions })
+}

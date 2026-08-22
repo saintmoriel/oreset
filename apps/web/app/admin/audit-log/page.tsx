@@ -1,15 +1,13 @@
-'use client'
-
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { Lock } from 'lucide-react'
 import { AdminShell } from '@/components/admin/admin-shell'
-import { AUDIT_LOG, ROLES, type RoleId } from '@/lib/admin-mock-data'
+import { AUDIT_LOG } from '@/lib/admin-mock-data'
+import { serverApiFetch } from '@/lib/api/server'
+import type { AuthUser } from '@oreset/shared'
 
-function AuditLogContent() {
-  const params = useSearchParams()
-  const role = (ROLES.find((r) => r.id === params.get('role'))?.id ?? 'admin') as RoleId
-  const roleInfo = ROLES.find((r) => r.id === role) ?? ROLES[0]
+export default async function AuditLogPage() {
+  const { user } = await serverApiFetch<{ user: AuthUser }>('/api/v1/auth/me')
+  const role = user.staffRole!
+  const canView = role === 'admin' || role === 'compliance'
 
   return (
     <AdminShell role={role}>
@@ -20,16 +18,14 @@ function AuditLogContent() {
           Immutable record of consent, screening, review, and RBAC events.
         </p>
 
-        {!roleInfo.canViewAuditLog ? (
+        {!canView ? (
           <div className="card-surface mt-6 flex flex-col items-center gap-3 p-10 text-center">
             <span className="flex size-12 items-center justify-center rounded-xl bg-muted">
               <Lock className="size-5 text-muted-foreground" />
             </span>
             <p className="text-body font-semibold text-foreground">Access restricted</p>
             <p className="text-body-sm max-w-sm text-muted-foreground">
-              The <strong className="font-medium text-foreground">{roleInfo.label}</strong> role
-              does not have audit log permissions. Switch to Admin or Compliance Officer to view
-              this page.
+              Your role does not have audit log permissions. Admin or Compliance Officer only.
             </p>
           </div>
         ) : (
@@ -60,13 +56,5 @@ function AuditLogContent() {
         )}
       </div>
     </AdminShell>
-  )
-}
-
-export default function AuditLogPage() {
-  return (
-    <Suspense>
-      <AuditLogContent />
-    </Suspense>
   )
 }

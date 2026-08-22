@@ -3,6 +3,7 @@ import { mediaTypeEnum, submissionStatusEnum } from './enums'
 import { users } from './users'
 import { batches } from './batches'
 import { consentRecords } from './consent-records'
+import { payouts } from './payouts'
 
 // Compliance core: identity (users) is deliberately separate from this
 // table. captured_at / device_info / storage_key are immutable once
@@ -34,6 +35,14 @@ export const submissions = pgTable('submissions', {
   geoLocation: jsonb('geo_location'),
   status: submissionStatusEnum('status').notNull().default('submitted'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  // Set once retention automation purges the underlying file from storage.
+  // Not trigger-protected (verified against the write-once trigger's exact
+  // IF condition — it only names captured_at/device_info/storage_key) —
+  // the row survives as the audit record, only the payload is gone.
+  fileDeletedAt: timestamp('file_deleted_at', { withTimezone: true }),
+  // Set once this submission is covered by a payout run. Not trigger-
+  // protected either. Nullable — most submissions are never approved.
+  payoutId: uuid('payout_id').references(() => payouts.id, { onDelete: 'set null' }),
 })
 
 export type Submission = typeof submissions.$inferSelect

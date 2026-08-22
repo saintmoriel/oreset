@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, timestamp, jsonb, uniqueIndex } from 'drizzle-orm/pg-core'
 import { roleTypeEnum, staffRoleEnum, userStatusEnum } from './enums'
 
 export const users = pgTable(
@@ -18,6 +18,9 @@ export const users = pgTable(
     // Human-readable operator id, e.g. "OP-4471"
     operatorCode: text('operator_code'),
     displayName: text('display_name'),
+    // e.g. {type:'mobile_money', provider, accountNumber} — contributor-set,
+    // required before a payout can be initiated for them.
+    payoutDetails: jsonb('payout_details'),
     status: userStatusEnum('status').notNull().default('active'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

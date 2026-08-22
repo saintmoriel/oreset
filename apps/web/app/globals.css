@@ -514,3 +514,71 @@
     transform: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   Contributor app shell (/capture/* authenticated experience) — Vercel-
+   style dense UI. Additive only: every rule here is a new `cx-` prefixed
+   class touching nothing above. No new colors — reuses the existing
+   navy/paper/copper/success/warning/destructive tokens, just disciplined
+   about which one does which job (navy ramp = neutrals, copper = signal
+   only). Kept in this root-level stylesheet because Next.js App Router
+   only allows global CSS imports from the root layout, not a nested one.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  .cx-label {
+    font-size: 0.6875rem; /* 11px */
+    line-height: 1.3;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .cx-meta {
+    font-size: 0.75rem; /* 12px */
+    line-height: 1.4;
+  }
+
+  .cx-body {
+    font-size: 0.8125rem; /* 13px */
+    line-height: 1.5;
+  }
+
+  .cx-title {
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+  }
+
+  .cx-page-title {
+    font-size: 1.75rem; /* 28px */
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .cx-stat {
+    font-size: 1.625rem; /* 26px */
+    line-height: 1.15;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .cx-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  .cx-fade {
+    transition: opacity 150ms ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cx-fade {
+      transition: none;
+    }
+  }
+}

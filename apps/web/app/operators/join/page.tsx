@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle2, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { applyAsOperator } from '@/lib/api/endpoints/operators'
+import { ApiError } from '@/lib/api/client'
 
 const FLUENCY_LEVELS = ['Native', 'Level 4', 'Level 3', 'Level 2', 'Level 1']
 const ACADEMIC_BACKGROUNDS = [
@@ -28,6 +30,7 @@ type FormState = {
   name: string
   email: string
   phone: string
+  password: string
   location: string
   languages: LanguageRow[]
   dialect: string
@@ -41,6 +44,7 @@ const initial: FormState = {
   name: '',
   email: '',
   phone: '',
+  password: '',
   location: '',
   languages: [{ language: '', fluency: '' }],
   dialect: '',
@@ -50,12 +54,13 @@ const initial: FormState = {
   experience: '',
 }
 
-type FieldErrors = Partial<Record<'name' | 'email' | 'phone' | 'location' | 'languages' | 'academicBackground' | 'englishProficiency', string>>
+type FieldErrors = Partial<Record<'name' | 'email' | 'phone' | 'password' | 'location' | 'languages' | 'academicBackground' | 'englishProficiency', string>>
 
 export default function OperatorsJoinPage() {
   const [values, setValues] = useState<FormState>(initial)
   const [errors, setErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
+  const [operatorCode, setOperatorCode] = useState<string | null>(null)
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setValues((v) => ({ ...v, [key]: value }))
@@ -95,6 +100,7 @@ export default function OperatorsJoinPage() {
       next.email = 'Enter a valid email.'
     }
     if (!values.phone.trim()) next.phone = 'Please enter a phone number.'
+    if (values.password.length < 8) next.password = 'Use at least 8 characters.'
     if (!values.location.trim()) next.location = 'Where are you based?'
     if (!values.languages.some((row) => row.language.trim() && row.fluency)) {
       next.languages = 'Add at least one language with a fluency level.'
@@ -105,8 +111,33 @@ export default function OperatorsJoinPage() {
     if (Object.keys(next).length) return
 
     setStatus('submitting')
-    await new Promise((r) => setTimeout(r, 700))
-    setStatus('success')
+    try {
+      const { user } = await applyAsOperator({
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+        location: values.location,
+        languages: values.languages.filter((row) => row.language.trim() && row.fluency),
+        dialect: values.dialect || undefined,
+        academicBackground: values.academicBackground,
+        englishProficiency: values.englishProficiency,
+        availability: values.availability.length ? values.availability : undefined,
+        experience: values.experience || undefined,
+      })
+      setOperatorCode(user.operatorCode)
+      setStatus('success')
+    } catch (err) {
+      if (err instanceof ApiError && err.code === 'email_taken') {
+        setErrors((e) => ({ ...e, email: 'An account with that email already exists.' }))
+      } else {
+        setErrors((e) => ({
+          ...e,
+          email: err instanceof ApiError ? err.message : 'Could not submit your application. Try again.',
+        }))
+      }
+      setStatus('idle')
+    }
   }
 
   return (
@@ -161,12 +192,20 @@ export default function OperatorsJoinPage() {
                   <CheckCircle2 className="size-6 text-success" />
                 </span>
                 <h2 className="text-h3 text-foreground">Application received.</h2>
+                {operatorCode && (
+                  <p className="text-body-sm text-muted-foreground">
+                    Your operator ID is <strong className="font-mono font-semibold text-foreground">{operatorCode}</strong>.
+                  </p>
+                )}
                 <p className="text-body text-muted-foreground">
-                  Thank you. The Operators team will review your submission and follow up if
-                  your languages and location match an open cohort.
+                  Sign in to begin certification — a short training and quiz that unlocks your
+                  first placement.
                 </p>
-                <Link href="/" className="text-body-sm font-semibold text-accent hover:text-copper-600">
-                  Return to Oreset
+                <Link
+                  href="/operator"
+                  className="text-body-sm font-semibold text-accent hover:text-copper-600"
+                >
+                  Sign in to begin certification
                 </Link>
               </div>
             ) : (
@@ -218,6 +257,19 @@ export default function OperatorsJoinPage() {
                       />
                     </Field>
                   </div>
+                  <Field label="Password" error={errors.password}>
+                    <input
+                      type="password"
+                      value={values.password}
+                      onChange={(e) => update('password', e.target.value)}
+                      className={fieldClass(Boolean(errors.password))}
+                      autoComplete="new-password"
+                      placeholder="At least 8 characters"
+                    />
+                  </Field>
+                  <p className="text-caption text-muted-foreground">
+                    You&apos;ll use this to sign in later and complete certification.
+                  </p>
                 </div>
 
                 <div className="space-y-3 border-t border-border/70 pt-6">

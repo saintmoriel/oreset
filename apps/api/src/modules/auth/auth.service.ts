@@ -21,13 +21,17 @@ function hashCode(code: string): string {
   return createHash('sha256').update(code).digest('hex')
 }
 
-function toAuthUser(user: User): AuthUser {
+export function toAuthUser(user: User): AuthUser {
   return {
     id: user.id,
     role: user.role,
     staffRole: user.staffRole,
     displayName: user.displayName,
     status: user.status,
+    operatorCode: user.operatorCode,
+    payoutDetails: (user.payoutDetails as Record<string, unknown> | null) ?? null,
+    phone: user.phone,
+    createdAt: user.createdAt.toISOString(),
   }
 }
 
@@ -124,7 +128,7 @@ export async function loginWithPassword(
   return { user: toAuthUser(user), ...tokens }
 }
 
-async function issueSession(
+export async function issueSession(
   user: User,
   context: { userAgent?: string; ip?: string },
 ): Promise<{ accessToken: string; refreshToken: string }> {
@@ -146,7 +150,7 @@ async function issueSession(
     .where(eq(sessions.id, session.id))
 
   const accessToken = await signAccessToken(
-    { sub: user.id, role: user.role, staffRole: user.staffRole },
+    { sub: user.id, role: user.role, staffRole: user.staffRole, status: user.status },
     env.ACCESS_TOKEN_SECRET,
     ACCESS_TOKEN_TTL,
   )
@@ -201,4 +205,15 @@ export async function logout(refreshToken: string | undefined): Promise<void> {
 export async function getUserById(userId: string): Promise<AuthUser | null> {
   const user = await db.query.users.findFirst({ where: eq(users.id, userId) })
   return user ? toAuthUser(user) : null
+}
+
+// No bulk-revoke helper existed before this — only single-session
+// revoke-by-id (logout, refresh rotation). Used by /me/delete-account so
+// a previously-valid refresh token stops working immediately, not just
+// the response body claiming it does.
+export async function revokeAllSessions(userId: string): Promise<void> {
+  await db
+    .update(sessions)
+    .set({ revokedAt: new Date() })
+    .where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)))
 }

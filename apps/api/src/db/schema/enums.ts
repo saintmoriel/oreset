@@ -13,6 +13,10 @@ import {
   OPERATOR_DECISIONS,
   CAMPAIGN_STATUSES,
   OTP_PURPOSES,
+  CLIENT_QUEUE_ITEM_STATUSES,
+  PAYOUT_STATUSES,
+  DATASET_STATUSES,
+  TICKET_STATUSES,
 } from '@oreset/shared'
 
 // Fed directly from packages/shared/src/enums.ts so the DB layer and the
@@ -30,3 +34,7 @@ export const qaDecisionEnum = pgEnum('qa_decision', QA_DECISIONS)
 export const operatorDecisionEnum = pgEnum('operator_decision', OPERATOR_DECISIONS)
 export const campaignStatusEnum = pgEnum('campaign_status', CAMPAIGN_STATUSES)
 export const otpPurposeEnum = pgEnum('otp_purpose', OTP_PURPOSES)
+export const clientQueueItemStatusEnum = pgEnum('client_queue_item_status', CLIENT_QUEUE_ITEM_STATUSES)
+export const payoutStatusEnum = pgEnum('payout_status', PAYOUT_STATUSES)
+export const datasetStatusEnum = pgEnum('dataset_status', DATASET_STATUSES)
+export const ticketStatusEnum = pgEnum('ticket_status', TICKET_STATUSES)

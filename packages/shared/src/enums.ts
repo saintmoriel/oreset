@@ -2,7 +2,7 @@
 // (fed into Drizzle pgEnum) and apps/web (consumed as TS unions). Keep this
 // the only place these value lists are written out.
 
-export const ROLE_TYPES = ['contributor', 'operator', 'staff'] as const
+export const ROLE_TYPES = ['contributor', 'operator', 'staff', 'buyer'] as const
 export type RoleType = (typeof ROLE_TYPES)[number]
 
 export const STAFF_ROLES = ['qa_reviewer', 'admin', 'compliance', 'reviewer_lead'] as const
@@ -36,6 +36,12 @@ export const ERR_TAG_LABELS: Record<ErrTag, string> = {
 export const SEVERITY_LEVELS = ['SEV-1', 'SEV-2', 'SEV-3'] as const
 export type Severity = (typeof SEVERITY_LEVELS)[number]
 
+export const SEVERITY_LABELS: Record<Severity, string> = {
+  'SEV-1': 'Critical — blocks release',
+  'SEV-2': 'Major — needs fix before next cycle',
+  'SEV-3': 'Minor — track and monitor',
+}
+
 export const QA_DECISIONS = ['approved', 'rejected'] as const
 export type QaDecision = (typeof QA_DECISIONS)[number]
 
@@ -47,3 +53,15 @@ export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number]
 
 export const OTP_PURPOSES = ['login', 'signup'] as const
 export type OtpPurpose = (typeof OTP_PURPOSES)[number]
+
+export const CLIENT_QUEUE_ITEM_STATUSES = ['pending', 'approved', 'escalated', 'rejected'] as const
+export type ClientQueueItemStatus = (typeof CLIENT_QUEUE_ITEM_STATUSES)[number]
+
+export const PAYOUT_STATUSES = ['pending', 'processing', 'paid', 'failed'] as const
+export type PayoutStatus = (typeof PAYOUT_STATUSES)[number]
+
+export const DATASET_STATUSES = ['draft', 'sealed', 'delivered'] as const
+export type DatasetStatus = (typeof DATASET_STATUSES)[number]
+
+export const TICKET_STATUSES = ['open', 'resolved'] as const
+export type TicketStatus = (typeof TICKET_STATUSES)[number]

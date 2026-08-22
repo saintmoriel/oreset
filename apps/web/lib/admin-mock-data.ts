@@ -1,29 +1,3 @@
-export const ROLES = [
-  {
-    id: 'admin',
-    label: 'Admin',
-    description: 'Full access — pipeline, audit log, RBAC controls, campaign creation.',
-    canViewAuditLog: true,
-    canManageCampaigns: true,
-  },
-  {
-    id: 'compliance',
-    label: 'Compliance Officer',
-    description: 'Read-only access to audit trail and consent records.',
-    canViewAuditLog: true,
-    canManageCampaigns: false,
-  },
-  {
-    id: 'reviewer-lead',
-    label: 'Reviewer Lead',
-    description: 'Pipeline visibility only — no audit log or campaign access.',
-    canViewAuditLog: false,
-    canManageCampaigns: false,
-  },
-] as const
-
-export type RoleId = (typeof ROLES)[number]['id']
-
 export const ORIGIN_STAGES = [
   { name: 'Intake', count: 128 },
   { name: 'Task Forge', count: 96 },
@@ -55,14 +29,6 @@ export const AUDIT_LOG = [
   { time: '2026-08-18 10:02', actor: 'OP-4471', role: 'Certified Operator', action: 'operator.escalated.ERR-02.SEV-2', resource: 'txn/5521c' },
   { time: '2026-08-18 10:30', actor: 'admin-01', role: 'Admin', action: 'rbac.role_changed', resource: 'operator/OP-4471' },
   { time: '2026-08-18 11:05', actor: 'foundry-lms', role: 'System', action: 'operator.certified', resource: 'operator/OP-5820' },
-] as const
-
-export type CampaignStatus = 'live' | 'paused' | 'draft'
-
-export const CAMPAIGNS = [
-  { id: 'camp-014', title: 'Yorùbá Read-Speech — Batch 14', language: 'Yorùbá', mediaType: 'Audio', status: 'live' as CampaignStatus },
-  { id: 'camp-021', title: 'Crop & Pest Photo Capture — Kaduna pilot', language: 'N/A', mediaType: 'Image', status: 'live' as CampaignStatus },
-  { id: 'camp-009', title: 'Hausa Read-Speech — Batch 9', language: 'Hausa', mediaType: 'Audio', status: 'paused' as CampaignStatus },
 ] as const
 
 export const CAMPAIGN_LANGUAGES = ['Yorùbá', 'Hausa', 'Igbo', 'Somali', 'Lingala', 'Swahili']

@@ -7,3 +7,4 @@ import * as controller from './submissions.controller'
 export const submissionsRouter = Router()
 
 submissionsRouter.post('/', requireAuth, requireRole('contributor'), asyncHandler(controller.create))
+submissionsRouter.get('/me', requireAuth, requireRole('contributor'), asyncHandler(controller.listMine))

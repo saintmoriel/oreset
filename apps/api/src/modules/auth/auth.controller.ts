@@ -1,26 +1,12 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
 import * as authService from './auth.service'
-import {
-  ACCESS_COOKIE_NAME,
-  REFRESH_COOKIE_NAME,
-  accessCookieOptions,
-  refreshCookieOptions,
-  clearedCookieOptions,
-} from '../../config/cookies'
+import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME, clearedCookieOptions } from '../../config/cookies'
+import { setSessionCookies, requestContext } from '../../lib/session-cookies'
 
 const otpRequestSchema = z.object({ phone: z.string().min(8) })
 const otpVerifySchema = z.object({ phone: z.string().min(8), code: z.string().length(6) })
 const loginSchema = z.object({ email: z.string().email(), password: z.string().min(1) })
-
-function setSessionCookies(res: Response, accessToken: string, refreshToken: string) {
-  res.cookie(ACCESS_COOKIE_NAME, accessToken, accessCookieOptions())
-  res.cookie(REFRESH_COOKIE_NAME, refreshToken, refreshCookieOptions())
-}
-
-function requestContext(req: Request) {
-  return { userAgent: req.get('user-agent') ?? undefined, ip: req.ip }
-}
 
 export async function requestOtp(req: Request, res: Response) {
   const { phone } = otpRequestSchema.parse(req.body)

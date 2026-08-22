@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { db } from '../../db/client'
 import { submissions, validationResults, type Submission } from '../../db/schema'
 import { validateSubmission } from '../validation/validation.service'
@@ -60,12 +60,13 @@ export async function createSubmission(
     score: validation.score.toString(),
   })
 
-  // Phase 0 simplification: only a pass moves status forward to
-  // 'validated' (ready for /qa). A fail leaves it at 'submitted' rather
-  // than introducing a distinct "needs retake" status — Phase 1 (wiring
-  // the actual retake loop from the /capture prototype) can revisit this.
+  // Only a pass moves status forward to 'validated' (ready for /qa). A
+  // fail leaves it at 'submitted' — there's no distinct "needs retake"
+  // status; the contributor's retake produces a new submission row
+  // entirely rather than mutating this one.
+  const finalStatus = validation.outcome === 'pass' ? 'validated' : submission.status
   if (validation.outcome === 'pass') {
-    await db.update(submissions).set({ status: 'validated' }).where(eq(submissions.id, submission.id))
+    await db.update(submissions).set({ status: finalStatus }).where(eq(submissions.id, submission.id))
   }
 
   await writeAuditLog({
@@ -78,5 +79,25 @@ export async function createSubmission(
     metadata: { reason: validation.reason },
   })
 
-  return { submission, validation }
+  return { submission: { ...submission, status: finalStatus }, validation }
+}
+
+export async function listMySubmissions(contributorId: string) {
+  const rows = await db.query.submissions.findMany({
+    where: eq(submissions.contributorId, contributorId),
+    orderBy: desc(submissions.createdAt),
+    with: {
+      batch: true,
+      validationResults: { orderBy: desc(validationResults.createdAt), limit: 1 },
+    },
+  })
+
+  return rows.map((s) => ({
+    id: s.id,
+    status: s.status,
+    mediaType: s.mediaType,
+    createdAt: s.createdAt,
+    batch: s.batch,
+    latestValidation: s.validationResults[0] ?? null,
+  }))
 }

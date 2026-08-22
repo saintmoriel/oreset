@@ -3,24 +3,34 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, LogOut, Megaphone, ScrollText, ShieldCheck } from 'lucide-react'
+import { LayoutDashboard, Megaphone, Package, ScrollText, ShieldCheck, TriangleAlert, Wallet } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ROLES, type RoleId } from '@/lib/admin-mock-data'
+import type { StaffRole } from '@oreset/shared'
+import { SignOutButton } from '@/components/shared/sign-out-button'
+
+const ROLE_LABELS: Record<StaffRole, string> = {
+  admin: 'Admin',
+  compliance: 'Compliance Officer',
+  reviewer_lead: 'Reviewer Lead',
+  qa_reviewer: 'QA Reviewer',
+}
 
 export function AdminShell({
   role,
   children,
 }: {
-  role: RoleId
+  role: StaffRole
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const roleInfo = ROLES.find((r) => r.id === role) ?? ROLES[0]
 
   const nav = [
-    { href: `/admin/dashboard?role=${role}`, label: 'Dashboard', icon: LayoutDashboard, match: '/admin/dashboard' },
-    { href: `/admin/campaigns?role=${role}`, label: 'Campaign Studio', icon: Megaphone, match: '/admin/campaigns' },
-    { href: `/admin/audit-log?role=${role}`, label: 'Audit Log', icon: ScrollText, match: '/admin/audit-log' },
+    { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, match: '/admin/dashboard' },
+    { href: '/admin/campaigns', label: 'Campaign Studio', icon: Megaphone, match: '/admin/campaigns' },
+    { href: '/admin/payouts', label: 'Payouts', icon: Wallet, match: '/admin/payouts' },
+    { href: '/admin/datasets', label: 'Datasets', icon: Package, match: '/admin/datasets' },
+    { href: '/admin/tickets', label: 'Tickets', icon: TriangleAlert, match: '/admin/tickets' },
+    { href: '/admin/audit-log', label: 'Audit Log', icon: ScrollText, match: '/admin/audit-log' },
   ]
 
   return (
@@ -39,15 +49,12 @@ export function AdminShell({
           <div className="flex items-center gap-4">
             <span className="hidden items-center gap-1.5 text-body-sm text-muted-foreground sm:inline-flex">
               <ShieldCheck className="size-4 text-accent" />
-              {roleInfo.label}
+              {ROLE_LABELS[role]}
             </span>
-            <Link
-              href="/admin"
+            <SignOutButton
+              signInPath="/admin"
               className="inline-flex items-center gap-1.5 text-body-sm font-medium text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="size-4" />
-              Switch role
-            </Link>
+            />
           </div>
         </div>
       </header>

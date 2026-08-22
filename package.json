@@ -10,12 +10,19 @@
     "lint": "pnpm -r lint",
     "db:generate": "pnpm --filter @oreset/api db:generate",
     "db:migrate": "pnpm --filter @oreset/api db:migrate",
-    "db:seed": "pnpm --filter @oreset/api db:seed"
+    "db:seed": "pnpm --filter @oreset/api db:seed",
+    "test": "pnpm -r test",
+    "test:e2e": "playwright test"
   },
   "pnpm": {
     "overrides": {
       "hono": "4.12.25"
     },
-    "onlyBuiltDependencies": ["argon2"]
+    "onlyBuiltDependencies": [
+      "argon2"
+    ]
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }

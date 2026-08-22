@@ -1,11 +1,37 @@
 'use client'
 
+import { Suspense, useState, type FormEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { ROLES } from '@/lib/admin-mock-data'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
+import { login } from '@/lib/api/endpoints/auth'
+import { ApiError } from '@/lib/api/client'
 
-export default function AdminSignInPage() {
+function AdminSignInContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next')
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+    try {
+      await login(email, password)
+      router.push(next ?? '/admin/dashboard')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Sign-in failed. Try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-svh bg-background">
       <header className="border-b border-border/70 bg-card/80 backdrop-blur-md">
@@ -27,29 +53,62 @@ export default function AdminSignInPage() {
       </header>
 
       <main className="container-narrow py-16 sm:py-24">
-        <p className="text-eyebrow text-accent">Admin · RBAC</p>
-        <h1 className="text-h1 mt-3 text-balance text-foreground">Choose a role to preview</h1>
-        <p className="text-body mt-3 text-pretty text-muted-foreground">
-          This demo swaps the dashboard&apos;s available views by role. In production, role is
-          assigned server-side and enforced on every request.
-        </p>
+        <div className="card-surface-raised p-8 sm:p-10">
+          <span className="flex size-12 items-center justify-center rounded-xl bg-accent/10">
+            <ShieldCheck className="size-6 text-accent" />
+          </span>
+          <p className="text-eyebrow mt-5 text-accent">Admin · RBAC</p>
+          <h1 className="text-h1 mt-2 text-balance text-foreground">Staff sign-in</h1>
+          <p className="text-body mt-3 text-pretty text-muted-foreground">
+            Role is assigned server-side from your account and enforced on every request.
+          </p>
 
-        <div className="mt-8 space-y-3">
-          {ROLES.map((role) => (
-            <Link
-              key={role.id}
-              href={`/admin/dashboard?role=${role.id}`}
-              className="card-surface flex items-center justify-between gap-4 p-5 hover:border-accent/40"
+          <form onSubmit={onSubmit} className="mt-8 space-y-4">
+            <div>
+              <label className="text-body-sm font-medium text-foreground">Email</label>
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@oreset.dev"
+                className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+              />
+            </div>
+            <div>
+              <label className="text-body-sm font-medium text-foreground">Password</label>
+              <input
+                required
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+              />
+            </div>
+            {error && (
+              <p className="text-caption text-destructive" role="alert">
+                {error}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60"
             >
-              <div>
-                <p className="text-body font-semibold text-foreground">{role.label}</p>
-                <p className="text-body-sm mt-1 text-muted-foreground">{role.description}</p>
-              </div>
-              <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-            </Link>
-          ))}
+              {submitting ? 'Signing in…' : 'Sign in'}
+              {!submitting && <ArrowRight className="size-4" />}
+            </button>
+          </form>
         </div>
       </main>
     </div>
+  )
+}
+
+export default function AdminSignInPage() {
+  return (
+    <Suspense>
+      <AdminSignInContent />
+    </Suspense>
   )
 }

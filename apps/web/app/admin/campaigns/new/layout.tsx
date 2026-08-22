@@ -36,7 +36,7 @@ export default function NewCampaignLayout({ children }: { children: React.ReactN
               </span>
             </Link>
             <Link
-              href="/admin/campaigns?role=admin"
+              href="/admin/campaigns"
               className="inline-flex items-center gap-1.5 text-body-sm font-medium text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="size-4" />

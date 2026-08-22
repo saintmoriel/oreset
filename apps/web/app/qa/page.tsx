@@ -1,18 +1,35 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { Suspense, useState, type FormEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
+import { login } from '@/lib/api/endpoints/auth'
+import { ApiError } from '@/lib/api/client'
 
-export default function QaSignInPage() {
+function QaSignInContent() {
   const router = useRouter()
-  const [staffId, setStaffId] = useState('')
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next')
 
-  function onSubmit(e: FormEvent) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  async function onSubmit(e: FormEvent) {
     e.preventDefault()
-    router.push('/qa/queue')
+    setError(null)
+    setSubmitting(true)
+    try {
+      await login(email, password)
+      router.push(next ?? '/qa/queue')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Sign-in failed. Try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -49,25 +66,50 @@ export default function QaSignInPage() {
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
             <div>
-              <label className="text-body-sm font-medium text-foreground">Staff credentials</label>
+              <label className="text-body-sm font-medium text-foreground">Email</label>
               <input
                 required
-                value={staffId}
-                onChange={(e) => setStaffId(e.target.value)}
-                placeholder="e.g. staff-lead-02"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@oreset.dev"
                 className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
               />
             </div>
+            <div>
+              <label className="text-body-sm font-medium text-foreground">Password</label>
+              <input
+                required
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+              />
+            </div>
+            {error && (
+              <p className="text-caption text-destructive" role="alert">
+                {error}
+              </p>
+            )}
             <button
               type="submit"
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600"
+              disabled={submitting}
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60"
             >
-              Enter QA Queue
-              <ArrowRight className="size-4" />
+              {submitting ? 'Signing in…' : 'Enter QA Queue'}
+              {!submitting && <ArrowRight className="size-4" />}
             </button>
           </form>
         </div>
       </main>
     </div>
+  )
+}
+
+export default function QaSignInPage() {
+  return (
+    <Suspense>
+      <QaSignInContent />
+    </Suspense>
   )
 }

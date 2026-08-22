@@ -11,14 +11,32 @@ type RouteGate = {
 
 const GATES: RouteGate[] = [
   {
+    matcher: '/capture',
+    signInPath: '/capture',
+    isAllowed: (c) => c.role === 'contributor',
+  },
+  {
     matcher: '/qa',
     signInPath: '/qa',
     isAllowed: (c) => c.role === 'staff' && (c.staffRole === 'qa_reviewer' || c.staffRole === 'admin'),
   },
   {
-    matcher: '/operator',
+    // Must precede the plain '/operator' gate below: GATES.find() returns
+    // the FIRST match, and '/operator/foundry' also satisfies
+    // pathname.startsWith('/operator/') — if the stricter (active-only)
+    // gate were listed first, a still-pending operator hitting
+    // /operator/foundry would be caught by it and bounced, defeating the
+    // whole point of Foundry being reachable pre-certification.
+    matcher: '/operator/foundry',
     signInPath: '/operator',
     isAllowed: (c) => c.role === 'operator',
+  },
+  {
+    // Catches /operator/queue, /operator/item, /operator/complete via
+    // prefix match — but NOT /operator/foundry, matched above first.
+    matcher: '/operator',
+    signInPath: '/operator',
+    isAllowed: (c) => c.role === 'operator' && c.status === 'active',
   },
   {
     matcher: '/admin',
@@ -26,6 +44,11 @@ const GATES: RouteGate[] = [
     isAllowed: (c) =>
       c.role === 'staff' &&
       (c.staffRole === 'admin' || c.staffRole === 'compliance' || c.staffRole === 'reviewer_lead'),
+  },
+  {
+    matcher: '/buyer',
+    signInPath: '/buyer',
+    isAllowed: (c) => c.role === 'buyer',
   },
 ]
 
@@ -64,5 +87,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/qa/:path*', '/operator/:path*', '/admin/:path*'],
+  matcher: ['/capture/:path*', '/qa/:path*', '/operator/:path*', '/admin/:path*', '/buyer/:path*'],
 }

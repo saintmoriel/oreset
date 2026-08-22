@@ -4,12 +4,39 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, PartyPopper, Rocket } from 'lucide-react'
+import type { MediaType } from '@oreset/shared'
 import { useCampaignDraft } from '@/components/admin/campaign-context'
+import { createCampaign, type Campaign } from '@/lib/api/endpoints/campaigns'
+import { ApiError } from '@/lib/api/client'
 
 export default function CampaignLaunchPage() {
   const router = useRouter()
   const { draft, reset } = useCampaignDraft()
-  const [launched, setLaunched] = useState(false)
+  const [launched, setLaunched] = useState<Campaign | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  async function onLaunch() {
+    setError(null)
+    setSubmitting(true)
+    try {
+      const { campaign } = await createCampaign({
+        title: draft.name,
+        mediaType: draft.mediaType.toLowerCase() as MediaType,
+        language: draft.language || undefined,
+        domain: draft.domain || undefined,
+        itemCount: Number(draft.batchSize),
+        payRateMinorUnits: Math.round(Number(draft.payRate) * 100),
+        cohort: draft.cohort || undefined,
+        materials: { uploaded: draft.materialsUploaded },
+      })
+      setLaunched(campaign)
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not launch this campaign. Try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   if (launched) {
     return (
@@ -17,13 +44,20 @@ export default function CampaignLaunchPage() {
         <span className="flex size-12 items-center justify-center rounded-xl bg-success/10">
           <PartyPopper className="size-6 text-success" />
         </span>
-        <h1 className="text-h2 text-foreground">{draft.name} is live.</h1>
+        <h1 className="text-h2 text-foreground">{launched.title} is live.</h1>
         <p className="text-body text-pretty text-muted-foreground">
-          This campaign is now visible in Contributors&apos; batch feed for the{' '}
-          <strong className="font-semibold text-foreground">{draft.cohort}</strong> cohort.
+          This campaign is now visible in Contributors&apos; batch feed
+          {launched.cohort ? (
+            <>
+              {' '}
+              for the <strong className="font-semibold text-foreground">{launched.cohort}</strong> cohort.
+            </>
+          ) : (
+            '.'
+          )}
         </p>
         <Link
-          href="/admin/campaigns?role=admin"
+          href="/admin/campaigns"
           onClick={reset}
           className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600"
         >
@@ -59,20 +93,28 @@ export default function CampaignLaunchPage() {
         ))}
       </dl>
 
+      {error && (
+        <p className="mt-4 text-caption text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+
       <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
         <button
           onClick={() => router.push('/admin/campaigns/new/cohort')}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border px-6 text-sm font-semibold text-foreground hover:bg-muted"
+          disabled={submitting}
+          className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border px-6 text-sm font-semibold text-foreground hover:bg-muted disabled:opacity-50"
         >
           <ArrowLeft className="size-4" />
           Back
         </button>
         <button
-          onClick={() => setLaunched(true)}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600"
+          onClick={onLaunch}
+          disabled={submitting}
+          className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Rocket className="size-4" />
-          Launch campaign
+          {submitting ? 'Launching…' : 'Launch campaign'}
         </button>
       </div>
     </div>

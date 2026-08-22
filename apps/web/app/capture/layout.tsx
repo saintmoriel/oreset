@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
+import { CaptureSessionProvider } from '@/components/capture/capture-session-context'
 
 export const metadata: Metadata = {
   title: 'Recording Session | Oreset',
-  description: 'Contributor capture flow prototype — consent, record, review, and submit a voice prompt.',
+  description: 'Record, review, and submit a voice or photo contribution.',
 }
 
 export default function CaptureLayout({ children }: { children: React.ReactNode }) {
-  return children
+  return <CaptureSessionProvider>{children}</CaptureSessionProvider>
 }

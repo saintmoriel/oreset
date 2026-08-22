@@ -1,13 +1,11 @@
-'use client'
-
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { AdminShell } from '@/components/admin/admin-shell'
-import { ORIGIN_STAGES, OPERATOR_STAGES, ROLES, type RoleId } from '@/lib/admin-mock-data'
+import { ORIGIN_STAGES, OPERATOR_STAGES } from '@/lib/admin-mock-data'
+import { serverApiFetch } from '@/lib/api/server'
+import type { AuthUser } from '@oreset/shared'
 
-function DashboardContent() {
-  const params = useSearchParams()
-  const role = (ROLES.find((r) => r.id === params.get('role'))?.id ?? 'admin') as RoleId
+export default async function DashboardPage() {
+  const { user } = await serverApiFetch<{ user: AuthUser }>('/api/v1/auth/me')
+  const role = user.staffRole!
 
   return (
     <AdminShell role={role}>
@@ -46,13 +44,5 @@ function DashboardContent() {
         </div>
       </div>
     </AdminShell>
-  )
-}
-
-export default function DashboardPage() {
-  return (
-    <Suspense>
-      <DashboardContent />
-    </Suspense>
   )
 }
