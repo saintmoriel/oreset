@@ -161,7 +161,7 @@ export function Hero() {
               A claim gets denied. A loan gets misjudged. 
               A transaction gets flagged — not because the logic was wrong, 
               but because the AI misread the Pidgin, Yoruba, or Hausa behind it. 
-              Oreset verifies that AI-driven decisions across African languages are actually correct
+              Oreset verifies that AI-driven decisions across African languages are actually correct.
             </p>
 
             <div
