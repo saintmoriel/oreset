@@ -151,17 +151,17 @@ export function Hero() {
               data-hero-item
               className="mt-5 text-balance font-display text-[clamp(1.85rem,5.2vw,3.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-white sm:mt-6"
             >
-              Consented Data. Certified Review. Built for African&nbsp;AI.
+              A language error shouldn't decide who gets &nbsp; paid.
             </h1>
 
             <p
               data-hero-item
               className="mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/70 sm:mt-5 sm:text-base md:text-lg"
             >
-              AI models fail when trained on scraped or noisy web data. Oreset originates
-              consented field data across Africa and certifies the native-language operators
-              who verify it — structured origination on one side, calibrated review on the
-              other.
+              A claim gets denied. A loan gets misjudged. 
+              A transaction gets flagged — not because the logic was wrong, 
+              but because the AI misread the Pidgin, Yoruba, or Hausa behind it. 
+              Oreset verifies that AI-driven decisions across African languages are actually correct
             </p>
 
             <div

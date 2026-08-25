@@ -57,8 +57,9 @@ export function Problem() {
                   />
                   <p className="text-h4 text-foreground">Unverified Talent QA</p>
                   <p className="text-body-sm mt-2 text-muted-foreground">
-                    Without certification and scorecards, buyers cannot trust review quality, and
-                    experts get treated as disposable gig labor.
+                    Without certification and scorecards, 
+                    buyers cannot trust that a language-driven decision was actually correct
+                     — and experts get treated as disposable gig labor, not professionals.
                   </p>
                 </div>
               </div>

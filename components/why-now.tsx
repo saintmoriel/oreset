@@ -25,17 +25,14 @@ export function WhyNow() {
             <MotionReveal delay={0.08}>
               <div className="space-y-8">
                 <p className="text-body-lg text-pretty text-muted-foreground">
-                  Low-resource African languages sit at the edge of today’s training regimes:
-                  thin scrapes, weak evaluation benches, and little infrastructure for consented
-                  field origination. That gap is not a content problem; it is an origination and
-                  verification problem.
+                  Real benchmarks exist for African-language accuracy — 
+                  but none of them measure whether a language failure changed the actual decision it produced: 
+                  a claim, a loan, a transaction. Fluency gets tested. Consequence doesn't.
                 </p>
                 <p className="text-body text-pretty text-muted-foreground">
-                  At the same time, enterprises shipping AI products into African markets need
-                  ongoing native-language QA they can trust, not anonymous gig queues. Oreset
-                  treats both sides as one network: raw field data refined through a provenance
-                  pipeline, and raw fluency refined through certification, under a Shared
-                  Trust Ledger that makes reliability visible before stakes rise.
+                  At the same time, enterprises shipping AI products into African markets
+                  need proof that language-driven decisions — a claim, a loan, a transaction — 
+                  are actually correct, not just fluent-sounding.
                 </p>
                 <div className="border-l-2 border-accent pl-5">
                   <ScrollWords

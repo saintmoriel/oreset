@@ -22,9 +22,9 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Oreset | High-Fidelity Field Data Origination for African AI Models',
+  title: 'Oreset | Independent AI Decision Verification for African Languages',
   description:
-    'Collect-to-Order speech, image, and text origination across Africa with opt-in consent, on-device quality checks, and certified native operator workflows.',
+    'When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.',
 }
 
 export const viewport: Viewport = {
