@@ -37,7 +37,7 @@ export function WhyNow() {
                 <div className="border-l-2 border-accent pl-5">
                   <ScrollWords
                     className="font-display text-xl font-semibold leading-snug tracking-tight text-foreground sm:text-2xl"
-                    text="Ore: raw material. Reset: how African AI gets its data and its people."
+                    text="Ore: raw material. Reset: what African AI needs before its decisions can be trusted."
                   />
                 </div>
               </div>

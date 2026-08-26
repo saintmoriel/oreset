@@ -7,24 +7,24 @@ const pillars = [
   {
     title: 'Consent-linked licensing',
     detail:
-      'Every Origin capture requires digital consent before submission. Licensing rights travel with the package, not bolted on at delivery.',
+      'Every field capture requires digital consent before submission. Licensing rights travel with the data, not bolted on at delivery.',
   },
   {
-    title: 'Operator reliability scorecards',
+    title: 'Reviewer reliability scorecards',
     detail:
-      'Certification, calibration thresholds, and ongoing review telemetry unlock higher-stakes placement. Reliability is earned on both sides, independently.',
+      'Certification, calibration thresholds, and ongoing review telemetry unlock higher-stakes cases. Reliability is earned, not assumed.',
   },
   {
     title: 'Wage-floor compliance',
     detail:
-      'Payout rails and oversight are designed so contributor and operator compensation is visible, timely, and held to an explicit floor, not opaque gig rates.',
+      'Payout rails and oversight are designed so collector and reviewer compensation is visible, timely, and held to an explicit floor, not opaque gig rates.',
   },
 ]
 
 const ledgerRows = [
-  { label: 'Consent lock', meta: 'Origin' },
-  { label: 'Reliability score', meta: 'Operators' },
-  { label: 'Wage floor', meta: 'Both arms' },
+  { label: 'Consent lock', meta: 'Capture' },
+  { label: 'Reliability score', meta: 'Review' },
+  { label: 'Wage floor', meta: 'Both stages' },
 ]
 
 function TrustDiagram() {
@@ -34,7 +34,7 @@ function TrustDiagram() {
     <div
       className="relative overflow-hidden rounded-2xl border border-border/70 bg-secondary/40"
       role="img"
-      aria-label="Shared Trust Ledger connecting Origin and Operators under one verification backbone"
+      aria-label="Shared Trust Ledger connecting capture and review under one verification engine"
     >
       {/* Soft brand atmosphere */}
       <div
@@ -47,18 +47,18 @@ function TrustDiagram() {
       />
 
       <div className="relative p-5 sm:p-7">
-        {/* Top: two arms */}
+        {/* Two stages of one engine, not two arms */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <ArmCard
-            eyebrow="Data arm"
-            title="Origin"
+            eyebrow="When fresh data is needed"
+            title="Capture"
             stages={10}
             delay={0}
             reduceMotion={!!reduceMotion}
           />
           <ArmCard
-            eyebrow="Talent arm"
-            title="Operators"
+            eyebrow="Every case, always"
+            title="Review"
             stages={6}
             delay={0.08}
             reduceMotion={!!reduceMotion}
@@ -179,7 +179,7 @@ function TrustDiagram() {
               </div>
             </div>
             <span className="hidden rounded-full border border-ink-border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-copper-300 sm:inline">
-              Cross-arm
+              End-to-end
             </span>
           </div>
 
@@ -246,7 +246,7 @@ function ArmCard({
         ))}
       </div>
       <p className="mt-2.5 text-caption text-muted-foreground">
-        {stages}-stage {title === 'Origin' ? 'pipeline' : 'track'}
+        {stages}-stage {title === 'Capture' ? 'pipeline' : 'track'}
       </p>
     </motion.div>
   )
@@ -264,8 +264,8 @@ export function TrustLedger() {
                 Shared Trust Ledger.
               </h2>
               <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-                The credibility backbone connecting both arms, so buyers can audit provenance,
-                and contributors and operators are treated as professionals, not disposable labor.
+                The credibility backbone behind every case, so buyers can audit provenance,
+                and collectors and reviewers are treated as professionals, not disposable labor.
               </p>
             </MotionReveal>
 
@@ -289,8 +289,8 @@ export function TrustLedger() {
           <MotionReveal delay={0.12} className="lg:col-span-6">
             <TrustDiagram />
             <p className="mt-3 px-1 text-caption text-muted-foreground">
-              Structural model. Reliability gates unlock higher-stakes work on each arm
-              independently.
+              Structural model. Reliability gates unlock higher-stakes cases at every stage of
+              the engine, not just at the end.
             </p>
           </MotionReveal>
         </div>

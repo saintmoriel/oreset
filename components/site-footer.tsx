@@ -5,19 +5,18 @@ import { motion, useReducedMotion } from 'framer-motion'
 
 const columns = [
   {
-    title: 'Origin',
+    title: 'Verification',
     links: [
-      { label: 'Overview', href: '#engine' },
-      { label: 'Origin pipeline', href: '#origin' },
-      { label: 'Commission data', href: '#contact' },
+      { label: 'How it works', href: '#engine' },
+      { label: 'Reviewer network', href: '#operators' },
+      { label: 'Verify a decision', href: '#contact' },
     ],
   },
   {
-    title: 'Operators',
+    title: 'Field data',
     links: [
-      { label: 'Overview', href: '#engine' },
-      { label: '6-stage lifecycle', href: '#operators' },
-      { label: 'Hire operators', href: '#contact' },
+      { label: 'When we originate data', href: '#origin' },
+      { label: 'Discuss a need', href: '#contact' },
     ],
   },
   {
@@ -45,11 +44,11 @@ export function SiteFooter() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="max-w-3xl font-display text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl md:text-5xl">
-            Origination for African&nbsp;AI.
+            Verified decisions for African&nbsp;AI.
           </p>
           <p className="mt-4 max-w-xl text-body text-ink-muted">
-            Consented field data and certified native-language operators, under one Shared
-            Trust Ledger.
+            Real language, certified review, and a decision that&apos;s actually correct \u2014
+            under one Shared Trust Ledger.
           </p>
         </motion.div>
 
@@ -71,10 +70,10 @@ export function SiteFooter() {
               Abuja, Nigeria
             </p>
             <a
-              href="mailto:hello@oreset.africa"
+              href="mailto:info@oreset.africa"
               className="mt-4 inline-block text-body-sm text-ink-muted transition-colors hover:text-copper-300"
             >
-              hello@oreset.africa
+              info@oreset.africa
             </a>
           </div>
 

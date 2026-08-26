@@ -140,10 +140,10 @@ export function Contact() {
             <p className="mt-8 text-body-sm text-muted-foreground">
               Or email{' '}
               <a
-                href="mailto:hello@oreset.africa"
+                href="mailto:info@oreset.africa"
                 className="font-medium text-accent underline-offset-4 hover:underline"
               >
-                hello@oreset.africa
+                info@oreset.africa
               </a>
             </p>
           </div>

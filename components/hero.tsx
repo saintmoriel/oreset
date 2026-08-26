@@ -13,24 +13,24 @@ const HERO_IMAGE = '/hero-oreset.jpg'
 
 const proof = [
   {
-    value: '2,144 languages',
-    label: 'Opt-in consent',
-    detail: 'Zero IP / regulatory liability',
+    value: '2,144',
+    label: 'languages spoken in Africa',
+    detail: 'just 20 served by a regional LLM',
   },
   {
-    value: '16 kHz',
-    label: '16-bit mono',
-    detail: 'Uncompressed ASR standard',
+    value: '0',
+    label: 'frameworks that check this',
+    detail: 'fluency gets tested, consequence doesn\u2019t',
   },
   {
-    value: '4-tier',
-    label: 'Error taxonomy',
-    detail: 'Shared standard, origination to review',
+    value: '2-check',
+    label: 'verification, not 1',
+    detail: 'understanding and outcome, scored separately',
   },
   {
-    value: '6-stage',
-    label: 'Certified track',
-    detail: 'Calibrated before placement',
+    value: '100%',
+    label: 'opt-in consent',
+    detail: 'zero IP / regulatory liability',
   },
 ] as const
 

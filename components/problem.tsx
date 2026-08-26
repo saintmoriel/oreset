@@ -29,9 +29,9 @@ export function Problem() {
 
             <MotionReveal delay={0.14}>
               <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground sm:mt-6">
-                Web-scraped training sets for low-resource African languages drive preference
-                collapse and hallucination. Native-language QA is often ad hoc, unverified
-                fluency, no calibration trail, no wage-floor accountability.
+                Real benchmarks test whether an AI is fluent in a language. Almost none test
+                whether a language failure changed the decision that followed — a claim, a loan,
+                a transaction.
               </p>
             </MotionReveal>
 
@@ -43,10 +43,10 @@ export function Problem() {
                     className="mb-5 h-0.5 w-12 origin-left bg-accent"
                     aria-hidden="true"
                   />
-                  <p className="text-h4 text-foreground">The Data Deficit</p>
+                  <p className="text-h4 text-foreground">The Consequence Gap</p>
                   <p className="text-body-sm mt-2 text-muted-foreground">
-                    Thin scrapes miss dialect, orthography, and domain. Models fail languages
-                    hundreds of millions speak every day.
+                    A model can sound fluent in Yoruba, Hausa, or Pidgin and still get the
+                    decision wrong. Nothing in standard evaluation checks for that difference.
                   </p>
                 </div>
                 <div className="border-t border-border pt-5">
