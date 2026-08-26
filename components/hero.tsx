@@ -122,7 +122,7 @@ export function Hero() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[85%_center] sm:object-[80%_center] filter brightness-95 contrast-105"
+            className="object-cover object-[35%_center] sm:object-center"
           />
         </div>
         <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,24,41,0.95)_0%,rgba(15,24,41,0.82)_42%,rgba(18,32,58,0.5)_70%,rgba(197,106,50,0.2)_100%)]" />
