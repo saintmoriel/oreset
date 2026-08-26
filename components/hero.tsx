@@ -9,7 +9,7 @@ import { openPilotModal } from './pilot-scoping-modal'
 
 registerGsap()
 
-const HERO_IMAGE = '/background hero image.jpg'
+const HERO_IMAGE = '/hero-oreset1.jpg'
 
 const proof = [
   {
