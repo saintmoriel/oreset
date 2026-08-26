@@ -23,7 +23,7 @@ export function Problem() {
 
             <MotionReveal delay={0.08}>
               <h2 className="text-h1 mt-4 text-balance text-foreground sm:mt-5">
-                The data deficit and unverified talent&nbsp;QA.
+                Fluency gets tested. Consequence &nbsp;doesn't.
               </h2>
             </MotionReveal>
 

@@ -71,7 +71,7 @@ export function TwoArms() {
       <div className="container-wide">
         <MotionReveal>
           <div className="max-w-2xl">
-            <p className="text-eyebrow text-accent">Two arms · one ledger</p>
+            <p className="text-eyebrow text-accent">How we verify a decision</p>
             <h2 className="text-h1 mt-4 text-balance text-foreground">
               How Oreset is structured.
             </h2>
