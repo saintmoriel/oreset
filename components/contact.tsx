@@ -273,7 +273,7 @@ export function Contact() {
                       fieldClass(Boolean(touched.message && errors.message)),
                       'min-h-[7rem] resize-y',
                     )}
-                    placeholder="Languages, modalities, timeline, or how you’d like to contribute…"
+                    placeholder="What decision, what language, and what you're trying to verify…"
                   />
                 </Field>
 

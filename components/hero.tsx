@@ -13,7 +13,7 @@ const HERO_IMAGE = '/hero-oreset.jpg'
 
 const proof = [
   {
-    value: '100%',
+    value: '2,144 languages',
     label: 'Opt-in consent',
     detail: 'Zero IP / regulatory liability',
   },
@@ -173,14 +173,14 @@ export function Hero() {
                 onClick={() => openPilotModal()}
                 className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground shadow-[0_10px_30px_rgba(197,106,50,0.35)] transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-copper-600 sm:w-auto"
               >
-                Scope a Pilot Batch
+                Verify a Decision
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </button>
               <a
                 href="#origin"
                 className="inline-flex h-12 w-full items-center justify-center rounded-md border border-white/25 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur-sm transition-[background-color,border-color] duration-200 hover:border-white/45 hover:bg-white/12 sm:w-auto"
               >
-                How Origin works
+                How Verification Works
               </a>
             </div>
           </div>

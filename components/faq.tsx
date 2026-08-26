@@ -29,8 +29,8 @@ const faqs = [
   },
   {
     audience: 'Buyers',
-    q: 'Which languages and modalities do you cover?',
-    a: 'Coverage is scoped per pilot: speech, language text, and agricultural imagery are in the Origin design. We do not publish inflated “N languages live” counts; we start from your languages, dialects, and deliverable.',
+    q: 'Which languages and decision types do you cover?',
+    a: 'Coverage is scoped per case: we start from the language and decision type you bring us — claims, lending, government services, or another decision-driven AI product. We do not publish inflated "N languages live" counts; we verify against real examples, not assumed coverage.',
   },
   {
     audience: 'Everyone',

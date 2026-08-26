@@ -18,21 +18,21 @@ type FormState = {
   name: string
   email: string
   org: string
-  modality: string
-  languages: string
-  notes: string
+  domain: string
+  language: string
+  caseDescription: string
 }
 
 const initial: FormState = {
   name: '',
   email: '',
   org: '',
-  modality: '',
-  languages: '',
-  notes: '',
+  domain: '',
+  language: '',
+  caseDescription: '',
 }
 
-const modalities = ['Speech / ASR', 'Image / agri', 'Text / language', 'Mixed modalities']
+const domains = ['Claims & payouts', 'Lending & credit', 'Government & public services', 'Other decision-driven AI']
 
 export function openPilotModal() {
   window.dispatchEvent(new CustomEvent('oreset:open-pilot'))
@@ -92,9 +92,12 @@ export function PilotScopingModal() {
     if (!values.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
       next.email = 'Enter a valid work email.'
     }
-    if (!values.org.trim()) next.org = 'Organization helps us route the pilot.'
-    if (!values.modality) next.modality = 'Select a primary modality.'
-    if (!values.languages.trim()) next.languages = 'Which languages or dialects?'
+    if (!values.org.trim()) next.org = 'Organization helps us route the review.'
+    if (!values.domain) next.domain = 'Select the decision type.'
+    if (!values.language.trim()) next.language = 'Which language or dialect is involved?'
+    if (!values.caseDescription.trim() || values.caseDescription.trim().length < 20) {
+      next.caseDescription = 'Describe the real decision or exchange \u2014 a few sentences is enough.'
+    }
     setErrors(next)
     if (Object.keys(next).length) return
 
@@ -134,9 +137,9 @@ export function PilotScopingModal() {
           >
             <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
               <div>
-                <p className="text-eyebrow text-accent">Pilot scoping</p>
+                <p className="text-eyebrow text-accent">Verification request</p>
                 <h2 id={titleId} className="mt-1 font-display text-xl font-semibold tracking-tight">
-                  Scope a pilot batch
+                  Verify a Decision
                 </h2>
               </div>
               <button
@@ -155,10 +158,10 @@ export function PilotScopingModal() {
                   <span className="flex size-11 items-center justify-center rounded-xl bg-success/10">
                     <CheckCircle2 className="size-5 text-success" />
                   </span>
-                  <h3 className="text-h4 text-foreground">Request received.</h3>
+                  <h3 className="text-h4 text-foreground">Case received.</h3>
                   <p className="text-body-sm text-muted-foreground">
-                    We’ll review your scoping note and follow up within a few business days to
-                    define languages, modalities, and batch size.
+                    Our reviewers will look at what you've sent and follow up within a few business
+                    days with what we found.
                   </p>
                   <button
                     type="button"
@@ -205,52 +208,52 @@ export function PilotScopingModal() {
 
                   <fieldset>
                     <legend className="text-body-sm font-medium text-foreground">
-                      Primary modality
+                      Decision type
                     </legend>
                     <div className="mt-2 grid grid-cols-2 gap-2">
-                      {modalities.map((m) => (
+                      {domains.map((d) => (
                         <label
-                          key={m}
+                          key={d}
                           className={cn(
                             'cursor-pointer rounded-lg border px-3 py-2.5 text-caption font-medium transition-colors',
-                            values.modality === m
+                            values.domain === d
                               ? 'border-accent bg-copper-50 text-foreground'
                               : 'border-border text-muted-foreground hover:border-foreground/20',
                           )}
                         >
                           <input
                             type="radio"
-                            name="modality"
+                            name="domain"
                             className="sr-only"
-                            checked={values.modality === m}
-                            onChange={() => update('modality', m)}
+                            checked={values.domain === d}
+                            onChange={() => update('domain', d)}
                           />
-                          {m}
+                          {d}
                         </label>
                       ))}
                     </div>
-                    {errors.modality && (
+                    {errors.domain && (
                       <p className="mt-1.5 text-caption text-destructive" role="alert">
-                        {errors.modality}
+                        {errors.domain}
                       </p>
                     )}
                   </fieldset>
 
-                  <Field label="Languages / dialects" error={errors.languages}>
+                  <Field label="Language or dialect" error={errors.language}>
                     <input
-                      value={values.languages}
-                      onChange={(e) => update('languages', e.target.value)}
-                      className={fieldClass(Boolean(errors.languages))}
-                      placeholder="e.g. Yorùbá, Hausa, Twi"
+                      value={values.language}
+                      onChange={(e) => update('language', e.target.value)}
+                      className={fieldClass(Boolean(errors.language))}
+                      placeholder="e.g. Yorùbá, Hausa, Pidgin"
                     />
                   </Field>
 
-                  <Field label="Batch notes (optional)">
+                  <Field label="Describe the decision" error={errors.caseDescription}>
                     <textarea
-                      value={values.notes}
-                      onChange={(e) => update('notes', e.target.value)}
-                      className={cn(fieldClass(false), 'min-h-[5rem] resize-y')}
-                      placeholder="Volume, timeline, domain constraints…"
+                      value={values.caseDescription}
+                      onChange={(e) => update('caseDescription', e.target.value)}
+                      className={cn(fieldClass(Boolean(errors.caseDescription)), 'min-h-[6rem] resize-y')}
+                      placeholder="What happened, and what decision did your AI make? A real example, in a few sentences."
                     />
                   </Field>
 
