@@ -22,14 +22,39 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.oreset.africa'),
   title: 'Oreset | Independent AI Decision Verification for African Languages',
   description:
     "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+  openGraph: {
+    title: 'Oreset | Independent AI Decision Verification for African Languages',
+    description:
+      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+    url: 'https://www.oreset.africa',
+    siteName: 'Oreset',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Oreset — Independent AI Decision Verification for African Languages',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Oreset | Independent AI Decision Verification for African Languages',
+    description:
+      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+    images: ['/og-image.jpg'],
+  },
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#faf8f4',
+  colorScheme: 'dark',
+  themeColor: '#0f172a',
 }
 
 export default function RootLayout({

@@ -5,7 +5,7 @@ import { ScrollWords } from './scroll-words'
 import { SiteImage } from './site-image'
 
 const PROBLEM_IMAGE =
-  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80'
+  '/pipeline-oreset.jpeg'
 
 export function Problem() {
   return (

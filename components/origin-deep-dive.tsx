@@ -5,7 +5,7 @@ import { MotionReveal, MotionStagger, MotionStaggerItem } from './motion-reveal'
 import { SiteImage } from './site-image'
 
 const ORIGIN_IMAGE =
-  'https://images.unsplash.com/photo-1602788526767-f09470bb8e0b?auto=format&fit=crop&w=1400&q=80'
+  '/origin-oreset.jpeg'
 
 const pillars = [
   {
