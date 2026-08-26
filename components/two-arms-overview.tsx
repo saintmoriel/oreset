@@ -1,40 +1,49 @@
 'use client'
 
-import { ArrowRight } from 'lucide-react'
 import { MotionReveal, MotionStagger, MotionStaggerItem } from './motion-reveal'
-import { SiteImage } from './site-image'
 
-const arms = [
+const steps = [
   {
-    id: 'origin-card',
-    href: '#origin',
-    label: 'Oreset Origin',
-    arm: 'Data arm',
-    stages: 'Field-to-delivery pipeline',
+    id: 'capture',
+    number: '01',
+    label: 'Capture the real exchange',
     summary:
-      'Local collectors originate fresh African speech, language, and agri imagery, with consent and licensing built in from capture.',
-    image:
-      'https://images.unsplash.com/photo-1741874299706-2b8e16839aaa?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'African farmer tending crops in a field, illustrative of Origin field capture contexts',
+      'Not a clean translation. The actual conversation — code-switching, Pidgin, mixed register — the way people really speak, not the way a textbook does.',
   },
   {
-    id: 'operators-card',
-    href: '#operators',
-    label: 'Oreset Operators',
-    arm: 'Talent arm',
-    stages: '6-stage track',
+    id: 'separate',
+    number: '02',
+    label: 'Separate understanding from outcome',
     summary:
-      'Native-language professionals trained and certified for AI-assisted review, correction, and ongoing product QA.',
-    image:
-      'https://images.unsplash.com/photo-1622295023876-0cdf583c41f6?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'African professional reviewing work on a laptop, illustrative of operator review work',
+      'Two different questions, checked independently: did the AI understand correctly, and separately, was the decision that followed actually right. A model can pass one and fail the other.',
+  },
+  {
+    id: 'route',
+    number: '03',
+    label: 'Route to a certified, domain-matched reviewer',
+    summary:
+      'Not just fluent in the language. Calibrated to the domain — claims, lending, service eligibility — so the review catches what generic language QA misses.',
+  },
+  {
+    id: 'score',
+    number: '04',
+    label: 'Score the gap, not just flag it',
+    summary:
+      'Severity-weighted: did the language failure change the outcome, or was it cosmetic. That distinction is what makes a finding actionable instead of vague.',
+  },
+  {
+    id: 'deliver',
+    number: '05',
+    label: 'Deliver evidence, not a report',
+    summary:
+      'A specific, reproducible trace: this exchange, this language, this wrong decision, here is what correct looks like.',
   },
 ]
 
 export function TwoArmsOverview() {
   return (
     <section
-      id="arms"
+      id="engine"
       data-scroll-section
       className="border-t border-border/60 bg-secondary/40 py-16 sm:py-24 md:py-32"
     >
@@ -43,45 +52,22 @@ export function TwoArmsOverview() {
           <div className="max-w-2xl">
             <p className="text-eyebrow text-accent">How we verify a decision</p>
             <h2 className="text-h1 mt-4 text-balance text-foreground">
-              How Oreset is structured.
+              One engine, five steps.
             </h2>
             <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-              Origin and Operators share one origination engine and one trust philosophy.
-              Reliability is earned before higher-stakes work is unlocked.
+              Not two separate services. One continuous verification, from the real exchange to
+              the evidence in your hands.
             </p>
           </div>
         </MotionReveal>
 
-        <MotionStagger className="mt-10 grid gap-5 sm:mt-12 sm:gap-6 lg:grid-cols-2 lg:gap-8" stagger={0.12}>
-          {arms.map((arm) => (
-            <MotionStaggerItem key={arm.id}>
-              <article className="card-surface-raised group flex h-full flex-col overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-[0_24px_60px_rgba(22,33,58,0.16)]">
-                <div className="photo-brand photo-brand-soft relative aspect-[16/10] overflow-hidden">
-                  <SiteImage
-                    data-scroll-media
-                    src={arm.image}
-                    alt={arm.imageAlt}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="will-change-transform transition-transform duration-700 group-hover:scale-[1.03]"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col p-5 sm:p-6 md:p-8">
-                  <p className="text-eyebrow text-accent">{arm.arm}</p>
-                  <h3 className="text-h2 mt-2 text-foreground">{arm.label}</h3>
-                  <p className="text-body mt-3 text-muted-foreground">{arm.summary}</p>
-                  <p className="mt-4 inline-flex items-center gap-2 text-caption font-semibold uppercase tracking-wider text-muted-foreground">
-                    <span className="motif-dot" aria-hidden="true" />
-                    {arm.stages}
-                  </p>
-                  <a
-                    href={arm.href}
-                    className="mt-auto inline-flex min-h-11 items-center gap-2 pt-6 text-body-sm font-semibold text-accent transition-colors hover:text-copper-600"
-                  >
-                    Learn more
-                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-                  </a>
-                </div>
+        <MotionStagger className="mt-10 grid gap-5 sm:mt-12 sm:gap-6 lg:grid-cols-5" stagger={0.1}>
+          {steps.map((step) => (
+            <MotionStaggerItem key={step.id}>
+              <article className="card-surface-raised group flex h-full flex-col p-5 transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-[0_24px_60px_rgba(22,33,58,0.16)] sm:p-6">
+                <p className="font-mono text-xs font-semibold text-accent">{step.number}</p>
+                <h3 className="text-h4 mt-3 text-foreground">{step.label}</h3>
+                <p className="text-body-sm mt-3 text-muted-foreground">{step.summary}</p>
               </article>
             </MotionStaggerItem>
           ))}

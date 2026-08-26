@@ -22,7 +22,7 @@ type NavItem =
 const navItems: NavItem[] = [
   {
     label: 'Solutions',
-    href: '#arms',
+    href: '#engine',
     children: [
       {
         label: 'Claims & payouts',

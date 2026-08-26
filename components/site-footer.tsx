@@ -7,7 +7,7 @@ const columns = [
   {
     title: 'Origin',
     links: [
-      { label: 'Overview', href: '#arms' },
+      { label: 'Overview', href: '#engine' },
       { label: 'Origin pipeline', href: '#origin' },
       { label: 'Commission data', href: '#contact' },
     ],
@@ -15,7 +15,7 @@ const columns = [
   {
     title: 'Operators',
     links: [
-      { label: 'Overview', href: '#arms' },
+      { label: 'Overview', href: '#engine' },
       { label: '6-stage lifecycle', href: '#operators' },
       { label: 'Hire operators', href: '#contact' },
     ],
