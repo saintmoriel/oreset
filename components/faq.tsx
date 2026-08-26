@@ -10,22 +10,22 @@ const faqs = [
   {
     audience: 'Everyone',
     q: 'Is Oreset live yet?',
-    a: 'Oreset is pre-revenue and building through partner pilots, not a self-serve product with instant signup. If you have a scoped need (data commission or operator staffing), talk to us about a pilot.',
+    a: 'Oreset is pre-revenue and building through real cases, not a self-serve product with instant signup. If you have a decision you need checked, talk to us directly.',
   },
   {
     audience: 'Buyers',
-    q: 'How is data consent handled?',
-    a: 'On the Origin arm, digital consent is required before a collector can submit a capture. Licensing and provenance travel with the delivered package via the Shared Trust Ledger, not as paperwork after the fact.',
+    q: 'How does verification actually work?',
+    a: "We check two things separately, not one blended score: did the AI correctly understand what the user meant, and separately, was the decision that followed actually correct. A model can pass one and fail the other — that's the gap most evaluation misses.",
   },
   {
     audience: 'Buyers',
-    q: 'How are operators certified?',
-    a: 'Operators move through Sourcing → Training → Certification before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes placement requires earned reliability scorecards.',
+    q: 'How are reviewers certified?',
+    a: 'Reviewers move through Sourcing → Training → Certification before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes cases require earned reliability scorecards — matched by language and domain, not language alone.',
   },
   {
     audience: 'Contributors',
-    q: 'How do collectors and operators get paid?',
-    a: 'Compensation is designed around explicit rates and a wage floor. Cleared Origin contributions move through Payout Line; Operators work under account arrangements, not opaque piece rates. Exact terms are set per pilot engagement.',
+    q: 'How do collectors and reviewers get paid?',
+    a: 'Compensation is designed around explicit rates and a wage floor, not opaque piece rates. Exact terms are set per case or account arrangement.',
   },
   {
     audience: 'Buyers',
@@ -34,8 +34,13 @@ const faqs = [
   },
   {
     audience: 'Everyone',
+    q: 'How is data consent handled, if you need fresh data for a case?',
+    a: 'Digital consent is required before a collector can submit a capture. Licensing and provenance travel with the data via the Shared Trust Ledger, not as paperwork after the fact.',
+  },
+  {
+    audience: 'Everyone',
     q: 'Where is Oreset based?',
-    a: 'Oreset Africa Hub is based in Abuja, Nigeria. The network is designed for distributed field collection and operator placement across African language communities.',
+    a: 'Oreset Africa Hub is based in Abuja, Nigeria. The reviewer network is designed for distributed placement across African language communities.',
   },
 ]
 
@@ -53,7 +58,7 @@ export function FAQ() {
               Straight answers.
             </h2>
             <p className="text-body mt-4 text-muted-foreground">
-              Honest to stage, for buyers, collectors, and prospective operators.
+              Honest to stage, for buyers, reviewers, and field collectors.
             </p>
           </MotionReveal>
 

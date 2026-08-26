@@ -9,8 +9,7 @@ import { openPilotModal } from './pilot-scoping-modal'
 
 registerGsap()
 
-// Ensure your file in public/ is named exactly hero-oreset1.jpg
-const HERO_IMAGE = '/hero-oreset1.jpg'
+const HERO_IMAGE = '/hero-oreset1.jpeg'
 
 const proof = [
   {
@@ -21,7 +20,7 @@ const proof = [
   {
     value: '0',
     label: 'frameworks that check this',
-    detail: 'fluency gets tested, consequence doesn\u2019t',
+    detail: "fluency gets tested, consequence doesn't",
   },
   {
     value: '2-check',
@@ -119,12 +118,11 @@ export function Hero() {
         <div ref={imageRef} className="relative h-[115%] w-full will-change-transform md:h-[120%]">
           <Image
             src={HERO_IMAGE}
-            alt="Oreset Field Ground-Truth Capture"
+            alt=""
             fill
             priority
             sizes="100vw"
-            /* FIXED: Locks camera focus to the right side (80%) across all screen sizes */
-            className="object-cover object-[80%_center]"
+            className="object-cover object-[72%_center] sm:object-center"
           />
         </div>
         <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,24,41,0.95)_0%,rgba(15,24,41,0.82)_42%,rgba(18,32,58,0.5)_70%,rgba(197,106,50,0.2)_100%)]" />

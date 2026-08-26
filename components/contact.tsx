@@ -25,19 +25,19 @@ const initial: FormState = {
 
 const audiences: { value: Exclude<Audience, ''>; label: string; hint: string }[] = [
   {
-    value: 'origin-buyer',
-    label: 'Commission data',
-    hint: 'Origin: speech, language, agri imagery',
+    value: 'operators-buyer',
+    label: 'Verify a decision',
+    hint: 'Send us a real case to check',
   },
   {
-    value: 'operators-buyer',
-    label: 'Hire operators',
-    hint: 'Certified native-language QA',
+    value: 'origin-buyer',
+    label: 'Discuss field data',
+    hint: 'When a case needs fresh data first',
   },
   {
     value: 'contributor',
-    label: 'Contribute / collect',
-    hint: 'Language expert or field collector',
+    label: 'Apply as a reviewer',
+    hint: 'Native-language expert or field collector',
   },
 ]
 
@@ -116,7 +116,7 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
-              Get involved
+              Get in touch
             </motion.p>
             <motion.h2
               className="text-h1 mt-4 text-balance text-foreground"
@@ -125,7 +125,7 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
             >
-              Start a pilot with Oreset.
+              Verify a decision with Oreset.
             </motion.h2>
             <motion.p
               className="text-body-lg mt-5 text-pretty text-muted-foreground"
@@ -134,8 +134,8 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             >
-              Commission data, hire certified operators, or join as a collector / language
-              expert. We’ll follow up personally. No automated drip.
+              Send us a real case, discuss a field data need, or apply as a certified reviewer.
+              We&apos;ll follow up personally. No automated drip.
             </motion.p>
             <p className="mt-8 text-body-sm text-muted-foreground">
               Or email{' '}
@@ -286,7 +286,7 @@ export function Contact() {
                     disabled={status === 'submitting'}
                     className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-body-sm font-semibold text-accent-foreground transition-[transform,background-color,opacity] duration-200 hover:-translate-y-0.5 hover:bg-copper-600 disabled:pointer-events-none disabled:opacity-60 sm:w-auto"
                   >
-                    {status === 'submitting' ? 'Sending…' : 'Start a pilot'}
+                    {status === 'submitting' ? 'Sending…' : 'Send it'}
                     {status !== 'submitting' && (
                       <ArrowRight className="size-4" aria-hidden="true" />
                     )}

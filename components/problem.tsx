@@ -93,7 +93,7 @@ export function Problem() {
           />
           <ScrollWords
             className="pl-5 font-display text-xl font-semibold leading-snug tracking-tight text-foreground sm:pl-6 sm:text-2xl md:pl-8 md:text-[2rem] md:leading-[1.25]"
-            text="AI built for Africa needs consented origination and certified native-language talent: earned reliability, not scraped volume."
+            text="Fluency is not the same as correct. Oreset verifies the difference, before it costs someone something."
           />
           <p className="mt-4 pl-5 text-body-sm text-muted-foreground sm:pl-6 md:pl-8">
             Oreset operating thesis

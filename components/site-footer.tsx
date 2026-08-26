@@ -47,7 +47,7 @@ export function SiteFooter() {
             Verified decisions for African&nbsp;AI.
           </p>
           <p className="mt-4 max-w-xl text-body text-ink-muted">
-            Real language, certified review, and a decision that&apos;s actually correct \u2014
+            Real language, certified review, and a decision that&apos;s actually correct —
             under one Shared Trust Ledger.
           </p>
         </motion.div>
