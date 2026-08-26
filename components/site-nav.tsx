@@ -182,7 +182,7 @@ export function SiteNav() {
               )}
             >
               <Image
-                src="/oreset-logo.png"
+                src="/oreset-logo v2.png"
                 alt=""
                 width={36}
                 height={36}
