@@ -11,7 +11,7 @@ const pillars = [
   {
     title: 'Capture in the field',
     detail:
-      'Speech, language text, and agri imagery originated by local collectors where the data actually lives.',
+      'When a case needs fresh field data — not just a client-submitted exchange — collectors originate it locally, where the language actually lives.',
   },
   {
     title: 'Consent before submit',
@@ -36,19 +36,20 @@ export function OriginDeepDive() {
         <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-14 xl:gap-16">
           <div className="lg:col-span-5">
             <MotionReveal>
-              <p className="text-eyebrow text-accent">Oreset Origin</p>
+              <p className="text-eyebrow text-accent">Field data origination</p>
               <h2 className="text-h1 mt-4 text-balance text-foreground">
-                From capture to delivery.
+                Where verification needs fresh data.
               </h2>
               <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-                Fresh African speech, language, and agricultural imagery—originated in the
-                field, verified before delivery, and licensed from the point of capture.
+                Most cases arrive as a real exchange you send us. Some need fresh field data first
+                — original speech, text, or imagery, consented and licensed from the point of
+                capture — before verification can happen at all.
               </p>
               <a
                 href="#contact"
                 className="group mt-8 inline-flex min-h-11 items-center gap-2 text-body-sm font-semibold text-accent transition-colors hover:text-copper-600"
               >
-                Commission Origin data
+                Discuss a data origination need
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </a>
             </MotionReveal>

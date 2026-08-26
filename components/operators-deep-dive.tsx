@@ -79,13 +79,14 @@ export function OperatorsDeepDive() {
 
           <div className="order-1 lg:order-2 lg:col-span-5">
             <MotionReveal>
-              <p className="text-eyebrow text-accent">Oreset Operators</p>
+              <p className="text-eyebrow text-accent">Behind step 3: the reviewer network</p>
               <h2 className="text-h1 mt-4 text-balance text-foreground">
-                A 6-stage certified talent track.
+                Certified, not just fluent.
               </h2>
               <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-                For enterprise ops and product leads whose live AI products need ongoing
-                native-language review, with a recurring staffing budget, not a one-off gig.
+                Every case is routed to a reviewer who cleared this track — calibrated on
+                language, domain, and the error taxonomy that separates a cosmetic slip from a
+                decision that went wrong.
               </p>
             </MotionReveal>
 
@@ -113,7 +114,7 @@ export function OperatorsDeepDive() {
                 href="#contact"
                 className="mt-6 inline-flex text-body-sm font-semibold text-accent hover:text-copper-600"
               >
-                Hire certified operators →
+                Apply to the reviewer network →
               </a>
             </MotionReveal>
           </div>
