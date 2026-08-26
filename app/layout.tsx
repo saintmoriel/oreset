@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.jpg',
+        url: 'https://www.oreset.africa/og-image.jpeg',
         width: 1200,
         height: 630,
         alt: 'Oreset — Independent AI Decision Verification for African Languages',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     title: 'Oreset | Independent AI Decision Verification for African Languages',
     description:
       "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
-    images: ['/og-image.jpeg'],
+    images: ['https://www.oreset.africa/og-image.jpg'],
   },
 }
 
