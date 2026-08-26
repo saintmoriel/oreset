@@ -95,7 +95,7 @@ export function OperatorsDeepDive() {
                 <div className="photo-brand photo-brand-soft relative aspect-[4/3] overflow-hidden">
                   <SiteImage
                     data-scroll-media
-                    src="/operator-review.jpeg"
+                    src="/operator-oreset.jpeg"
                     alt="Black professional working on a laptop, illustrative of operator review work"
                     fill
                     sizes="(max-width: 1024px) 100vw, 40vw"
