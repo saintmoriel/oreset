@@ -56,7 +56,7 @@ export function SiteFooter() {
           <div className="sm:col-span-2 md:col-span-1">
             <div className="flex items-center gap-2.5">
               <Image
-                src="/oreset-logo.png"
+                src="/oreset-logo v2.png"
                 alt=""
                 width={28}
                 height={28}
