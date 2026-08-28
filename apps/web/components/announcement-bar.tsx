@@ -33,7 +33,7 @@ export function AnnouncementBar() {
               className="group inline-flex flex-wrap items-center justify-center gap-x-1.5 text-xs font-medium tracking-wide text-ink-foreground/90 transition-colors hover:text-white sm:text-sm"
             >
               <span>
-                Oreset is accepting operator applications for African native language
+                Oreset is accepting reviewer applications for African native language
                 cohorts
               </span>
               <span className="inline-flex items-center gap-1 text-accent transition-transform group-hover:translate-x-0.5">
