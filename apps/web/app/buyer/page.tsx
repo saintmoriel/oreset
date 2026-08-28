@@ -33,7 +33,7 @@ function BuyerSignInContent() {
   }
 
   return (
-    <div className="min-h-svh bg-background">
+    <div className="min-h-svh overflow-y-auto bg-background">
       <header className="border-b border-border/70 bg-card/80 backdrop-blur-md">
         <div className="container-narrow flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5" aria-label="Oreset home">

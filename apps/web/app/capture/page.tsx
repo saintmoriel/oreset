@@ -51,7 +51,7 @@ function CaptureSignInContent() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col bg-background">
+    <div className="flex min-h-svh flex-col overflow-y-auto bg-background">
       <header className="border-b border-border">
         <div className="container-narrow flex h-14 items-center justify-between">
           <Link href="/" className="flex items-center gap-2" aria-label="Oreset home">
