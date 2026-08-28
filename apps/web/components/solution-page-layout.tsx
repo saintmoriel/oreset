@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
 import { MotionReveal, MotionStagger, MotionStaggerItem } from './motion-reveal'
 import { openPilotModal, PilotScopingModal } from './pilot-scoping-modal'
-import { SmoothScroll } from './smooth-scroll'
 
 export type SolutionPageData = {
   vertical: string
@@ -36,9 +35,8 @@ export type SolutionPageData = {
 export function SolutionPageLayout({ data }: { data: SolutionPageData }) {
   return (
     <>
-    <SmoothScroll />
     <PilotScopingModal />
-    <div className="min-h-svh bg-background">
+    <div className="min-h-svh overflow-y-auto bg-background">
       {/* Header */}
       <header className="border-b border-border/70 bg-card/80 backdrop-blur-md">
         <div className="container-wide flex h-16 items-center justify-between">
