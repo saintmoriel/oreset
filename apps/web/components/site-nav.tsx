@@ -40,6 +40,11 @@ const navItems: NavItem[] = [
         hint: 'Verified access for every language spoken',
       },
       {
+        label: 'Healthcare',
+        href: '#engine',
+        hint: 'Correct diagnoses across local languages',
+      },
+      {
         label: 'Verify a decision',
         href: '#contact',
         hint: 'Send us a real example',
@@ -92,7 +97,7 @@ const navItems: NavItem[] = [
         hint: 'Straight answers for buyers',
       },
       {
-        label: 'Operator applications',
+        label: 'Reviewer applications',
         href: '/operators/join',
         hint: 'African cohorts',
       },
