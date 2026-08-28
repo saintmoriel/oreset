@@ -74,7 +74,7 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    label: 'Talent Network',
+    label: 'Reviewers',
     href: '#operators',
   },
   {

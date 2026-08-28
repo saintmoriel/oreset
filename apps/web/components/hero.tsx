@@ -193,7 +193,7 @@ export function Hero() {
               <span aria-hidden="true">·</span>
               <a href="/operators/join" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Get certified</a>
               <span aria-hidden="true">·</span>
-              <a href="#contact" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Commission data</a>
+              <a href="#contact" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Start a pilot</a>
             </nav>
           </div>
         </div>

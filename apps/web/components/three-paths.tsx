@@ -89,16 +89,16 @@ export function ThreePaths() {
             <div className="card-surface-raised h-full flex flex-col p-6 sm:p-8 relative">
               <div className="mb-8">
                 <div className="font-mono text-accent text-sm mb-4">03</div>
-                <h3 className="text-h3 text-foreground mb-2">Commission a dataset</h3>
-                <p className="text-body-sm text-muted-foreground">For AI labs and enterprise buyers</p>
+                <h3 className="text-h3 text-foreground mb-2">Verify a decision</h3>
+                <p className="text-body-sm text-muted-foreground">For AI teams shipping into African markets</p>
               </div>
 
               <ol className="space-y-4 mb-10 flex-grow">
                 {[
-                  "Scope languages, modalities, and batch size",
-                  "We activate a field pool with matched collectors",
-                  "Automated gatechecks + operator review before delivery",
-                  "Receive packages with consent licensing and provenance"
+                  "Send us a real case — a claim, loan, or transaction",
+                  "We route to a certified, domain-matched reviewer",
+                  "Understanding and outcome checked separately",
+                  "Receive a severity-scored evidence trace"
                 ].map((step, i) => (
                   <li key={i} className="flex gap-3 text-body-sm">
                     <span className="font-mono text-accent/70 mt-0.5 shrink-0">{i + 1}.</span>
@@ -109,7 +109,7 @@ export function ThreePaths() {
 
               <div className="mt-auto">
                 <button onClick={() => openPilotModal()} className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-accent hover:text-copper-600 transition-colors group/cta text-left">
-                  Scope a pilot
+                  Start a pilot
                   <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-1" />
                 </button>
               </div>
