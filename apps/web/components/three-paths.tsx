@@ -14,7 +14,7 @@ export function ThreePaths() {
             <p className="text-eyebrow text-accent">Three paths in</p>
             <h2 className="text-h1 mt-4 text-balance text-foreground">How you work with Oreset.</h2>
             <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-              Whether you contribute data, certify as an operator, or commission deliverables — every path runs through the same trust infrastructure.
+              Whether you contribute data, certify as a reviewer, or verify a decision — every path runs through the same trust infrastructure.
             </p>
           </div>
         </MotionReveal>
@@ -57,7 +57,7 @@ export function ThreePaths() {
             <div className="card-surface-raised h-full flex flex-col p-6 sm:p-8 relative">
               <div className="mb-8">
                 <div className="font-mono text-accent text-sm mb-4">02</div>
-                <h3 className="text-h3 text-foreground mb-2">Become a Certified Operator</h3>
+                <h3 className="text-h3 text-foreground mb-2">Become a Certified Reviewer</h3>
                 <p className="text-body-sm text-muted-foreground">For native-language professionals</p>
               </div>
 
@@ -66,7 +66,7 @@ export function ThreePaths() {
                   "Apply through Scout intake",
                   "Complete Foundry training: Pacing, Clarity, Spontaneity",
                   "Pass timed Certify evaluation (≥90%, zero critical errors)",
-                  "Join the Bench for enterprise matching"
+                  "Join the reviewer network for case matching"
                 ].map((step, i) => (
                   <li key={i} className="flex gap-3 text-body-sm">
                     <span className="font-mono text-accent/70 mt-0.5 shrink-0">{i + 1}.</span>
