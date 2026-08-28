@@ -106,9 +106,9 @@ const navItems: NavItem[] = [
 ]
 
 const signInItems = [
-  { label: 'Contributor', href: '/capture', hint: 'Field data collection' },
+  { label: 'Contributor', href: '/capture', hint: 'Field data capture' },
   { label: 'Operator', href: '/operator', hint: 'Certified review work' },
-  { label: 'Buyer', href: '/buyer', hint: 'Commission & manage data' },
+  { label: 'Client', href: '/buyer', hint: 'Verification cases & evidence' },
 ] as const
 
 const staffItems = [

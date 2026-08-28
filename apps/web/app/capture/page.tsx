@@ -72,7 +72,7 @@ function CaptureSignInContent() {
           <span className="flex size-9 items-center justify-center rounded-md bg-accent/10">
             <Mic className="size-4 text-accent" />
           </span>
-          <p className="cx-label mt-4 text-navy-400">Origin · Capture</p>
+          <p className="cx-label mt-4 text-navy-400">Field Capture</p>
           <h1 className="cx-page-title mt-1.5 text-navy-900">Contributor sign-in</h1>
 
           {step === 'phone' ? (

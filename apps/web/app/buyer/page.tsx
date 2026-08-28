@@ -54,11 +54,10 @@ function BuyerSignInContent() {
 
       <main className="container-narrow py-16 sm:py-24">
         <div className="cx-card p-8 sm:p-10">
-          <p className="cx-label text-accent">Origin · Buyer Portal</p>
-          <h1 className="cx-page-title mt-2 text-navy-900">Buyer sign-in</h1>
+          <p className="cx-label text-accent">Verification · Client Portal</p>
+          <h1 className="cx-page-title mt-2 text-navy-900">Client sign-in</h1>
           <p className="cx-body mt-3 text-navy-500">
-            Access datasets handed off to your organization, complete with licensing terms and a
-            provenance seal.
+            Access your verification cases, evidence traces, and severity-scored results.
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -99,11 +98,11 @@ function BuyerSignInContent() {
           </form>
 
           <p className="mt-6 cx-meta text-navy-500">
-            Not a buyer yet?{' '}
+            Not a client yet?{' '}
             <a href="/#contact" className="font-semibold text-accent hover:text-copper-600">
-              Get in touch
+              Start a pilot
             </a>{' '}
-            to commission Origin data.
+            to verify your first case.
           </p>
         </div>
       </main>
