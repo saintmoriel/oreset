@@ -26,22 +26,22 @@ const navItems: NavItem[] = [
     children: [
       {
         label: 'Claims & payouts',
-        href: '#engine',
+        href: '/solutions/claims',
         hint: 'Catching language-driven claim errors',
       },
       {
         label: 'Lending & credit decisions',
-        href: '#engine',
+        href: '/solutions/lending',
         hint: 'Verifying loan decisions across languages',
       },
       {
         label: 'Government & public services',
-        href: '#engine',
+        href: '/solutions/government',
         hint: 'Verified access for every language spoken',
       },
       {
         label: 'Healthcare',
-        href: '#engine',
+        href: '/solutions/healthcare',
         hint: 'Correct diagnoses across local languages',
       },
       {
