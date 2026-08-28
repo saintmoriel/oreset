@@ -1,48 +1,51 @@
 import Link from 'next/link'
-import { ArrowRight, Package } from 'lucide-react'
-import { BuyerShell } from '@/components/buyer/buyer-shell'
-import { serverApiFetch } from '@/lib/api/server'
+import { ArrowRight } from 'lucide-react'
+import { BuyerAppShell } from '@/components/buyer/buyer-app-shell'
+import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import type { MyDataset } from '@/lib/api/endpoints/buyer'
 
 export default async function BuyerDatasetsPage() {
-  const { datasets } = await serverApiFetch<{ datasets: MyDataset[] }>('/api/v1/buyer/datasets')
+  let datasets: MyDataset[]
+  try {
+    ;({ datasets } = await serverApiFetch<{ datasets: MyDataset[] }>('/api/v1/buyer/datasets'))
+  } catch (err) {
+    redirectIfSignedOut(err, '/buyer')
+  }
 
   return (
-    <BuyerShell>
-      <p className="text-eyebrow text-accent">Your datasets</p>
-      <h1 className="text-h1 mt-2 text-balance text-foreground">Delivered to you</h1>
+    <BuyerAppShell>
+      <p className="cx-label text-navy-400">Your datasets</p>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Delivered to you</h1>
 
       {datasets.length === 0 ? (
-        <p className="mt-6 text-body-sm text-muted-foreground">
+        <p className="cx-body mt-6 text-navy-400">
           Nothing delivered yet — datasets appear here once Oreset hands one off to your
           organization.
         </p>
       ) : (
-        <ul className="mt-8 space-y-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {datasets.map((d) => (
-            <li key={d.id}>
-              <Link
-                href={`/buyer/datasets/${d.id}`}
-                className="card-surface-raised flex flex-col items-start gap-4 p-6 hover:border-accent/40 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-                    <Package className="size-5 text-accent" />
-                  </span>
-                  <div>
-                    <p className="text-body font-semibold text-foreground">{d.title}</p>
-                    <p className="text-body-sm mt-1 text-muted-foreground">
-                      {d.items.length} item{d.items.length === 1 ? '' : 's'} · delivered{' '}
-                      {new Date(d.deliveredAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-              </Link>
-            </li>
+            <Link
+              key={d.id}
+              href={`/buyer/datasets/${d.id}`}
+              className="cx-card flex flex-col gap-3 p-5 hover:border-accent/40"
+            >
+              <div className="flex items-center justify-between">
+                <p className="cx-mono-meta font-semibold uppercase tracking-wider text-navy-400">
+                  {d.items.length} item{d.items.length === 1 ? '' : 's'}
+                </p>
+                <ArrowRight className="size-4 shrink-0 text-navy-300" />
+              </div>
+              <div>
+                <h2 className="cx-title text-navy-900">{d.title}</h2>
+                <p className="cx-mono-meta mt-0.5 text-navy-400">
+                  Delivered {new Date(d.deliveredAt).toLocaleDateString()}
+                </p>
+              </div>
+            </Link>
           ))}
-        </ul>
+        </div>
       )}
-    </BuyerShell>
+    </BuyerAppShell>
   )
 }

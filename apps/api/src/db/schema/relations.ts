@@ -13,6 +13,7 @@ import { operatorApplications } from './operator-applications'
 import { payouts } from './payouts'
 import { datasets } from './datasets'
 import { datasetItems } from './dataset-items'
+import { datasetDownloadEvents } from './dataset-download-events'
 import { clientTickets } from './client-tickets'
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -30,6 +31,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   boughtDatasets: many(datasets, { relationName: 'datasetBuyer' }),
   createdDatasets: many(datasets, { relationName: 'datasetCreator' }),
   resolvedTickets: many(clientTickets),
+  datasetDownloadEvents: many(datasetDownloadEvents),
 }))
 
 export const datasetsRelations = relations(datasets, ({ one, many }) => ({
@@ -41,11 +43,21 @@ export const datasetsRelations = relations(datasets, ({ one, many }) => ({
     relationName: 'datasetCreator',
   }),
   items: many(datasetItems),
+  downloadEvents: many(datasetDownloadEvents),
 }))
 
 export const datasetItemsRelations = relations(datasetItems, ({ one }) => ({
   dataset: one(datasets, { fields: [datasetItems.datasetId], references: [datasets.id] }),
   submission: one(submissions, { fields: [datasetItems.submissionId], references: [submissions.id] }),
+}))
+
+export const datasetDownloadEventsRelations = relations(datasetDownloadEvents, ({ one }) => ({
+  dataset: one(datasets, { fields: [datasetDownloadEvents.datasetId], references: [datasets.id] }),
+  submission: one(submissions, {
+    fields: [datasetDownloadEvents.submissionId],
+    references: [submissions.id],
+  }),
+  buyer: one(users, { fields: [datasetDownloadEvents.buyerId], references: [users.id] }),
 }))
 
 export const clientTicketsRelations = relations(clientTickets, ({ one }) => ({

@@ -60,7 +60,7 @@ export function PromptsForgeClient({ batchId }: { batchId: string }) {
   }
 
   if (error && !prompts) {
-    return <p className="mt-6 text-body-sm text-destructive">{error}</p>
+    return <p className="mt-6 cx-body text-destructive">{error}</p>
   }
 
   if (!prompts) {
@@ -74,18 +74,18 @@ export function PromptsForgeClient({ batchId }: { batchId: string }) {
   return (
     <div className="mt-6">
       {error && (
-        <p className="mb-4 text-caption text-destructive" role="alert">
+        <p className="mb-4 cx-meta text-destructive" role="alert">
           {error}
         </p>
       )}
 
       {prompts.length === 0 ? (
-        <p className="text-body-sm text-muted-foreground">No prompts authored yet.</p>
+        <p className="cx-body text-navy-400">No prompts authored yet.</p>
       ) : (
-        <ol className="divide-y divide-border/70 border-y border-border/70">
+        <ol className="cx-card divide-y divide-border">
           {prompts.map((prompt, i) => (
             <li key={prompt.id} className="flex items-start gap-3 py-3.5">
-              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-caption font-semibold text-muted-foreground">
+              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-navy-100 cx-mono-meta font-semibold text-navy-500">
                 {i + 1}
               </span>
               {editingId === prompt.id ? (
@@ -93,20 +93,20 @@ export function PromptsForgeClient({ batchId }: { batchId: string }) {
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full rounded-lg border border-accent/50 bg-background px-3 py-2 text-body-sm outline-none focus-visible:ring-3 focus-visible:ring-accent/20"
+                    className="w-full rounded-lg border border-accent/50 bg-background px-3 py-2 cx-body outline-none focus-visible:ring-3 focus-visible:ring-accent/20"
                     rows={2}
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={() => saveEdit(prompt.id)}
-                      className="inline-flex items-center gap-1 text-caption font-semibold text-success"
+                      className="inline-flex items-center gap-1 cx-meta font-semibold text-success"
                     >
                       <Check className="size-3.5" />
                       Save
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
-                      className="inline-flex items-center gap-1 text-caption font-semibold text-muted-foreground"
+                      className="inline-flex items-center gap-1 cx-meta font-semibold text-navy-400"
                     >
                       <X className="size-3.5" />
                       Cancel
@@ -115,18 +115,18 @@ export function PromptsForgeClient({ batchId }: { batchId: string }) {
                 </div>
               ) : (
                 <>
-                  <p className="flex-1 text-body-sm text-foreground">{prompt.content}</p>
+                  <p className="flex-1 cx-body text-navy-800">{prompt.content}</p>
                   <button
                     onClick={() => startEdit(prompt)}
                     aria-label="Edit prompt"
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-navy-400 hover:text-navy-800"
                   >
                     <Pencil className="size-4" />
                   </button>
                   <button
                     onClick={() => onDelete(prompt.id)}
                     aria-label="Delete prompt"
-                    className="text-muted-foreground hover:text-destructive"
+                    className="text-navy-400 hover:text-destructive"
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -143,7 +143,7 @@ export function PromptsForgeClient({ batchId }: { batchId: string }) {
           onChange={(e) => setNewContent(e.target.value)}
           placeholder="Add a new prompt…"
           rows={2}
-          className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-body-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+          className="flex-1 rounded-lg border border-border bg-background px-3 py-2 cx-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
         />
         <button
           onClick={onAdd}

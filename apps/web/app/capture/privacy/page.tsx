@@ -1,4 +1,4 @@
-import { serverApiFetch } from '@/lib/api/server'
+import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import { CaptureAppShell } from '@/components/capture/capture-app-shell'
 import { AccountActions } from '@/components/capture/account-actions'
 import type { ConsentRecordSummary } from '@/lib/api/endpoints/me'
@@ -11,12 +11,17 @@ const WHATS_STORED = [
 ]
 
 export default async function CapturePrivacyPage() {
-  const { consentRecords } = await serverApiFetch<{ consentRecords: ConsentRecordSummary[] }>(
-    '/api/v1/me/consent-records',
-  )
+  let consentRecords: ConsentRecordSummary[]
+  try {
+    ;({ consentRecords } = await serverApiFetch<{ consentRecords: ConsentRecordSummary[] }>(
+      '/api/v1/me/consent-records',
+    ))
+  } catch (err) {
+    redirectIfSignedOut(err, '/capture')
+  }
 
   return (
-    <CaptureAppShell active="privacy">
+    <CaptureAppShell>
       <p className="cx-label text-navy-400">GDPR / NDPR</p>
       <h1 className="cx-page-title mt-1.5 text-navy-900">Data &amp; privacy</h1>
       <p className="cx-body mt-2 max-w-2xl text-navy-500">
@@ -51,7 +56,7 @@ export default async function CapturePrivacyPage() {
               {consentRecords.map((record) => (
                 <div key={record.id} className="flex items-center justify-between gap-4 p-4">
                   <p className="cx-body font-medium text-navy-900">{record.batch?.title ?? 'Deleted batch'}</p>
-                  <p className="cx-meta text-navy-400">{new Date(record.consentedAt).toLocaleDateString()}</p>
+                  <p className="cx-mono-meta text-navy-400">{new Date(record.consentedAt).toLocaleDateString()}</p>
                 </div>
               ))}
             </div>

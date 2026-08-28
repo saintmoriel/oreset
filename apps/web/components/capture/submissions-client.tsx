@@ -2,17 +2,12 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { StatusTag, TONE_TEXT_CLASS } from '@/components/capture/status-tag'
+import { VerificationSeal } from '@/components/capture/verification-seal'
+import { SUBMISSION_STATUS_META } from '@/lib/submission-status'
 import type { SubmissionSummary } from '@/lib/api/endpoints/submissions'
 import type { SubmissionStatus } from '@oreset/shared'
-
-const STATUS_STYLE: Record<SubmissionStatus, { icon: typeof Clock; label: string; text: string }> = {
-  submitted: { icon: XCircle, label: 'Flagged', text: 'text-destructive' },
-  validated: { icon: Clock, label: 'Awaiting review', text: 'text-navy-400' },
-  qa_approved: { icon: CheckCircle2, label: 'Approved', text: 'text-success' },
-  qa_rejected: { icon: XCircle, label: 'Rejected', text: 'text-destructive' },
-}
 
 const STATUS_FILTERS: { key: 'all' | SubmissionStatus; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -66,12 +61,12 @@ export function SubmissionsClient({ submissions }: { submissions: SubmissionSumm
 
   return (
     <div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="cx-card p-5">
+      <div className="cx-card flex divide-x divide-border">
+        <div className="flex-1 p-5">
           <p className="cx-meta text-navy-400">Total submissions</p>
           <p className="cx-stat mt-1 text-navy-900">{submissions.length}</p>
         </div>
-        <div className="cx-card p-5">
+        <div className="flex-1 p-5">
           <p className="cx-meta text-navy-400">Approval rate</p>
           <p className="cx-stat mt-1 text-navy-900">{approvalRate}</p>
         </div>
@@ -79,14 +74,14 @@ export function SubmissionsClient({ submissions }: { submissions: SubmissionSumm
 
       {submissions.length > 0 && (
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="inline-flex rounded-lg bg-navy-100/60 p-1">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setStatus(f.key)}
                 className={cn(
-                  'cx-meta rounded-md px-2.5 py-1 font-medium cx-fade',
-                  status === f.key ? 'bg-navy-800 text-white' : 'text-navy-400 hover:bg-navy-50',
+                  'cx-meta rounded-md px-3 py-1.5 font-medium cx-fade',
+                  status === f.key ? 'bg-card text-navy-900 shadow-xs' : 'text-navy-500 hover:text-navy-800',
                 )}
               >
                 {f.label}
@@ -134,22 +129,26 @@ export function SubmissionsClient({ submissions }: { submissions: SubmissionSumm
       ) : (
         <div className="cx-card mt-3 divide-y divide-border">
           {filtered.map((s) => {
-            const { icon: Icon, label, text } = STATUS_STYLE[s.status]
+            const { icon: Icon, label, tone } = SUBMISSION_STATUS_META[s.status]
             const failed = s.status === 'qa_rejected' || s.status === 'submitted'
             const reason = s.latestValidation?.reason
             return (
               <div key={s.id} className="flex flex-col gap-1.5 p-4">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <Icon className={cn('size-4 shrink-0', text)} />
+                    <Icon className={cn('size-4 shrink-0', TONE_TEXT_CLASS[tone])} />
                     <div>
                       <p className="cx-body font-medium text-navy-900">
                         {s.batch.title} · Item {ordinals[s.id]}
                       </p>
-                      <p className="cx-meta text-navy-400">{new Date(s.createdAt).toLocaleDateString()}</p>
+                      <p className="cx-mono-meta text-navy-400">{new Date(s.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
-                  <span className={cn('cx-meta font-semibold', text)}>{label}</span>
+                  {s.status === 'qa_approved' ? (
+                    <VerificationSeal label={label} />
+                  ) : (
+                    <StatusTag tone={tone}>{label}</StatusTag>
+                  )}
                 </div>
                 {reason && <p className="cx-meta pl-7 text-navy-400">{reason}</p>}
                 {failed && (

@@ -31,6 +31,7 @@ export function toAuthUser(user: User): AuthUser {
     operatorCode: user.operatorCode,
     payoutDetails: (user.payoutDetails as Record<string, unknown> | null) ?? null,
     phone: user.phone,
+    email: user.email,
     createdAt: user.createdAt.toISOString(),
   }
 }

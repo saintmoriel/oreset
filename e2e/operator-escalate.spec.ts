@@ -8,6 +8,8 @@ test('operator escalates a client item with an ERR tag and severity', async ({ p
   await page.locator('input[type=password]').fill('dev-password')
   await page.getByRole('button', { name: /^sign in$/i }).click()
 
+  await expect(page).toHaveURL(/\/operator\/home/)
+  await page.locator('nav').getByRole('link', { name: 'Queue', exact: true }).click()
   await expect(page).toHaveURL(/\/operator\/queue/)
   await page.getByRole('link', { name: /start reviewing/i }).click()
   await expect(page).toHaveURL(/\/operator\/item/)
@@ -18,5 +20,5 @@ test('operator escalates a client item with an ERR tag and severity', async ({ p
   // Default ERR tag / severity radios are pre-selected — submit as-is.
   await page.getByRole('button', { name: /route to client ticket queue/i }).click()
 
-  await expect(page).toHaveURL(/\/operator\/(item|complete)/)
+  await expect(page).toHaveURL(/\/operator\/(item|home)/)
 })

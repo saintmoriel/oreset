@@ -14,6 +14,29 @@ export type QaQueueItem = {
   downloadUrl: string
 }
 
+export type QaStats = {
+  queueRemaining: number
+  reviewedToday: number
+  reviewedAllTime: number
+  approvedAllTime: number
+  rejectedAllTime: number
+  approvalRate: number | null
+  defectTagBreakdown: Record<ErrTag, number>
+}
+
+export type QaDecisionRecord = {
+  id: string
+  decision: QaDecision
+  defectTag: ErrTag | null
+  notes: string | null
+  createdAt: string
+  submission: {
+    id: string
+    mediaType: MediaType
+    batch: Batch
+  }
+}
+
 export function getQaQueue() {
   return apiFetch<{ items: QaQueueItem[] }>('/api/v1/qa/queue')
 }
@@ -26,4 +49,12 @@ export function submitQaDecision(
     `/api/v1/qa/items/${submissionId}/decision`,
     { method: 'POST', body: input },
   )
+}
+
+export function getMyQaStats() {
+  return apiFetch<QaStats>('/api/v1/qa/me/stats')
+}
+
+export function getMyQaDecisions() {
+  return apiFetch<{ decisions: QaDecisionRecord[] }>('/api/v1/qa/me/decisions')
 }

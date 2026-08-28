@@ -21,6 +21,16 @@ export async function getMyPayouts(contributorId: string): Promise<Payout[]> {
   })
 }
 
+// Admin visibility into what a batch run actually did — previously there
+// was no GET anywhere for this, only the contributor's own /payouts/me.
+export async function listAllPayouts() {
+  return db.query.payouts.findMany({
+    orderBy: desc(payouts.createdAt),
+    limit: 50,
+    with: { contributor: { columns: { id: true, displayName: true, phone: true } } },
+  })
+}
+
 export async function setPayoutDetails(
   contributorId: string,
   payoutDetails: Record<string, unknown>,

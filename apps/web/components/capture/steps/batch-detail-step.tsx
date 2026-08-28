@@ -55,11 +55,11 @@ export function BatchDetailStep({
       </div>
       {batch.brief && <p className="cx-body mt-2 text-navy-500">{batch.brief}</p>}
 
-      <div className="cx-card mt-6 divide-y divide-border">
+      <div className="cx-card mt-6 grid grid-cols-2 gap-x-6 gap-y-4 p-5">
         {facts.map((fact) => (
-          <div key={fact.label} className="flex items-center justify-between gap-4 px-4 py-2.5">
-            <span className="cx-meta font-medium text-navy-400">{fact.label}</span>
-            <span className="cx-body text-navy-800">{fact.value}</span>
+          <div key={fact.label}>
+            <p className="cx-meta text-navy-400">{fact.label}</p>
+            <p className="cx-body mt-0.5 font-medium text-navy-800">{fact.value}</p>
           </div>
         ))}
       </div>

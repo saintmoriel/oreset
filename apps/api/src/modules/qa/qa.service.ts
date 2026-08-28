@@ -1,5 +1,6 @@
-import { asc, desc, eq } from 'drizzle-orm'
+import { asc, count, desc, eq } from 'drizzle-orm'
 import type { ErrTag, QaDecision, StaffRole } from '@oreset/shared'
+import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
 import { submissions, validationResults, qaReviewDecisions } from '../../db/schema'
 import { getDownloadUrl } from '../uploads/uploads.service'
@@ -28,6 +29,53 @@ export async function getQueue() {
       downloadUrl: await getDownloadUrl(s.storageKey),
     })),
   )
+}
+
+// A real COUNT — deliberately not just `(await getQueue()).length`, which
+// would also generate a presigned download URL per row just to throw it
+// away.
+export async function getQueueCount(): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(submissions).where(eq(submissions.status, 'validated'))
+  return row?.value ?? 0
+}
+
+export async function getMyDecisions(reviewerId: string) {
+  return db.query.qaReviewDecisions.findMany({
+    where: eq(qaReviewDecisions.reviewerId, reviewerId),
+    orderBy: desc(qaReviewDecisions.createdAt),
+    limit: 50,
+    with: {
+      submission: { with: { batch: true } },
+    },
+  })
+}
+
+export async function getMyStats(reviewerId: string) {
+  const decisions = await db.query.qaReviewDecisions.findMany({
+    where: eq(qaReviewDecisions.reviewerId, reviewerId),
+  })
+
+  const today = new Date().toISOString().slice(0, 10)
+  const reviewedToday = decisions.filter((d) => d.createdAt.toISOString().slice(0, 10) === today).length
+  const approvedAllTime = decisions.filter((d) => d.decision === 'approved').length
+  const rejectedAllTime = decisions.filter((d) => d.decision === 'rejected').length
+  const reviewedAllTime = decisions.length
+  const approvalRate = reviewedAllTime > 0 ? Math.round((approvedAllTime / reviewedAllTime) * 100) : null
+
+  const defectTagBreakdown = Object.fromEntries(ERR_TAGS.map((tag) => [tag, 0])) as Record<ErrTag, number>
+  for (const d of decisions) {
+    if (d.defectTag) defectTagBreakdown[d.defectTag] += 1
+  }
+
+  return {
+    queueRemaining: await getQueueCount(),
+    reviewedToday,
+    reviewedAllTime,
+    approvedAllTime,
+    rejectedAllTime,
+    approvalRate,
+    defectTagBreakdown,
+  }
 }
 
 export async function decide(input: {

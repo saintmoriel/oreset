@@ -1,5 +1,5 @@
 import { Lock } from 'lucide-react'
-import { AdminShell } from '@/components/admin/admin-shell'
+import { AdminAppShell } from '@/components/admin/admin-app-shell'
 import { DatasetAssemblyClient } from '@/components/admin/dataset-assembly-client'
 import { serverApiFetch } from '@/lib/api/server'
 import type { AuthUser } from '@oreset/shared'
@@ -13,17 +13,15 @@ export default async function DatasetDetailPage({ params }: { params: Promise<{ 
 
   if (!canManage) {
     return (
-      <AdminShell role={role}>
-        <div className="card-surface flex flex-col items-center gap-3 p-10 text-center">
-          <span className="flex size-12 items-center justify-center rounded-xl bg-muted">
-            <Lock className="size-5 text-muted-foreground" />
+      <AdminAppShell>
+        <div className="cx-card flex flex-col items-center gap-3 p-10 text-center">
+          <span className="flex size-12 items-center justify-center rounded-xl bg-navy-100">
+            <Lock className="size-5 text-navy-400" />
           </span>
-          <p className="text-body font-semibold text-foreground">Access restricted</p>
-          <p className="text-body-sm max-w-sm text-muted-foreground">
-            Your role cannot manage datasets. Admin only.
-          </p>
+          <p className="cx-body font-semibold text-navy-900">Access restricted</p>
+          <p className="cx-meta max-w-sm text-navy-500">Your role cannot manage datasets. Admin only.</p>
         </div>
-      </AdminShell>
+      </AdminAppShell>
     )
   }
 
@@ -33,8 +31,8 @@ export default async function DatasetDetailPage({ params }: { params: Promise<{ 
   ])
 
   return (
-    <AdminShell role={role}>
+    <AdminAppShell>
       <DatasetAssemblyClient dataset={dataset} buyers={buyers} />
-    </AdminShell>
+    </AdminAppShell>
   )
 }

@@ -105,6 +105,17 @@ const navItems: NavItem[] = [
   },
 ]
 
+const signInItems = [
+  { label: 'Contributor', href: '/capture', hint: 'Field data collection' },
+  { label: 'Operator', href: '/operator', hint: 'Certified review work' },
+  { label: 'Buyer', href: '/buyer', hint: 'Commission & manage data' },
+] as const
+
+const staffItems = [
+  { label: 'QA', href: '/qa', hint: 'Quality assurance' },
+  { label: 'Admin', href: '/admin', hint: 'Platform administration' },
+] as const
+
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -232,6 +243,71 @@ export function SiteNav() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <div className="relative" onMouseEnter={() => setOpenMenu('signin')} onMouseLeave={() => setOpenMenu(null)}>
+              <button
+                type="button"
+                aria-expanded={openMenu === 'signin'}
+                aria-haspopup="menu"
+                onClick={() => setOpenMenu(openMenu === 'signin' ? null : 'signin')}
+                className={cn(
+                  'hidden rounded-md px-3 py-2 text-body-sm font-medium transition-colors lg:inline-flex lg:items-center lg:gap-1',
+                  onDark
+                    ? 'text-white/70 hover:text-white'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Sign in
+                <span className="text-[10px] opacity-70" aria-hidden="true">▾</span>
+              </button>
+
+              <AnimatePresence>
+                {openMenu === 'signin' && (
+                  <motion.div
+                    role="menu"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
+                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute right-0 top-full z-50 w-64 pt-2"
+                  >
+                    <div className="card-surface-raised overflow-hidden p-2">
+                      <p className="px-3 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-eyebrow text-muted-foreground">
+                        Sign in as
+                      </p>
+                      {signInItems.map((item) => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          role="menuitem"
+                          onClick={() => setOpenMenu(null)}
+                          className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-secondary"
+                        >
+                          <span className="block text-body-sm font-semibold text-foreground">{item.label}</span>
+                          <span className="text-caption text-muted-foreground">{item.hint}</span>
+                        </Link>
+                      ))}
+                      <div className="mx-3 my-1.5 border-t border-border/60" />
+                      <p className="px-3 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-eyebrow text-muted-foreground">
+                        Staff
+                      </p>
+                      {staffItems.map((item) => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          role="menuitem"
+                          onClick={() => setOpenMenu(null)}
+                          className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-secondary"
+                        >
+                          <span className="block text-body-sm font-semibold text-foreground">{item.label}</span>
+                          <span className="text-caption text-muted-foreground">{item.hint}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <button
               type="button"
               onClick={() => openPilotModal()}
@@ -373,6 +449,36 @@ export function SiteNav() {
                   </a>
                 ),
               )}
+              <div className="border-t border-border/50 pt-3 mt-2">
+                <p className="px-3 pb-2 text-caption font-semibold uppercase tracking-eyebrow text-muted-foreground">Sign in</p>
+                <div className="flex flex-col gap-0.5">
+                  {signInItems.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-md px-3 py-2.5"
+                    >
+                      <span className="block text-body-sm font-medium text-foreground">{item.label}</span>
+                      <span className="text-caption text-muted-foreground">{item.hint}</span>
+                    </Link>
+                  ))}
+                </div>
+                <p className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-eyebrow text-muted-foreground">Staff</p>
+                <div className="flex flex-col gap-0.5">
+                  {staffItems.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-md px-3 py-2.5"
+                    >
+                      <span className="block text-body-sm font-medium text-foreground">{item.label}</span>
+                      <span className="text-caption text-muted-foreground">{item.hint}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </nav>
           </motion.div>
         )}

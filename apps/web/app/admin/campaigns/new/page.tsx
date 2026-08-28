@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ArrowRight, Megaphone } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useCampaignDraft } from '@/components/admin/campaign-context'
 
 export default function NewCampaignNamePage() {
@@ -9,23 +9,20 @@ export default function NewCampaignNamePage() {
   const { draft, update } = useCampaignDraft()
 
   return (
-    <div className="card-surface-raised p-8 sm:p-10">
-      <span className="flex size-12 items-center justify-center rounded-xl bg-accent/10">
-        <Megaphone className="size-6 text-accent" />
-      </span>
-      <p className="text-eyebrow mt-5 text-accent">Step 1</p>
-      <h1 className="text-h2 mt-2 text-balance text-foreground">New campaign</h1>
-      <p className="text-body mt-3 text-pretty text-muted-foreground">
+    <div className="cx-card p-8 sm:p-10">
+      <p className="cx-label text-accent">Step 1</p>
+      <h1 className="cx-page-title mt-2 text-balance text-navy-900">New campaign</h1>
+      <p className="cx-body mt-3 text-pretty text-navy-400">
         Give this campaign a name your team will recognize in reports and payouts.
       </p>
 
       <div className="mt-6">
-        <label className="text-body-sm font-medium text-foreground">Campaign name</label>
+        <label className="cx-meta font-medium text-navy-900">Campaign name</label>
         <input
           value={draft.name}
           onChange={(e) => update({ name: e.target.value })}
           placeholder="e.g. CLEAR Global Hausa Pilot — 100 Prompts"
-          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 cx-body outline-none placeholder:text-navy-400/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
         />
       </div>
 

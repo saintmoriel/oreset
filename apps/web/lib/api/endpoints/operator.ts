@@ -1,4 +1,4 @@
-import type { ErrTag, OperatorDecision, Severity } from '@oreset/shared'
+import type { ErrTag, OperatorDecision, Severity, TicketStatus } from '@oreset/shared'
 import { apiFetch } from '../client'
 
 export type OperatorQueueItem = {
@@ -8,6 +8,30 @@ export type OperatorQueueItem = {
   content: string
   status: string
   createdAt: string
+}
+
+export type OperatorStats = {
+  queueRemaining: number
+  reviewedToday: number
+  reviewedAllTime: number
+  approvedAllTime: number
+  escalatedAllTime: number
+  rejectedAllTime: number
+  approvalRate: number | null
+  errTagBreakdown: Record<ErrTag, number>
+  openTicketsFromMe: number
+}
+
+export type OperatorDecisionRecord = {
+  id: string
+  decision: OperatorDecision
+  errTag: ErrTag | null
+  severity: Severity | null
+  notes: string | null
+  createdAt: string
+  clientItemId: string
+  clientItemSnapshot: { content?: string; clientName?: string } | null
+  ticket: { status: TicketStatus; resolvedAt: string | null } | null
 }
 
 export function getOperatorQueue() {
@@ -22,4 +46,12 @@ export function submitOperatorDecision(
     method: 'POST',
     body: input,
   })
+}
+
+export function getMyOperatorStats() {
+  return apiFetch<OperatorStats>('/api/v1/operator/me/stats')
+}
+
+export function getMyOperatorDecisions() {
+  return apiFetch<{ decisions: OperatorDecisionRecord[] }>('/api/v1/operator/me/decisions')
 }

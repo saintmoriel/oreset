@@ -12,6 +12,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { ScrollOrchestrator } from '@/components/scroll-orchestrator'
 import { SmoothScroll } from '@/components/smooth-scroll'
 import { PilotScopingModal } from '@/components/pilot-scoping-modal'
+import { ThreePaths } from '@/components/three-paths'
 
 export default function Page() {
   return (
@@ -23,6 +24,7 @@ export default function Page() {
       <main>
         <Hero />
         <Problem />
+        <ThreePaths />
         <TwoArmsOverview />
         <OriginDeepDive />
         <OperatorsDeepDive />

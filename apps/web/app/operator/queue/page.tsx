@@ -1,55 +1,50 @@
 import Link from 'next/link'
-import { ArrowRight, MessageSquare } from 'lucide-react'
-import { QueueShell } from '@/components/shared/queue-shell'
-import { serverApiFetch } from '@/lib/api/server'
+import { ArrowRight } from 'lucide-react'
+import { OperatorAppShell } from '@/components/operator/operator-app-shell'
+import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import type { OperatorQueueItem } from '@/lib/api/endpoints/operator'
-import type { AuthUser } from '@oreset/shared'
 
 export default async function OperatorQueuePage() {
-  const [{ items }, { user }] = await Promise.all([
-    serverApiFetch<{ items: OperatorQueueItem[] }>('/api/v1/operator/queue'),
-    serverApiFetch<{ user: AuthUser }>('/api/v1/auth/me'),
-  ])
-  const clientName = items[0]?.clientName ?? 'Client placement'
+  let items: OperatorQueueItem[]
+  try {
+    ;({ items } = await serverApiFetch<{ items: OperatorQueueItem[] }>('/api/v1/operator/queue'))
+  } catch (err) {
+    redirectIfSignedOut(err, '/operator')
+  }
 
   return (
-    <QueueShell badge="Client Queue" signOutHref="/operator" step={0}>
-      <div className="card-surface-raised p-8 sm:p-10">
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-eyebrow text-accent">{clientName}</p>
-          {user.operatorCode && (
-            <p className="text-caption text-muted-foreground">Signed in as {user.operatorCode}</p>
-          )}
-        </div>
-        <h1 className="text-h2 mt-2 text-balance text-foreground">
-          {items.length} transcript{items.length === 1 ? '' : 's'} awaiting review
-        </h1>
-        <p className="text-body mt-3 text-pretty text-muted-foreground">
-          Live production output — not Oreset&apos;s own collected data. Review against the
-          client&apos;s SOP brief.
-        </p>
+    <OperatorAppShell>
+      <p className="cx-label text-navy-400">Client Queue</p>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Queue</h1>
+      <p className="cx-body mt-2 max-w-2xl text-navy-500">
+        Live production output — not Oreset&apos;s own collected data. Review against the client&apos;s
+        SOP brief.
+      </p>
 
+      <div className="mt-6">
+        <p className="cx-label text-navy-400">
+          {items.length} transcript{items.length === 1 ? '' : 's'} awaiting review
+        </p>
         {items.length === 0 ? (
-          <p className="mt-6 text-body-sm text-muted-foreground">Queue is empty — nothing awaiting review.</p>
+          <p className="cx-body mt-2.5 text-navy-400">Queue is empty — nothing awaiting review.</p>
         ) : (
           <>
-            <ul className="mt-6 divide-y divide-border/70 border-y border-border/70">
+            <div className="mt-2.5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => (
-                <li key={item.id} className="flex items-start gap-3 py-3">
-                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-muted">
-                    <MessageSquare className="size-4 text-muted-foreground" />
-                  </span>
+                <div key={item.id} className="cx-card flex flex-col gap-3 p-5">
+                  <p className="cx-mono-meta font-semibold uppercase tracking-wider text-navy-400">Transcript</p>
                   <div>
-                    <p className="text-body-sm font-mono font-medium text-foreground">{item.externalRef}</p>
-                    <p className="text-caption mt-0.5 text-muted-foreground">{item.content}</p>
+                    <h2 className="cx-title text-navy-900">{item.clientName}</h2>
+                    <p className="cx-mono-meta mt-0.5 text-navy-400">{item.externalRef}</p>
                   </div>
-                </li>
+                  <p className="cx-meta line-clamp-2 text-navy-500">{item.content}</p>
+                </div>
               ))}
-            </ul>
+            </div>
 
             <Link
               href="/operator/item"
-              className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 sm:w-auto"
+              className="mt-6 inline-flex h-11 w-fit items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600"
             >
               Start reviewing
               <ArrowRight className="size-4" />
@@ -57,6 +52,6 @@ export default async function OperatorQueuePage() {
           </>
         )}
       </div>
-    </QueueShell>
+    </OperatorAppShell>
   )
 }

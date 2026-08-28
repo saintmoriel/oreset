@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Mic } from 'lucide-react'
 import { requestOtp, verifyOtp } from '@/lib/api/endpoints/auth'
 import { ApiError } from '@/lib/api/client'
+import { VoidMark } from '@/components/capture/verification-seal'
 
 function CaptureSignInContent() {
   const router = useRouter()
@@ -110,10 +111,10 @@ function CaptureSignInContent() {
             <>
               <p className="cx-body mt-2 text-navy-500">Enter the 6-digit code sent to {phone}.</p>
               {devCode && (
-                <p className="mt-3 flex items-center gap-2 rounded-md border border-border bg-navy-50 px-3 py-2 cx-meta text-navy-500">
-                  <span className="cx-label rounded bg-navy-200 px-1.5 py-0.5 text-navy-800">DEV</span>
-                  <span className="font-mono">{devCode}</span>
-                </p>
+                <div className="mt-3 flex items-center justify-between gap-2 rounded-md border border-warning/30 bg-warning/5 px-3 py-2">
+                  <VoidMark label="Dev mode — not a real code" />
+                  <span className="cx-body font-mono font-semibold tracking-[0.2em] text-navy-800">{devCode}</span>
+                </div>
               )}
               <form onSubmit={onVerifyOtp} className="mt-5 space-y-4">
                 <div>

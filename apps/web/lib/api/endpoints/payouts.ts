@@ -13,6 +13,10 @@ export type Payout = {
   updatedAt: string
 }
 
+export type AdminPayout = Payout & {
+  contributor: { id: string; displayName: string | null; phone: string | null }
+}
+
 export function getMyPayouts() {
   return apiFetch<{ payouts: Payout[] }>('/api/v1/payouts/me')
 }
@@ -27,4 +31,8 @@ export function runPayoutBatch() {
 
 export function runRetentionSweep() {
   return apiFetch<{ deletedCount: number }>('/api/v1/admin/retention/run', { method: 'POST' })
+}
+
+export function listAllPayouts() {
+  return apiFetch<{ payouts: AdminPayout[] }>('/api/v1/admin/payouts')
 }

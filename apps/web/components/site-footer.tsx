@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { motion, useReducedMotion } from 'framer-motion'
 
 const columns = [
@@ -29,6 +30,16 @@ const columns = [
       { label: 'Get involved', href: '#contact' },
     ],
   },
+  {
+    title: 'Sign in',
+    links: [
+      { label: 'Contributor', href: '/capture' },
+      { label: 'Operator', href: '/operator' },
+      { label: 'Buyer', href: '/buyer' },
+      { label: 'QA (staff)', href: '/qa' },
+      { label: 'Admin (staff)', href: '/admin' },
+    ],
+  },
 ]
 
 export function SiteFooter() {
@@ -53,7 +64,7 @@ export function SiteFooter() {
           </p>
         </motion.div>
 
-        <div className="grid gap-10 py-12 sm:grid-cols-2 md:grid-cols-4 md:py-14">
+        <div className="grid gap-10 py-12 sm:grid-cols-2 md:grid-cols-5 md:py-14">
           <div className="sm:col-span-2 md:col-span-1">
             <div className="flex items-center gap-2.5">
               <Image
@@ -82,15 +93,25 @@ export function SiteFooter() {
             <div key={col.title}>
               <p className="text-eyebrow text-ink-muted">{col.title}</p>
               <nav className="mt-4 flex flex-col gap-2.5" aria-label={col.title}>
-                {col.links.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="text-body-sm text-ink-muted transition-colors hover:text-ink-foreground"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+                {col.links.map((link) =>
+                  link.href.startsWith('/') ? (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-body-sm text-ink-muted transition-colors hover:text-ink-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="text-body-sm text-ink-muted transition-colors hover:text-ink-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  )
+                )}
               </nav>
             </div>
           ))}

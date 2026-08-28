@@ -117,3 +117,17 @@ export async function certify(
   const tokens = await issueSession(updated, context)
   return { user: toAuthUser(updated), ...tokens }
 }
+
+// Admin visibility into applications — read-only. Certification itself
+// stays entirely self-service (the Foundry quiz); this doesn't add an
+// approve/reject action, just makes the previously-invisible applicant
+// pool visible, same "read/stats-only" shape as every other round's new
+// capability.
+export async function listApplications() {
+  return db.query.operatorApplications.findMany({
+    orderBy: (fields, { desc }) => desc(fields.createdAt),
+    with: {
+      user: { columns: { id: true, displayName: true, email: true, operatorCode: true, status: true } },
+    },
+  })
+}

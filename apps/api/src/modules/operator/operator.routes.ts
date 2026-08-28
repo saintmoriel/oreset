@@ -14,6 +14,20 @@ operatorRouter.get(
   requireActive,
   asyncHandler(controller.queue),
 )
+operatorRouter.get(
+  '/me/stats',
+  requireAuth,
+  requireRole('operator'),
+  requireActive,
+  asyncHandler(controller.myStats),
+)
+operatorRouter.get(
+  '/me/decisions',
+  requireAuth,
+  requireRole('operator'),
+  requireActive,
+  asyncHandler(controller.myDecisions),
+)
 operatorRouter.post(
   '/items/:id/decision',
   requireAuth,

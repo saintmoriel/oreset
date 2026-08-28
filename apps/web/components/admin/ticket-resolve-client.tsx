@@ -29,7 +29,7 @@ export function TicketResolveClient({ ticketId }: { ticketId: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex h-9 shrink-0 items-center rounded-md border border-border px-3 text-caption font-semibold text-foreground hover:bg-muted"
+        className="inline-flex h-9 shrink-0 items-center rounded-md border border-border px-3 cx-meta font-semibold text-navy-800 hover:bg-navy-50"
       >
         Resolve
       </button>
@@ -43,26 +43,26 @@ export function TicketResolveClient({ ticketId }: { ticketId: string }) {
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Resolution notes (optional)"
         rows={2}
-        className="w-56 rounded-md border border-border bg-background px-2.5 py-1.5 text-caption outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+        className="w-56 rounded-md border border-border bg-background px-2.5 py-1.5 cx-meta outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
       />
       <div className="flex gap-2">
         <button
           onClick={() => setOpen(false)}
           disabled={submitting}
-          className="h-8 rounded-md border border-border px-3 text-caption font-medium text-foreground hover:bg-muted"
+          className="h-8 rounded-md border border-border px-3 cx-meta font-medium text-navy-800 hover:bg-navy-50"
         >
           Cancel
         </button>
         <button
           onClick={onResolve}
           disabled={submitting}
-          className="inline-flex h-8 items-center gap-1.5 rounded-md bg-accent px-3 text-caption font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60"
+          className="inline-flex h-8 items-center gap-1.5 rounded-md bg-accent px-3 cx-meta font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60"
         >
           {submitting && <Loader2 className="size-3.5 animate-spin" />}
           Confirm
         </button>
       </div>
-      {error && <p className="text-caption text-destructive">{error}</p>}
+      {error && <p className="cx-meta text-destructive">{error}</p>}
     </div>
   )
 }

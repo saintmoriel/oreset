@@ -43,6 +43,13 @@
       "when": 1787141987036,
       "tag": "0005_minor_mimic",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787656191949,
+      "tag": "0006_good_namora",
+      "breakpoints": true
     }
   ]
 }

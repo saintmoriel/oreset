@@ -33,3 +33,8 @@ export async function certify(req: Request, res: Response) {
   setSessionCookies(res, accessToken, refreshToken)
   res.status(200).json({ user })
 }
+
+export async function listApplications(_req: Request, res: Response) {
+  const applications = await operatorsService.listApplications()
+  res.status(200).json({ applications })
+}

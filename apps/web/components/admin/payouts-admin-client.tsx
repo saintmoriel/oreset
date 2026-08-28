@@ -44,9 +44,9 @@ export function PayoutsAdminClient() {
   }
 
   return (
-    <div className="card-surface-raised p-6">
-      <p className="text-body-sm font-semibold text-foreground">Batch operations</p>
-      <p className="text-caption mt-1 text-muted-foreground">
+    <div className="cx-card p-6">
+      <p className="cx-body font-semibold text-navy-900">Batch operations</p>
+      <p className="cx-meta mt-1 text-navy-400">
         Both are admin-triggered manually here — in production these are wired to an external cron.
       </p>
       <div className="mt-4 flex flex-wrap gap-3">
@@ -61,14 +61,14 @@ export function PayoutsAdminClient() {
         <button
           onClick={onRunRetention}
           disabled={runningRetention}
-          className="inline-flex h-10 items-center gap-2 rounded-md border border-border px-4 text-sm font-semibold text-foreground hover:bg-muted disabled:opacity-60"
+          className="inline-flex h-10 items-center gap-2 rounded-md border border-border px-4 text-sm font-semibold text-navy-800 hover:bg-navy-50 disabled:opacity-60"
         >
           {runningRetention ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
           Run Retention Sweep
         </button>
       </div>
-      {message && <p className="mt-4 text-body-sm text-success">{message}</p>}
-      {error && <p className="mt-4 text-body-sm text-destructive">{error}</p>}
+      {message && <p className="mt-4 cx-meta text-success">{message}</p>}
+      {error && <p className="mt-4 cx-meta text-destructive">{error}</p>}
     </div>
   )
 }

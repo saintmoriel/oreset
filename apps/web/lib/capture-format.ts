@@ -16,3 +16,19 @@ export function sameMonth(iso: string, ref: Date) {
 export function daysAgo(iso: string) {
   return (Date.now() - new Date(iso).getTime()) / 86_400_000
 }
+
+// A real derived stat, not a fabricated one — consecutive calendar days
+// (ending today or yesterday) with at least one submission.
+export function computeStreak(createdAtDates: string[]): number {
+  const days = new Set(createdAtDates.map((d) => new Date(d).toISOString().slice(0, 10)))
+  const cursor = new Date()
+  const today = cursor.toISOString().slice(0, 10)
+  if (!days.has(today)) cursor.setDate(cursor.getDate() - 1)
+
+  let streak = 0
+  while (days.has(cursor.toISOString().slice(0, 10))) {
+    streak += 1
+    cursor.setDate(cursor.getDate() - 1)
+  }
+  return streak
+}

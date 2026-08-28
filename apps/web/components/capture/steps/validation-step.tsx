@@ -13,6 +13,7 @@ export function ValidationStep({ onNext, onRetake }: { onNext: () => void; onRet
   if (!result) return null
 
   const passed = result.outcome === 'pass'
+  const isImage = session.mediaType === 'image'
 
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center gap-4 py-6 text-center">
@@ -28,7 +29,14 @@ export function ValidationStep({ onNext, onRetake }: { onNext: () => void; onRet
 
       <p className="cx-label text-navy-400">Automated Validation result</p>
       <h1 className="cx-page-title text-navy-900">{passed ? 'Passed — no errors detected' : 'Flagged for retake'}</h1>
-      {!passed && result.reason && <p className="cx-body mx-auto max-w-sm text-navy-500">{result.reason}</p>}
+      {!passed && (
+        <div className="mx-auto max-w-sm">
+          <p className="cx-body text-navy-500">
+            We couldn&apos;t verify this {isImage ? 'photo' : 'recording'} — try again.
+          </p>
+          {result.reason && <p className="cx-mono-meta mt-2 text-navy-400">{result.reason}</p>}
+        </div>
+      )}
 
       {passed ? (
         <button

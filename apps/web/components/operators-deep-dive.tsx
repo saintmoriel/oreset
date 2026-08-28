@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { MotionReveal } from './motion-reveal'
 import { SiteImage } from './site-image'
 
 export const OPERATOR_STAGES = [
   { name: 'Scout', detail: 'Source native-language professionals with dialect and domain baselines.' },
-  { name: 'Foundry', detail: 'Train on fluency baselines, error taxonomy, and live evaluation sprints.' },
+  { name: 'Foundry', detail: 'Train on fluency baselines, error taxonomy, and live evaluation sprints. Quiz topics: Pacing, Clarity, and Spontaneity.' },
   { name: 'Certify', detail: 'Timed evaluation with calibration thresholds before badge issuance.' },
   { name: 'Bench', detail: 'Certified operators wait on an availability bench by language and domain.' },
   { name: 'Match', detail: 'Pair operators to enterprise accounts by shift, language, and specialty.' },
@@ -109,12 +111,13 @@ export function OperatorsDeepDive() {
             </MotionReveal>
 
             <MotionReveal delay={0.14}>
-              <a
-                href="#contact"
-                className="mt-6 inline-flex text-body-sm font-semibold text-accent hover:text-copper-600"
+              <Link
+                href="/operators/join"
+                className="group mt-6 inline-flex items-center gap-2 text-body-sm font-semibold text-accent transition-colors hover:text-copper-600"
               >
-                Hire certified operators →
-              </a>
+                Apply to the cohort
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
             </MotionReveal>
           </div>
         </div>

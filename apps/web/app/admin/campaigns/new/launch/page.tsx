@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, PartyPopper, Rocket } from 'lucide-react'
+import { ArrowLeft, Rocket } from 'lucide-react'
 import type { MediaType } from '@oreset/shared'
 import { useCampaignDraft } from '@/components/admin/campaign-context'
 import { createCampaign, type Campaign } from '@/lib/api/endpoints/campaigns'
@@ -40,17 +40,14 @@ export default function CampaignLaunchPage() {
 
   if (launched) {
     return (
-      <div className="card-surface-raised flex flex-col items-start gap-4 p-8 sm:p-10" role="status">
-        <span className="flex size-12 items-center justify-center rounded-xl bg-success/10">
-          <PartyPopper className="size-6 text-success" />
-        </span>
-        <h1 className="text-h2 text-foreground">{launched.title} is live.</h1>
-        <p className="text-body text-pretty text-muted-foreground">
+      <div className="cx-card flex flex-col items-start gap-4 p-8 sm:p-10" role="status">
+        <h1 className="cx-page-title text-navy-900">{launched.title} is live.</h1>
+        <p className="cx-body text-pretty text-navy-400">
           This campaign is now visible in Contributors&apos; batch feed
           {launched.cohort ? (
             <>
               {' '}
-              for the <strong className="font-semibold text-foreground">{launched.cohort}</strong> cohort.
+              for the <strong className="font-semibold text-navy-900">{launched.cohort}</strong> cohort.
             </>
           ) : (
             '.'
@@ -68,14 +65,11 @@ export default function CampaignLaunchPage() {
   }
 
   return (
-    <div className="card-surface-raised p-8 sm:p-10">
-      <span className="flex size-12 items-center justify-center rounded-xl bg-accent/10">
-        <Rocket className="size-6 text-accent" />
-      </span>
-      <p className="text-eyebrow mt-5 text-accent">Step 6</p>
-      <h1 className="text-h2 mt-2 text-balance text-foreground">Review &amp; launch</h1>
+    <div className="cx-card p-8 sm:p-10">
+      <p className="cx-label text-accent">Step 6</p>
+      <h1 className="cx-page-title mt-2 text-balance text-navy-900">Review &amp; launch</h1>
 
-      <dl className="mt-6 divide-y divide-border/70 border-y border-border/70">
+      <dl className="mt-6 divide-y divide-border/70 border-y border-border">
         {[
           ['Name', draft.name || '—'],
           ['Language', draft.language || '—'],
@@ -86,15 +80,15 @@ export default function CampaignLaunchPage() {
           ['Reference materials', draft.materialsUploaded ? 'Attached' : 'None'],
           ['Cohort', draft.cohort || '—'],
         ].map(([label, value]) => (
-          <div key={label} className="flex items-center justify-between py-2.5 text-body-sm">
-            <dt className="text-muted-foreground">{label}</dt>
-            <dd className="font-medium text-foreground">{value}</dd>
+          <div key={label} className="flex items-center justify-between py-2.5 cx-meta">
+            <dt className="text-navy-400">{label}</dt>
+            <dd className="font-medium text-navy-900">{value}</dd>
           </div>
         ))}
       </dl>
 
       {error && (
-        <p className="mt-4 text-caption text-destructive" role="alert">
+        <p className="mt-4 cx-meta text-destructive" role="alert">
           {error}
         </p>
       )}
@@ -103,7 +97,7 @@ export default function CampaignLaunchPage() {
         <button
           onClick={() => router.push('/admin/campaigns/new/cohort')}
           disabled={submitting}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border px-6 text-sm font-semibold text-foreground hover:bg-muted disabled:opacity-50"
+          className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border px-6 text-sm font-semibold text-navy-900 hover:bg-navy-50 disabled:opacity-50"
         >
           <ArrowLeft className="size-4" />
           Back

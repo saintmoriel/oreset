@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
-import { serverApiFetch } from '@/lib/api/server'
+import { ArrowRight } from 'lucide-react'
+import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import { CaptureAppShell } from '@/components/capture/capture-app-shell'
 import { ResumeBanner } from '@/components/capture/resume-banner'
+import { StatusTag } from '@/components/capture/status-tag'
 import { formatRate } from '@/lib/capture-format'
 import type { Batch } from '@/lib/api/endpoints/batches'
 import type { SubmissionSummary } from '@/lib/api/endpoints/submissions'
@@ -18,14 +19,20 @@ function computeCompletedBatches(submissions: SubmissionSummary[]) {
 }
 
 export default async function CaptureBatchesPage() {
-  const [{ batches: availableBatches }, { submissions }] = await Promise.all([
-    serverApiFetch<{ batches: Batch[] }>('/api/v1/batches'),
-    serverApiFetch<{ submissions: SubmissionSummary[] }>('/api/v1/submissions/me'),
-  ])
+  let availableBatches: Batch[]
+  let submissions: SubmissionSummary[]
+  try {
+    ;[{ batches: availableBatches }, { submissions }] = await Promise.all([
+      serverApiFetch<{ batches: Batch[] }>('/api/v1/batches'),
+      serverApiFetch<{ submissions: SubmissionSummary[] }>('/api/v1/submissions/me'),
+    ])
+  } catch (err) {
+    redirectIfSignedOut(err, '/capture')
+  }
   const completedBatches = computeCompletedBatches(submissions)
 
   return (
-    <CaptureAppShell active="batches">
+    <CaptureAppShell>
       <p className="cx-label text-navy-400">Work</p>
       <h1 className="cx-page-title mt-1.5 text-navy-900">Batches</h1>
 
@@ -48,6 +55,7 @@ export default async function CaptureBatchesPage() {
                   href={`/capture/batches/${batch.id}`}
                   className="cx-card flex flex-col gap-3 p-5 hover:border-accent/40"
                 >
+                  <p className="cx-mono-meta font-semibold uppercase tracking-wider text-navy-400">{batch.type}</p>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="cx-title text-navy-900">{batch.title}</h2>
@@ -92,13 +100,13 @@ export default async function CaptureBatchesPage() {
                 href={`/capture/batches/${batch.id}`}
                 className="flex items-center justify-between gap-4 p-4 hover:bg-navy-50"
               >
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="size-4 shrink-0 text-success" />
+                <div>
                   <p className="cx-body font-medium text-navy-900">{batch.title}</p>
+                  <p className="cx-meta text-navy-400">
+                    {count} / {batch.itemCount} items
+                  </p>
                 </div>
-                <span className="cx-meta text-navy-400">
-                  {count} / {batch.itemCount} items
-                </span>
+                <StatusTag tone="success">Completed</StatusTag>
               </Link>
             ))}
           </div>

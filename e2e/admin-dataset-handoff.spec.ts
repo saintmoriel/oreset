@@ -7,7 +7,7 @@ test('admin assembles, seals, and hands off a dataset', async ({ page }) => {
   await page.locator('input[type=email]').fill('admin@oreset.dev')
   await page.locator('input[type=password]').fill('dev-password')
   await page.getByRole('button', { name: /^sign in$/i }).click()
-  await expect(page).toHaveURL(/\/admin\/dashboard/)
+  await expect(page).toHaveURL(/\/admin\/home/)
 
   await page.goto('/admin/datasets')
   await page.getByRole('button', { name: /new dataset/i }).click()

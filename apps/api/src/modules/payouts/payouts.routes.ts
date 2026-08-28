@@ -21,3 +21,4 @@ payoutsRouter.post(
 export const payoutsAdminRouter = Router()
 
 payoutsAdminRouter.post('/run', requireAuth, requireRole('staff:admin'), asyncHandler(controller.runBatch))
+payoutsAdminRouter.get('/', requireAuth, requireRole('staff:admin'), asyncHandler(controller.listAll))

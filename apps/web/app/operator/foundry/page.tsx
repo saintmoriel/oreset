@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CheckCircle2, GraduationCap, Loader2 } from 'lucide-react'
-import { QueueShell } from '@/components/shared/queue-shell'
+import { ArrowLeft, CheckCircle2, GraduationCap, Loader2 } from 'lucide-react'
 import { certifyOperator } from '@/lib/api/endpoints/operators'
 import { ApiError } from '@/lib/api/client'
 import { cn } from '@/lib/utils'
@@ -70,100 +71,120 @@ export default function FoundryPage() {
   }
 
   return (
-    <QueueShell badge="Foundry" signOutHref="/operator" step={0}>
-      <div className="card-surface-raised p-8 sm:p-10">
-        <span className="flex size-12 items-center justify-center rounded-xl bg-accent/10">
-          <GraduationCap className="size-6 text-accent" />
-        </span>
-        <p className="text-eyebrow mt-5 text-accent">Foundry · Certification</p>
-        <h1 className="text-h2 mt-2 text-balance text-foreground">
-          Complete training to unlock your first placement
-        </h1>
-        <p className="text-body mt-3 text-pretty text-muted-foreground">
-          These are the TWB Voice Playbook standards every reviewer is held to. Read each, then
-          answer the check below.
-        </p>
-
-        <div className="mt-6 space-y-4">
-          {LESSONS.map((lesson) => (
-            <div key={lesson.title} className="rounded-xl border border-border bg-paper-100 p-5">
-              <p className="text-body-sm font-semibold text-foreground">{lesson.title}</p>
-              <p className="text-body-sm mt-1.5 text-muted-foreground">{lesson.body}</p>
-            </div>
-          ))}
+    <div className="min-h-svh bg-background">
+      <header className="border-b border-border/70 bg-card/80 backdrop-blur-md">
+        <div className="container-narrow flex h-16 items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5" aria-label="Oreset home">
+            <span className="flex size-8 overflow-hidden rounded-md bg-paper-200">
+              <Image src="/oreset-logo.png" alt="" width={32} height={32} className="size-8" />
+            </span>
+            <span className="font-display text-lg font-semibold tracking-display">Oreset</span>
+            <span className="ml-1 rounded-full bg-navy-800 px-2 py-0.5 text-caption font-semibold text-white">
+              Foundry
+            </span>
+          </Link>
+          <Link
+            href="/operator"
+            className="inline-flex items-center gap-1.5 text-body-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            Sign out
+          </Link>
         </div>
+      </header>
 
-        <div className="mt-8 space-y-5 border-t border-border/70 pt-6">
-          <p className="text-body-sm font-semibold text-foreground">Quick check</p>
-          {QUIZ.map((q, i) => (
-            <div key={i}>
-              <p className="text-body-sm text-foreground">{q.question}</p>
-              <div className="mt-2 space-y-2">
-                {q.options.map((opt) => (
-                  <label
-                    key={opt}
-                    className={cn(
-                      'flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-body-sm transition-colors',
-                      answers[i] === opt ? 'border-accent/50 bg-accent/5' : 'border-border bg-background',
-                      checked && answers[i] === opt && opt !== q.answer && 'border-destructive/50 bg-destructive/5',
-                      checked && opt === q.answer && 'border-success/50 bg-success/5',
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name={`quiz-${i}`}
-                      checked={answers[i] === opt}
-                      onChange={() => setAnswers((a) => ({ ...a, [i]: opt }))}
-                      className="size-4 accent-accent"
-                    />
-                    <span className="text-foreground">{opt}</span>
-                    {checked && opt === q.answer && <CheckCircle2 className="ml-auto size-4 text-success" />}
-                  </label>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {error && (
-          <p className="mt-4 text-caption text-destructive" role="alert">
-            {error}
+      <main className="container-narrow py-12 sm:py-16">
+        <div className="cx-card p-8 sm:p-10">
+          <p className="cx-label text-accent">Foundry · Certification</p>
+          <h1 className="cx-page-title mt-2 text-navy-900">
+            Complete training to unlock your first placement
+          </h1>
+          <p className="cx-body mt-3 text-navy-500">
+            These are the TWB Voice Playbook standards every reviewer is held to. Read each, then
+            answer the check below.
           </p>
-        )}
 
-        <div className="mt-8">
-          {!checked ? (
-            <button
-              onClick={() => setChecked(true)}
-              disabled={!allAnswered}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
-            >
-              Check answers
-            </button>
-          ) : allCorrect ? (
-            <button
-              onClick={onCertify}
-              disabled={certifying}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-            >
-              {certifying ? <Loader2 className="size-4 animate-spin" /> : <GraduationCap className="size-4" />}
-              {certifying ? 'Certifying…' : 'Certify and enter queue'}
-            </button>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-body-sm text-destructive">
-                A few answers need another look — check the highlighted questions above.
-              </p>
-              <button
-                onClick={() => setChecked(false)}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border px-6 text-sm font-semibold text-foreground hover:bg-muted"
-              >
-                Try again
-              </button>
-            </div>
+          <div className="mt-6 space-y-4">
+            {LESSONS.map((lesson) => (
+              <div key={lesson.title} className="rounded-xl border border-border bg-paper-100 p-5">
+                <p className="cx-body font-semibold text-navy-900">{lesson.title}</p>
+                <p className="cx-meta mt-1.5 text-navy-500">{lesson.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 space-y-5 border-t border-border/70 pt-6">
+            <p className="cx-body font-semibold text-navy-900">Quick check</p>
+            {QUIZ.map((q, i) => (
+              <div key={i}>
+                <p className="cx-body text-navy-900">{q.question}</p>
+                <div className="mt-2 space-y-2">
+                  {q.options.map((opt) => (
+                    <label
+                      key={opt}
+                      className={cn(
+                        'flex cursor-pointer items-center gap-3 rounded-lg border p-3 cx-body cx-fade',
+                        answers[i] === opt ? 'border-accent/50 bg-accent/5' : 'border-border bg-background',
+                        checked && answers[i] === opt && opt !== q.answer && 'border-destructive/50 bg-destructive/5',
+                        checked && opt === q.answer && 'border-success/50 bg-success/5',
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name={`quiz-${i}`}
+                        checked={answers[i] === opt}
+                        onChange={() => setAnswers((a) => ({ ...a, [i]: opt }))}
+                        className="size-4 accent-accent"
+                      />
+                      <span className="text-navy-900">{opt}</span>
+                      {checked && opt === q.answer && <CheckCircle2 className="ml-auto size-4 text-success" />}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {error && (
+            <p className="mt-4 cx-meta text-destructive" role="alert">
+              {error}
+            </p>
           )}
+
+          <div className="mt-8">
+            {!checked ? (
+              <button
+                onClick={() => setChecked(true)}
+                disabled={!allAnswered}
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+              >
+                Check answers
+              </button>
+            ) : allCorrect ? (
+              <button
+                onClick={onCertify}
+                disabled={certifying}
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              >
+                {certifying ? <Loader2 className="size-4 animate-spin" /> : <GraduationCap className="size-4" />}
+                {certifying ? 'Certifying…' : 'Certify and enter queue'}
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <p className="cx-body text-destructive">
+                  A few answers need another look — check the highlighted questions above.
+                </p>
+                <button
+                  onClick={() => setChecked(false)}
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border px-6 text-sm font-semibold text-foreground hover:bg-muted"
+                >
+                  Try again
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </QueueShell>
+      </main>
+    </div>
   )
 }

@@ -183,6 +183,18 @@ export function Hero() {
                 View 10-Stage Lifecycle
               </a>
             </div>
+
+            <nav
+              data-hero-item
+              className="mt-5 flex flex-wrap items-center gap-x-1 gap-y-1 text-[13px] text-white/50 sm:mt-6"
+              aria-label="Quick links"
+            >
+              <a href="/capture" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Contribute</a>
+              <span aria-hidden="true">·</span>
+              <a href="/operators/join" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Get certified</a>
+              <span aria-hidden="true">·</span>
+              <a href="#contact" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Commission data</a>
+            </nav>
           </div>
         </div>
 

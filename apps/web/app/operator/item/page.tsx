@@ -1,20 +1,18 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { CheckCircle2, Loader2, TriangleAlert, XCircle } from 'lucide-react'
 import { ERR_TAGS, ERR_TAG_LABELS, SEVERITY_LEVELS, SEVERITY_LABELS, type ErrTag, type Severity } from '@oreset/shared'
-import { QueueShell } from '@/components/shared/queue-shell'
+import { OperatorAppShell } from '@/components/operator/operator-app-shell'
 import { getOperatorQueue, submitOperatorDecision, type OperatorQueueItem } from '@/lib/api/endpoints/operator'
 import { ApiError } from '@/lib/api/client'
 import { cn } from '@/lib/utils'
 
-function OperatorItemContent() {
+const INTERACTIVE_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'])
+
+export default function OperatorItemPage() {
   const router = useRouter()
-  const params = useSearchParams()
-  const approved = Number(params.get('approved') ?? 0)
-  const escalated = Number(params.get('escalated') ?? 0)
-  const rejected = Number(params.get('rejected') ?? 0)
 
   const [items, setItems] = useState<OperatorQueueItem[] | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -31,7 +29,7 @@ function OperatorItemContent() {
 
   async function decide(decision: 'approved' | 'escalated' | 'rejected') {
     const item = items?.[0]
-    if (!item) return
+    if (!item || submitting) return
     setSubmitting(true)
     setError(null)
     try {
@@ -40,19 +38,15 @@ function OperatorItemContent() {
         errTag: decision === 'escalated' ? errTag : undefined,
         severity: decision === 'escalated' ? severity : undefined,
       })
-      const next = {
-        approved: approved + (decision === 'approved' ? 1 : 0),
-        escalated: escalated + (decision === 'escalated' ? 1 : 0),
-        rejected: rejected + (decision === 'rejected' ? 1 : 0),
-      }
-
       const refreshed = await getOperatorQueue()
       if (refreshed.items.length === 0) {
-        router.push(`/operator/complete?approved=${next.approved}&escalated=${next.escalated}&rejected=${next.rejected}`)
+        // Real stats on Home already reflect everything just decided.
+        router.push('/operator/home')
       } else {
         setItems(refreshed.items)
         setShowEscalatePanel(false)
-        router.replace(`/operator/item?approved=${next.approved}&escalated=${next.escalated}&rejected=${next.rejected}`)
+        setErrTag(ERR_TAGS[0])
+        setSeverity(SEVERITY_LEVELS[0])
       }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not submit that decision. Try again.')
@@ -61,53 +55,77 @@ function OperatorItemContent() {
     }
   }
 
+  // A approve (direct, matches today's one-click behavior), R reject
+  // (direct, no extra data needed), E opens the escalate panel (1-4 pick
+  // the err tag, Enter confirms with whatever severity is selected, Esc
+  // cancels — severity stays mouse-only, a real third axis isn't worth
+  // cramming onto the keyboard).
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const active = document.activeElement
+      if (active && INTERACTIVE_TAGS.has(active.tagName)) return
+      if (!items?.[0] || submitting) return
+
+      if (!showEscalatePanel) {
+        if (e.key === 'a' || e.key === 'A') decide('approved')
+        else if (e.key === 'r' || e.key === 'R') decide('rejected')
+        else if (e.key === 'e' || e.key === 'E') setShowEscalatePanel(true)
+        return
+      }
+
+      if (e.key === 'Escape') setShowEscalatePanel(false)
+      else if (e.key === 'Enter') decide('escalated')
+      else if (['1', '2', '3', '4'].includes(e.key)) setErrTag(ERR_TAGS[Number(e.key) - 1])
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, showEscalatePanel, submitting, errTag, severity])
+
   if (error && !items) {
     return (
-      <QueueShell badge="Client Queue" signOutHref="/operator" step={1}>
-        <div className="card-surface-raised p-8 text-center sm:p-10">
-          <p className="text-body text-destructive">{error}</p>
-        </div>
-      </QueueShell>
+      <OperatorAppShell>
+        <p className="cx-body text-destructive">{error}</p>
+      </OperatorAppShell>
     )
   }
 
   if (!items) {
     return (
-      <QueueShell badge="Client Queue" signOutHref="/operator" step={1}>
+      <OperatorAppShell>
         <div className="flex justify-center p-16">
           <Loader2 className="size-8 animate-spin text-accent" />
         </div>
-      </QueueShell>
+      </OperatorAppShell>
     )
   }
 
   const item = items[0]
   if (!item) {
-    router.push(`/operator/complete?approved=${approved}&escalated=${escalated}&rejected=${rejected}`)
+    router.push('/operator/home')
     return null
   }
 
   return (
-    <QueueShell badge="Client Queue" signOutHref="/operator" step={1}>
-      <div className="card-surface-raised p-8 sm:p-10">
-        <div className="flex items-center justify-between">
-          <p className="text-eyebrow text-accent">{items.length} remaining</p>
-          <p className="font-mono text-caption text-muted-foreground">{item.externalRef}</p>
-        </div>
+    <OperatorAppShell>
+      <div className="flex items-center justify-between">
+        <p className="cx-label text-navy-400">{items.length} remaining</p>
+        <p className="cx-mono-meta text-navy-400">{item.externalRef}</p>
+      </div>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Review against SOP brief</h1>
 
-        <h1 className="text-h2 mt-2 text-balance text-foreground">Review against SOP brief</h1>
+      <div className="cx-card mt-6 p-5">
+        <p className="cx-body text-navy-800">{item.content}</p>
+      </div>
 
-        <div className="mt-6 rounded-xl border border-border bg-paper-100 p-5 text-body-sm text-foreground">
-          {item.content}
-        </div>
+      {error && (
+        <p className="mt-4 cx-meta text-destructive" role="alert">
+          {error}
+        </p>
+      )}
 
-        {error && (
-          <p className="mt-4 text-caption text-destructive" role="alert">
-            {error}
-          </p>
-        )}
-
-        {!showEscalatePanel ? (
+      {!showEscalatePanel ? (
+        <>
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <button
               onClick={() => decide('approved')}
@@ -134,83 +152,79 @@ function OperatorItemContent() {
               Reject
             </button>
           </div>
-        ) : (
-          <div className="mt-8 rounded-xl border border-warning/30 bg-warning/5 p-5">
-            <p className="text-body-sm font-semibold text-foreground">Tag the issue</p>
-            <div className="mt-3 space-y-2">
-              {ERR_TAGS.map((tag) => (
-                <label
-                  key={tag}
-                  className={cn(
-                    'flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-body-sm transition-colors',
-                    errTag === tag ? 'border-warning/50 bg-warning/10' : 'border-border bg-background',
-                  )}
-                >
+          <p className="mt-3 cx-mono-meta text-navy-300">A approve · R reject · E escalate</p>
+        </>
+      ) : (
+        <div className="cx-card mt-8 border-warning/30 bg-warning/5 p-5">
+          <p className="cx-body font-semibold text-navy-900">Tag the issue</p>
+          <div className="mt-3 space-y-2">
+            {ERR_TAGS.map((tag, i) => (
+              <label
+                key={tag}
+                className={cn(
+                  'flex cursor-pointer items-center gap-3 rounded-md border p-3 cx-body cx-fade',
+                  errTag === tag ? 'border-warning/50 bg-warning/10' : 'border-border bg-card',
+                )}
+              >
+                <input
+                  type="radio"
+                  name="err"
+                  checked={errTag === tag}
+                  onChange={() => setErrTag(tag)}
+                  className="size-4 accent-warning"
+                />
+                <span className="cx-mono-meta font-semibold text-navy-800">
+                  {i + 1} · {tag}
+                </span>
+                <span className="text-navy-500">{ERR_TAG_LABELS[tag]}</span>
+              </label>
+            ))}
+          </div>
+
+          <p className="mt-4 cx-body font-semibold text-navy-900">Severity</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {SEVERITY_LEVELS.map((sev) => (
+              <label
+                key={sev}
+                className={cn(
+                  'flex cursor-pointer flex-col gap-1 rounded-md border p-3 cx-meta cx-fade',
+                  severity === sev ? 'border-warning/50 bg-warning/10' : 'border-border bg-card',
+                )}
+              >
+                <span className="flex items-center gap-2">
                   <input
                     type="radio"
-                    name="err"
-                    checked={errTag === tag}
-                    onChange={() => setErrTag(tag)}
-                    className="size-4 accent-warning"
+                    name="severity"
+                    checked={severity === sev}
+                    onChange={() => setSeverity(sev)}
+                    className="size-3.5 accent-warning"
                   />
-                  <span className="font-mono font-semibold text-foreground">{tag}</span>
-                  <span className="text-muted-foreground">{ERR_TAG_LABELS[tag]}</span>
-                </label>
-              ))}
-            </div>
-
-            <p className="mt-4 text-body-sm font-semibold text-foreground">Severity</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">
-              {SEVERITY_LEVELS.map((sev) => (
-                <label
-                  key={sev}
-                  className={cn(
-                    'flex cursor-pointer flex-col gap-1 rounded-lg border p-3 text-caption transition-colors',
-                    severity === sev ? 'border-warning/50 bg-warning/10' : 'border-border bg-background',
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="severity"
-                      checked={severity === sev}
-                      onChange={() => setSeverity(sev)}
-                      className="size-3.5 accent-warning"
-                    />
-                    <span className="font-mono font-semibold text-foreground">{sev}</span>
-                  </span>
-                  <span className="text-muted-foreground">{SEVERITY_LABELS[sev]}</span>
-                </label>
-              ))}
-            </div>
-
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={() => setShowEscalatePanel(false)}
-                disabled={submitting}
-                className="inline-flex h-11 flex-1 items-center justify-center rounded-md border border-border text-sm font-semibold text-foreground hover:bg-muted disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => decide('escalated')}
-                disabled={submitting}
-                className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-warning/90 text-sm font-semibold text-warning-foreground hover:bg-warning disabled:opacity-50"
-              >
-                {submitting ? 'Submitting…' : `Route to client ticket queue · ${errTag} / ${severity}`}
-              </button>
-            </div>
+                  <span className="cx-mono-meta font-semibold text-navy-800">{sev}</span>
+                </span>
+                <span className="text-navy-500">{SEVERITY_LABELS[sev]}</span>
+              </label>
+            ))}
           </div>
-        )}
-      </div>
-    </QueueShell>
-  )
-}
 
-export default function OperatorItemPage() {
-  return (
-    <Suspense>
-      <OperatorItemContent />
-    </Suspense>
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={() => setShowEscalatePanel(false)}
+              disabled={submitting}
+              className="inline-flex h-11 flex-1 items-center justify-center rounded-md border border-border text-sm font-semibold text-navy-800 hover:bg-navy-50 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => decide('escalated')}
+              disabled={submitting}
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-warning px-4 text-sm font-semibold text-warning-foreground hover:opacity-90 disabled:opacity-50"
+            >
+              {submitting ? 'Submitting…' : `Route to client ticket queue · ${errTag} / ${severity}`}
+            </button>
+          </div>
+          <p className="mt-3 cx-mono-meta text-navy-300">1–4 pick tag · Enter confirm · Esc cancel</p>
+        </div>
+      )}
+    </OperatorAppShell>
   )
 }

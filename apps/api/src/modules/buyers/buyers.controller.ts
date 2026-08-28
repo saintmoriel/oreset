@@ -28,3 +28,18 @@ export async function myDatasetDetail(req: Request, res: Response) {
   const dataset = await buyersService.getMyDatasetDetail(req.user!.sub, req.params.id)
   res.status(200).json({ dataset })
 }
+
+export async function myStats(req: Request, res: Response) {
+  const stats = await buyersService.getMyStats(req.user!.sub)
+  res.status(200).json(stats)
+}
+
+export async function myDownloads(req: Request, res: Response) {
+  const downloads = await buyersService.getMyDownloadActivity(req.user!.sub)
+  res.status(200).json({ downloads })
+}
+
+export async function downloadItem(req: Request, res: Response) {
+  const { url } = await buyersService.recordDownload(req.user!.sub, req.params.id, req.params.itemId)
+  res.redirect(302, url)
+}

@@ -19,6 +19,16 @@ export async function queue(_req: Request, res: Response) {
   res.status(200).json({ items })
 }
 
+export async function myStats(req: Request, res: Response) {
+  const stats = await qaService.getMyStats(req.user!.sub)
+  res.status(200).json(stats)
+}
+
+export async function myDecisions(req: Request, res: Response) {
+  const decisions = await qaService.getMyDecisions(req.user!.sub)
+  res.status(200).json({ decisions })
+}
+
 export async function decide(req: Request, res: Response) {
   const body = decisionSchema.parse(req.body)
   const result = await qaService.decide({

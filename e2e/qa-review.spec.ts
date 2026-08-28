@@ -54,6 +54,10 @@ test('QA reviewer approves a validated submission and it leaves the queue', asyn
   await page.locator('input[type=password]').fill('dev-password')
   await page.getByRole('button', { name: /enter qa queue/i }).click()
 
+  // Sign-in now lands on the real dashboard (Home), matching Contributor's
+  // pattern — navigate to Queue from there via the sidebar.
+  await expect(page).toHaveURL(/\/qa\/home/)
+  await page.locator('nav').getByRole('link', { name: 'Queue', exact: true }).click()
   await expect(page).toHaveURL(/\/qa\/queue/)
   await expect(page.getByText(/awaiting manual review/i)).toBeVisible()
 
@@ -61,7 +65,8 @@ test('QA reviewer approves a validated submission and it leaves the queue', asyn
   await expect(page).toHaveURL(/\/qa\/item/)
   await page.getByRole('button', { name: /^approve$/i }).click()
 
-  // Either back to the queue (more items) or /qa/complete (none left) —
-  // both prove the decision was accepted and the item left the queue.
-  await expect(page).toHaveURL(/\/qa\/(item|complete)/)
+  // Either back to /qa/item (more items) or /qa/home (queue cleared,
+  // real stats there reflect everything just decided) — both prove the
+  // decision was accepted and the item left the queue.
+  await expect(page).toHaveURL(/\/qa\/(item|home)/)
 })

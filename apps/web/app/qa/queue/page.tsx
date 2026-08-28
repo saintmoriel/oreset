@@ -1,62 +1,62 @@
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2, TriangleAlert } from 'lucide-react'
-import { QueueShell } from '@/components/shared/queue-shell'
-import { cn } from '@/lib/utils'
-import { serverApiFetch } from '@/lib/api/server'
+import { ArrowRight, TriangleAlert } from 'lucide-react'
+import { QaAppShell } from '@/components/qa/qa-app-shell'
+import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import type { QaQueueItem } from '@/lib/api/endpoints/qa'
 
 export default async function QaQueuePage() {
-  const { items } = await serverApiFetch<{ items: QaQueueItem[] }>('/api/v1/qa/queue')
+  let items: QaQueueItem[]
+  try {
+    ;({ items } = await serverApiFetch<{ items: QaQueueItem[] }>('/api/v1/qa/queue'))
+  } catch (err) {
+    redirectIfSignedOut(err, '/qa')
+  }
 
   return (
-    <QueueShell badge="Origin QA" signOutHref="/qa" step={0}>
-      <div className="card-surface-raised p-8 sm:p-10">
-        <p className="text-eyebrow text-accent">Origin QA</p>
-        <h1 className="text-h2 mt-2 text-balance text-foreground">
-          {items.length} submission{items.length === 1 ? '' : 's'} awaiting manual review
-        </h1>
-        <p className="text-body mt-3 text-pretty text-muted-foreground">
-          These passed Automated Validation. Approve for packaging, or reject with a standardized
-          defect tag.
-        </p>
+    <QaAppShell>
+      <p className="cx-label text-navy-400">Origin QA</p>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Queue</h1>
+      <p className="cx-body mt-2 max-w-2xl text-navy-500">
+        These passed Automated Validation. Approve for packaging, or reject with a standardized
+        defect tag.
+      </p>
 
+      <div className="mt-6">
+        <p className="cx-label text-navy-400">
+          {items.length} submission{items.length === 1 ? '' : 's'} awaiting manual review
+        </p>
         {items.length === 0 ? (
-          <p className="mt-6 text-body-sm text-muted-foreground">Queue is empty — nothing awaiting review.</p>
+          <p className="cx-body mt-2.5 text-navy-400">Queue is empty — nothing awaiting review.</p>
         ) : (
           <>
-            <ul className="mt-6 divide-y divide-border/70 border-y border-border/70">
+            <div className="mt-2.5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => {
                 const flagged = item.latestValidation?.outcome === 'fail'
                 return (
-                  <li key={item.id} className="flex items-center justify-between gap-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={cn(
-                          'flex size-8 items-center justify-center rounded-full',
-                          flagged ? 'bg-warning/10' : 'bg-success/10',
-                        )}
-                      >
-                        {flagged ? (
-                          <TriangleAlert className="size-4 text-warning" />
-                        ) : (
-                          <CheckCircle2 className="size-4 text-success" />
-                        )}
-                      </span>
-                      <div>
-                        <p className="text-body-sm font-medium text-foreground">{item.batch.title}</p>
-                        <p className="text-caption text-muted-foreground">
-                          {item.mediaType} · {new Date(item.createdAt).toLocaleString()}
-                        </p>
-                      </div>
+                  <div key={item.id} className="cx-card flex flex-col gap-3 p-5">
+                    <p className="cx-mono-meta font-semibold uppercase tracking-wider text-navy-400">
+                      {item.mediaType}
+                    </p>
+                    <div>
+                      <h2 className="cx-title text-navy-900">{item.batch.title}</h2>
+                      <p className="cx-mono-meta mt-0.5 text-navy-400">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </p>
                     </div>
-                  </li>
+                    {flagged && (
+                      <p className="flex items-center gap-1.5 cx-meta text-warning">
+                        <TriangleAlert className="size-3.5 shrink-0" />
+                        Automated Validation flagged this
+                      </p>
+                    )}
+                  </div>
                 )
               })}
-            </ul>
+            </div>
 
             <Link
               href="/qa/item"
-              className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 sm:w-auto"
+              className="mt-6 inline-flex h-11 w-fit items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600"
             >
               Start reviewing
               <ArrowRight className="size-4" />
@@ -64,6 +64,6 @@ export default async function QaQueuePage() {
           </>
         )}
       </div>
-    </QueueShell>
+    </QaAppShell>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { MotionReveal, MotionStagger, MotionStaggerItem } from './motion-reveal'
 import { SiteImage } from './site-image'
 
@@ -9,19 +10,19 @@ const ORIGIN_IMAGE =
 
 const pillars = [
   {
-    title: 'Capture in the field',
+    title: 'On-device consent and capture',
     detail:
-      'Speech, language text, and agri imagery originated by local collectors where the data actually lives.',
+      'Collectors accept tasks from the pool, record speech or capture imagery on-device, and digitally sign consent before anything is submitted. No post-hoc paperwork.',
   },
   {
-    title: 'Consent before submit',
+    title: 'Automated quality gatekeeping',
     detail:
-      'Digital consent locks at capture. Quality checks clear contributions before anything moves to payout.',
+      'Every submission passes through a 4-tier error taxonomy and automated validation checks at capture time. Contributions that fail are rejected before they reach review or payout.',
   },
   {
-    title: 'Deliver with provenance',
+    title: 'Payout Line and licensed delivery',
     detail:
-      'Structured packages arrive with licensing and an inspectable path from field to handoff.',
+      'Cleared contributions move to Payout Line with explicit per-task rates and a wage floor. Delivered packages arrive with consent licensing and an inspectable provenance path.',
   },
 ] as const
 
@@ -44,13 +45,13 @@ export function OriginDeepDive() {
                 Fresh African speech, language, and agricultural imagery—originated in the
                 field, verified before delivery, and licensed from the point of capture.
               </p>
-              <a
-                href="#contact"
+              <Link
+                href="/capture"
                 className="group mt-8 inline-flex min-h-11 items-center gap-2 text-body-sm font-semibold text-accent transition-colors hover:text-copper-600"
               >
-                Commission Origin data
+                Start contributing
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
+              </Link>
             </MotionReveal>
 
             <MotionStagger className="mt-10 space-y-0 sm:mt-12" stagger={0.08}>

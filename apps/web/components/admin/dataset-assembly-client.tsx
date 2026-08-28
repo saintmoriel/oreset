@@ -13,8 +13,9 @@ import {
   type UnassembledSubmission,
   type Buyer,
 } from '@/lib/api/endpoints/datasets'
+import { StatusTag } from '@/components/capture/status-tag'
+import { VerificationSeal } from '@/components/capture/verification-seal'
 import { ApiError } from '@/lib/api/client'
-import { cn } from '@/lib/utils'
 
 export function DatasetAssemblyClient({ dataset, buyers }: { dataset: DatasetWithRelations; buyers: Buyer[] }) {
   const router = useRouter()
@@ -22,24 +23,19 @@ export function DatasetAssemblyClient({ dataset, buyers }: { dataset: DatasetWit
 
   return (
     <div>
-      <p className="text-eyebrow text-accent">{dataset.campaign.title}</p>
-      <div className="mt-2 flex items-center gap-3">
-        <h1 className="text-h2 text-foreground">{dataset.title}</h1>
-        <span
-          className={cn(
-            'rounded-full px-2.5 py-1 text-caption font-semibold capitalize',
-            dataset.status === 'draft' && 'bg-muted text-muted-foreground',
-            dataset.status === 'sealed' && 'bg-warning/10 text-warning',
-            dataset.status === 'delivered' && 'bg-success/10 text-success',
-          )}
-        >
-          {dataset.status}
-        </span>
+      <p className="cx-label text-accent">{dataset.campaign.title}</p>
+      <div className="mt-1.5 flex items-center gap-3">
+        <h1 className="cx-page-title text-navy-900">{dataset.title}</h1>
+        {dataset.status === 'draft' ? (
+          <StatusTag tone="neutral">Draft</StatusTag>
+        ) : (
+          <VerificationSeal label={dataset.status === 'sealed' ? 'Sealed' : 'Delivered'} />
+        )}
       </div>
-      <p className="text-body-sm mt-3 max-w-lg text-muted-foreground">{dataset.licenseTerms}</p>
+      <p className="cx-body mt-3 max-w-lg text-navy-500">{dataset.licenseTerms}</p>
 
       {error && (
-        <p className="mt-4 text-caption text-destructive" role="alert">
+        <p className="mt-4 cx-meta text-destructive" role="alert">
           {error}
         </p>
       )}
@@ -63,16 +59,19 @@ function ItemsList({
   onRemove?: (submissionId: string) => void
 }) {
   if (items.length === 0) {
-    return <p className="mt-4 text-body-sm text-muted-foreground">No items yet.</p>
+    return <p className="cx-body mt-4 text-navy-400">No items yet.</p>
   }
   return (
-    <ul className="mt-4 divide-y divide-border/70 border-y border-border/70">
+    <div className="cx-card mt-4 divide-y divide-border">
       {items.map((item) => (
-        <li key={item.id} className="flex items-center justify-between gap-4 py-3">
+        <div key={item.id} className="flex items-center justify-between gap-4 p-4">
           <div>
-            <p className="font-mono text-body-sm font-medium text-foreground">{item.submissionId}</p>
-            <p className="text-caption text-muted-foreground">
-              {item.submission.mediaType} · {item.submission.mimeType}
+            <p className="cx-mono-meta font-semibold uppercase tracking-wider text-navy-400">
+              {item.submission.mediaType}
+            </p>
+            <p className="cx-mono-meta mt-0.5 text-navy-800">{item.submissionId}</p>
+            <p className="cx-meta text-navy-400">
+              {item.submission.mimeType}
               {item.submission.durationSeconds ? ` · ${item.submission.durationSeconds}s` : ''}
             </p>
           </div>
@@ -80,14 +79,14 @@ function ItemsList({
             <button
               onClick={() => onRemove(item.submissionId)}
               aria-label="Remove item"
-              className="text-muted-foreground hover:text-destructive"
+              className="text-navy-400 hover:text-destructive"
             >
               <Trash2 className="size-4" />
             </button>
           )}
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   )
 }
 
@@ -164,24 +163,24 @@ function DraftView({
 
   return (
     <div>
-      <h2 className="text-h4 mt-8 text-foreground">In this dataset ({dataset.items.length})</h2>
+      <h2 className="cx-title mt-8 text-navy-900">In this dataset ({dataset.items.length})</h2>
       <ItemsList items={dataset.items} onRemove={onRemove} />
-      {removing && <p className="mt-2 text-caption text-muted-foreground">Removing…</p>}
+      {removing && <p className="mt-2 cx-meta text-navy-400">Removing…</p>}
 
-      <h2 className="text-h4 mt-10 text-foreground">Available to add</h2>
+      <h2 className="cx-title mt-10 text-navy-900">Available to add</h2>
       {!pool ? (
         <div className="mt-4 flex justify-center py-8">
           <Loader2 className="size-6 animate-spin text-accent" />
         </div>
       ) : pool.length === 0 ? (
-        <p className="mt-4 text-body-sm text-muted-foreground">
+        <p className="cx-body mt-4 text-navy-400">
           No qa_approved submissions in this campaign are currently unassembled.
         </p>
       ) : (
         <>
-          <ul className="mt-4 divide-y divide-border/70 border-y border-border/70">
+          <div className="cx-card mt-4 divide-y divide-border">
             {pool.map((s) => (
-              <li key={s.id} className="flex items-center gap-3 py-3">
+              <label key={s.id} className="flex cursor-pointer items-center gap-3 p-4 hover:bg-navy-50">
                 <input
                   type="checkbox"
                   checked={selected.has(s.id)}
@@ -189,14 +188,15 @@ function DraftView({
                   className="size-4 accent-accent"
                 />
                 <div className="flex-1">
-                  <p className="font-mono text-body-sm font-medium text-foreground">{s.id}</p>
-                  <p className="text-caption text-muted-foreground">
-                    {s.contributor.displayName ?? 'Contributor'} · {s.mediaType} · {s.mimeType}
+                  <p className="cx-mono-meta font-semibold uppercase tracking-wider text-navy-400">
+                    {s.mediaType}
                   </p>
+                  <p className="cx-mono-meta mt-0.5 text-navy-800">{s.id}</p>
+                  <p className="cx-meta text-navy-400">{s.contributor.displayName ?? 'Contributor'} · {s.mimeType}</p>
                 </div>
-              </li>
+              </label>
             ))}
-          </ul>
+          </div>
           <button
             onClick={onAddSelected}
             disabled={adding || selected.size === 0}
@@ -208,17 +208,17 @@ function DraftView({
         </>
       )}
 
-      <div className="mt-10 border-t border-border/70 pt-6">
+      <div className="mt-10 border-t border-border pt-6">
         <button
           onClick={onSeal}
           disabled={sealing || dataset.items.length === 0}
-          className="inline-flex h-11 items-center gap-2 rounded-md bg-navy-800 px-5 text-sm font-semibold text-white hover:bg-navy-900 disabled:opacity-60"
+          className="inline-flex h-11 items-center gap-2 rounded-md bg-navy-900 px-5 text-sm font-semibold text-white hover:bg-navy-800 disabled:opacity-60"
         >
           {sealing ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
           Seal dataset
         </button>
         {dataset.items.length === 0 && (
-          <p className="mt-2 text-caption text-muted-foreground">Add at least one item before sealing.</p>
+          <p className="mt-2 cx-meta text-navy-400">Add at least one item before sealing.</p>
         )}
       </div>
     </div>
@@ -254,29 +254,24 @@ function SealedView({
 
   return (
     <div>
-      <div className="mt-6 flex items-start gap-3 rounded-xl border border-success/30 bg-success/5 p-5">
-        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-success" />
-        <div>
-          <p className="text-body-sm font-semibold text-foreground">Provenance sealed</p>
-          <p className="font-mono text-caption mt-1 break-all text-muted-foreground">{dataset.provenanceHash}</p>
-        </div>
+      <div className="mt-6 flex items-center gap-3 rounded-xl border border-accent/30 bg-accent/5 p-5">
+        <VerificationSeal label="Provenance sealed" />
+        <p className="cx-mono-meta break-all text-navy-400">{dataset.provenanceHash}</p>
       </div>
 
-      <h2 className="text-h4 mt-8 text-foreground">Manifest ({dataset.items.length})</h2>
+      <h2 className="cx-title mt-8 text-navy-900">Manifest ({dataset.items.length})</h2>
       <ItemsList items={dataset.items} />
 
-      <div className="mt-10 border-t border-border/70 pt-6">
-        <p className="text-body-sm font-semibold text-foreground">Hand off to a buyer</p>
+      <div className="mt-10 border-t border-border pt-6">
+        <p className="cx-body font-semibold text-navy-900">Hand off to a buyer</p>
         {buyers.length === 0 ? (
-          <p className="mt-2 text-body-sm text-muted-foreground">
-            No buyer accounts exist yet — provision one first.
-          </p>
+          <p className="cx-body mt-2 text-navy-400">No buyer accounts exist yet — provision one first.</p>
         ) : (
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
             <select
               value={buyerId}
               onChange={(e) => setBuyerId(e.target.value)}
-              className="h-10 flex-1 rounded-md border border-border bg-background px-3 text-body-sm outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+              className="h-10 flex-1 rounded-md border border-border bg-background px-3 cx-body outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
             >
               {buyers.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -305,15 +300,15 @@ function DeliveredView({ dataset }: { dataset: DatasetWithRelations }) {
       <div className="mt-6 flex items-start gap-3 rounded-xl border border-success/30 bg-success/5 p-5">
         <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" />
         <div>
-          <p className="text-body-sm font-semibold text-foreground">
+          <p className="cx-body font-semibold text-navy-900">
             Delivered to {dataset.buyer?.displayName ?? dataset.buyer?.email} on{' '}
             {dataset.deliveredAt ? new Date(dataset.deliveredAt).toLocaleDateString() : ''}
           </p>
-          <p className="font-mono text-caption mt-1 break-all text-muted-foreground">{dataset.provenanceHash}</p>
+          <p className="cx-mono-meta mt-1 break-all text-navy-400">{dataset.provenanceHash}</p>
         </div>
       </div>
 
-      <h2 className="text-h4 mt-8 text-foreground">Manifest ({dataset.items.length})</h2>
+      <h2 className="cx-title mt-8 text-navy-900">Manifest ({dataset.items.length})</h2>
       <ItemsList items={dataset.items} />
     </div>
   )

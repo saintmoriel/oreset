@@ -163,15 +163,15 @@ export default function OperatorsJoinPage() {
       <main className="container-wide py-12 sm:py-16 md:py-20">
         <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-5">
-            <p className="text-eyebrow text-accent">Operators · Africa</p>
-            <h1 className="text-h1 mt-4 text-balance text-foreground">
+            <p className="cx-label text-accent">Operators · Africa</p>
+            <h1 className="cx-page-title mt-4 text-balance text-navy-900">
               Apply to the native language operator cohort.
             </h1>
-            <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
+            <p className="cx-body mt-5 text-pretty text-navy-500">
               We are accepting applications from African native speakers for training,
               certification, and placement on AI review and QA workflows.
             </p>
-            <ul className="mt-8 space-y-3 text-body-sm text-muted-foreground">
+            <ul className="mt-8 space-y-3 cx-meta text-navy-500">
               {[
                 'Native fluency with dialect baselines',
                 'Training and timed certification',
@@ -187,23 +187,23 @@ export default function OperatorsJoinPage() {
 
           <div className="lg:col-span-7">
             {status === 'success' ? (
-              <div className="card-surface-raised flex flex-col items-start gap-4 p-8" role="status">
+              <div className="cx-card flex flex-col items-start gap-4 p-8" role="status">
                 <span className="flex size-12 items-center justify-center rounded-xl bg-success/10">
                   <CheckCircle2 className="size-6 text-success" />
                 </span>
-                <h2 className="text-h3 text-foreground">Application received.</h2>
+                <h2 className="cx-title text-navy-900">Application received.</h2>
                 {operatorCode && (
-                  <p className="text-body-sm text-muted-foreground">
-                    Your operator ID is <strong className="font-mono font-semibold text-foreground">{operatorCode}</strong>.
+                  <p className="cx-meta text-navy-500">
+                    Your operator ID is <strong className="cx-mono-meta font-semibold text-navy-900">{operatorCode}</strong>.
                   </p>
                 )}
-                <p className="text-body text-muted-foreground">
+                <p className="cx-body text-navy-500">
                   Sign in to begin certification — a short training and quiz that unlocks your
                   first placement.
                 </p>
                 <Link
                   href="/operator"
-                  className="text-body-sm font-semibold text-accent hover:text-copper-600"
+                  className="cx-meta font-semibold text-accent hover:text-copper-600"
                 >
                   Sign in to begin certification
                 </Link>
@@ -212,10 +212,10 @@ export default function OperatorsJoinPage() {
               <form
                 onSubmit={onSubmit}
                 noValidate
-                className="card-surface-raised space-y-6 p-6 sm:p-8"
+                className="cx-card space-y-6 p-6 sm:p-8"
               >
                 <div className="space-y-4">
-                  <p className="text-eyebrow text-muted-foreground">Contact details</p>
+                  <p className="cx-label text-navy-400">Contact details</p>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label="Full name" error={errors.name}>
                       <input
@@ -267,13 +267,13 @@ export default function OperatorsJoinPage() {
                       placeholder="At least 8 characters"
                     />
                   </Field>
-                  <p className="text-caption text-muted-foreground">
+                  <p className="cx-meta text-navy-500">
                     You&apos;ll use this to sign in later and complete certification.
                   </p>
                 </div>
 
                 <div className="space-y-3 border-t border-border/70 pt-6">
-                  <p className="text-eyebrow text-muted-foreground">Languages</p>
+                  <p className="cx-label text-navy-400">Languages</p>
                   <Field label="Native language(s) with fluency" error={errors.languages}>
                     <div className="space-y-2">
                       {values.languages.map((row, i) => (
@@ -312,7 +312,7 @@ export default function OperatorsJoinPage() {
                     <button
                       type="button"
                       onClick={addLanguageRow}
-                      className="mt-2 inline-flex items-center gap-1.5 text-body-sm font-medium text-accent hover:text-copper-600"
+                      className="mt-2 inline-flex items-center gap-1.5 cx-meta font-medium text-accent hover:text-copper-600"
                     >
                       <Plus className="size-4" />
                       Add another language
@@ -361,7 +361,7 @@ export default function OperatorsJoinPage() {
                 </div>
 
                 <div className="border-t border-border/70 pt-6">
-                  <p className="text-body-sm font-medium text-foreground">
+                  <p className="cx-meta font-medium text-navy-900">
                     Availability / preferred working hours <span className="text-muted-foreground">(optional)</span>
                   </p>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -369,7 +369,7 @@ export default function OperatorsJoinPage() {
                       <label
                         key={opt}
                         className={cn(
-                          'flex cursor-pointer items-center gap-2.5 rounded-lg border p-3 text-body-sm transition-colors',
+                          'flex cursor-pointer items-center gap-2.5 rounded-lg border p-3 cx-meta cx-fade',
                           values.availability.includes(opt) ? 'border-accent/50 bg-accent/5' : 'border-border',
                         )}
                       >
@@ -424,10 +424,10 @@ function Field({
 }) {
   return (
     <div>
-      <label className="text-body-sm font-medium text-foreground">{label}</label>
+      <label className="cx-meta font-medium text-navy-800">{label}</label>
       <div className="mt-1.5">{children}</div>
       {error && (
-        <p className="mt-1.5 text-caption text-destructive" role="alert">
+        <p className="mt-1.5 cx-meta text-destructive" role="alert">
           {error}
         </p>
       )}
@@ -437,7 +437,7 @@ function Field({
 
 function fieldClass(invalid: boolean) {
   return cn(
-    'w-full rounded-lg border bg-background px-3.5 py-2.5 text-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20',
+    'w-full rounded-lg border bg-background px-3.5 py-2.5 cx-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20',
     invalid ? 'border-destructive/50' : 'border-border',
   )
 }

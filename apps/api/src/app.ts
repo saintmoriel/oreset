@@ -14,7 +14,7 @@ import { uploadsRouter } from './modules/uploads/uploads.routes'
 import { qaRouter } from './modules/qa/qa.routes'
 import { campaignsRouter } from './modules/campaigns/campaigns.routes'
 import { promptsRouter } from './modules/prompts/prompts.routes'
-import { operatorsRouter } from './modules/operators/operators.routes'
+import { operatorsRouter, operatorsAdminRouter } from './modules/operators/operators.routes'
 import { operatorRouter } from './modules/operator/operator.routes'
 import { retentionRouter } from './modules/retention/retention.routes'
 import { payoutsRouter, payoutsAdminRouter } from './modules/payouts/payouts.routes'
@@ -22,6 +22,7 @@ import { meRouter } from './modules/me/me.routes'
 import { datasetsRouter } from './modules/datasets/datasets.routes'
 import { buyersRouter, buyersAdminRouter } from './modules/buyers/buyers.routes'
 import { ticketsRouter } from './modules/tickets/tickets.routes'
+import { adminRouter } from './modules/admin/admin.routes'
 
 const allowedOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim())
 
@@ -58,6 +59,8 @@ app.use('/api/v1/buyer', buyersRouter)
 app.use('/api/v1/admin/buyers', buyersAdminRouter)
 app.use('/api/v1/admin/datasets', datasetsRouter)
 app.use('/api/v1/admin/tickets', ticketsRouter)
+app.use('/api/v1/admin/operators', operatorsAdminRouter)
+app.use('/api/v1/admin', adminRouter)
 
 app.use((req, res) => {
   res.status(404).json({ error: { code: 'not_found', message: `No route for ${req.method} ${req.path}` } })

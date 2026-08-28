@@ -19,3 +19,8 @@ export async function runBatch(_req: Request, res: Response) {
   const result = await payoutsService.runPayoutBatch()
   res.status(200).json(result)
 }
+
+export async function listAll(_req: Request, res: Response) {
+  const items = await payoutsService.listAllPayouts()
+  res.status(200).json({ payouts: items })
+}

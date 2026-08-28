@@ -1,18 +1,34 @@
-import { cn } from '@/lib/utils'
-import { serverApiFetch } from '@/lib/api/server'
+import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import { CaptureAppShell } from '@/components/capture/capture-app-shell'
 import { PayoutDetailsForm } from '@/components/capture/payout-details-form'
+import { StatusTag } from '@/components/capture/status-tag'
+import { VerificationSeal } from '@/components/capture/verification-seal'
 import { formatRate, daysAgo, sameMonth } from '@/lib/capture-format'
 import type { Payout } from '@/lib/api/endpoints/payouts'
 import type { SubmissionSummary } from '@/lib/api/endpoints/submissions'
 import type { AuthUser } from '@oreset/shared'
+import type { PayoutStatus } from '@oreset/shared'
+
+const PAYOUT_STATUS_TONE: Record<PayoutStatus, 'success' | 'warning' | 'destructive' | 'neutral'> = {
+  paid: 'success',
+  pending: 'neutral',
+  processing: 'warning',
+  failed: 'destructive',
+}
 
 export default async function CapturePayoutsPage() {
-  const [{ payouts }, { user }, { submissions }] = await Promise.all([
-    serverApiFetch<{ payouts: Payout[] }>('/api/v1/payouts/me'),
-    serverApiFetch<{ user: AuthUser }>('/api/v1/auth/me'),
-    serverApiFetch<{ submissions: SubmissionSummary[] }>('/api/v1/submissions/me'),
-  ])
+  let payouts: Payout[]
+  let user: AuthUser
+  let submissions: SubmissionSummary[]
+  try {
+    ;[{ payouts }, { user }, { submissions }] = await Promise.all([
+      serverApiFetch<{ payouts: Payout[] }>('/api/v1/payouts/me'),
+      serverApiFetch<{ user: AuthUser }>('/api/v1/auth/me'),
+      serverApiFetch<{ submissions: SubmissionSummary[] }>('/api/v1/submissions/me'),
+    ])
+  } catch (err) {
+    redirectIfSignedOut(err, '/capture')
+  }
   const paid = payouts.filter((p) => p.status === 'paid')
   const totalPaidMinorUnits = paid.reduce((sum, p) => sum + p.amountMinorUnits, 0)
   const currency = payouts[0]?.currency ?? 'NGN'
@@ -31,20 +47,20 @@ export default async function CapturePayoutsPage() {
   const earnedRows = Array.from(earnedByBatch.values())
 
   return (
-    <CaptureAppShell active="payouts">
+    <CaptureAppShell>
       <p className="cx-label text-navy-400">Money</p>
       <h1 className="cx-page-title mt-1.5 text-navy-900">Payouts</h1>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <div className="cx-card p-5 lg:col-span-2">
+      <div className="cx-card mt-6 grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="p-5">
           <p className="cx-meta text-navy-400">Total paid out</p>
           <p className="cx-stat mt-1 text-navy-900">{formatRate(totalPaidMinorUnits, currency)}</p>
         </div>
-        <div className="cx-card p-5">
+        <div className="p-5">
           <p className="cx-meta text-navy-400">This week</p>
           <p className="cx-stat mt-1 text-navy-900">{formatRate(thisWeekPaid, currency)}</p>
         </div>
-        <div className="cx-card p-5">
+        <div className="p-5">
           <p className="cx-meta text-navy-400">This month</p>
           <p className="cx-stat mt-1 text-navy-900">{formatRate(thisMonthPaid, currency)}</p>
         </div>
@@ -86,7 +102,7 @@ export default async function CapturePayoutsPage() {
                       {row.count} submission{row.count === 1 ? '' : 's'} approved
                     </p>
                   </div>
-                  <span className="cx-body font-semibold tabular text-navy-800">
+                  <span className="cx-body font-mono font-semibold tabular-nums text-navy-800">
                     {formatRate(row.total, row.currency)}
                   </span>
                 </div>
@@ -104,19 +120,16 @@ export default async function CapturePayoutsPage() {
               {payouts.map((p) => (
                 <div key={p.id} className="flex items-center justify-between gap-4 p-4">
                   <div>
-                    <p className="cx-body font-medium tabular text-navy-900">
+                    <p className="cx-body font-mono font-medium tabular-nums text-navy-900">
                       {formatRate(p.amountMinorUnits, p.currency)}
                     </p>
-                    <p className="cx-meta text-navy-400">{new Date(p.createdAt).toLocaleDateString()}</p>
+                    <p className="cx-mono-meta text-navy-400">{new Date(p.createdAt).toLocaleDateString()}</p>
                   </div>
-                  <span
-                    className={cn(
-                      'cx-meta font-semibold capitalize',
-                      p.status === 'paid' ? 'text-success' : p.status === 'failed' ? 'text-destructive' : 'text-navy-400',
-                    )}
-                  >
-                    {p.status}
-                  </span>
+                  {p.status === 'paid' ? (
+                    <VerificationSeal label="Paid" />
+                  ) : (
+                    <StatusTag tone={PAYOUT_STATUS_TONE[p.status]}>{p.status}</StatusTag>
+                  )}
                 </div>
               ))}
             </div>

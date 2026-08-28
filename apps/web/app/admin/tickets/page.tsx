@@ -1,7 +1,7 @@
-import { Lock, TriangleAlert } from 'lucide-react'
-import { AdminShell } from '@/components/admin/admin-shell'
+import { Lock } from 'lucide-react'
+import { AdminAppShell } from '@/components/admin/admin-app-shell'
 import { TicketResolveClient } from '@/components/admin/ticket-resolve-client'
-import { cn } from '@/lib/utils'
+import { StatusTag } from '@/components/capture/status-tag'
 import { serverApiFetch } from '@/lib/api/server'
 import type { AuthUser } from '@oreset/shared'
 import type { Ticket } from '@/lib/api/endpoints/tickets'
@@ -16,58 +16,51 @@ export default async function TicketsPage() {
     : []
 
   return (
-    <AdminShell role={role}>
-      <div>
-        <p className="text-eyebrow text-accent">Operators · Oversight</p>
-        <h1 className="text-h2 mt-2 text-foreground">Client tickets</h1>
-        <p className="text-body-sm mt-2 max-w-lg text-muted-foreground">
-          Where a Certified Operator's Escalate decision actually lands — real client output flagged
-          for follow-up.
-        </p>
+    <AdminAppShell>
+      <p className="cx-label text-navy-400">Operators · Oversight</p>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Client tickets</h1>
+      <p className="cx-body mt-2 max-w-lg text-navy-500">
+        Where a Certified Operator&apos;s Escalate decision actually lands — real client output
+        flagged for follow-up.
+      </p>
 
-        {!canView ? (
-          <div className="card-surface mt-6 flex flex-col items-center gap-3 p-10 text-center">
-            <span className="flex size-12 items-center justify-center rounded-xl bg-muted">
-              <Lock className="size-5 text-muted-foreground" />
-            </span>
-            <p className="text-body font-semibold text-foreground">Access restricted</p>
-            <p className="text-body-sm max-w-sm text-muted-foreground">
-              Your role cannot view client tickets. Admin and Reviewer Lead only.
-            </p>
-          </div>
-        ) : tickets.length === 0 ? (
-          <p className="mt-6 text-body-sm text-muted-foreground">No tickets yet.</p>
-        ) : (
-          <ul className="mt-6 divide-y divide-border/70 border-y border-border/70">
-            {tickets.map((t) => (
-              <li key={t.id} className="flex items-start justify-between gap-4 py-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    {t.status === 'open' && <TriangleAlert className="size-4 text-warning" />}
-                    <p className="font-mono text-body-sm font-medium text-foreground">{t.externalRef}</p>
-                    {t.errTag && (
-                      <span className="font-mono text-caption font-semibold text-accent">{t.errTag}</span>
-                    )}
-                    {t.severity && <span className="text-caption text-muted-foreground">{t.severity}</span>}
-                  </div>
-                  <p className="text-caption mt-1 text-muted-foreground">{t.clientName}</p>
-                  {t.notes && <p className="text-body-sm mt-2 text-foreground">{t.notes}</p>}
-                  {t.status === 'resolved' && t.resolutionNotes && (
-                    <p className="text-caption mt-2 text-success">Resolved: {t.resolutionNotes}</p>
-                  )}
+      {!canView ? (
+        <div className="cx-card mt-6 flex flex-col items-center gap-3 p-10 text-center">
+          <span className="flex size-12 items-center justify-center rounded-xl bg-navy-100">
+            <Lock className="size-5 text-navy-400" />
+          </span>
+          <p className="cx-body font-semibold text-navy-900">Access restricted</p>
+          <p className="cx-meta max-w-sm text-navy-500">
+            Your role cannot view client tickets. Admin and Reviewer Lead only.
+          </p>
+        </div>
+      ) : tickets.length === 0 ? (
+        <p className="cx-body mt-6 text-navy-400">No tickets yet.</p>
+      ) : (
+        <div className="cx-card mt-6 divide-y divide-border">
+          {tickets.map((t) => (
+            <div key={t.id} className="flex items-start justify-between gap-4 p-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="cx-mono-meta font-semibold text-navy-800">{t.externalRef}</p>
+                  {t.errTag && <span className="cx-mono-meta font-semibold text-accent">{t.errTag}</span>}
+                  {t.severity && <span className="cx-mono-meta text-navy-400">{t.severity}</span>}
                 </div>
-                {t.status === 'open' ? (
-                  <TicketResolveClient ticketId={t.id} />
-                ) : (
-                  <span className={cn('shrink-0 rounded-full px-2.5 py-1 text-caption font-semibold', 'bg-success/10 text-success')}>
-                    Resolved
-                  </span>
+                <p className="cx-mono-meta mt-1 text-navy-400">{t.clientName}</p>
+                {t.notes && <p className="cx-body mt-2 text-navy-800">{t.notes}</p>}
+                {t.status === 'resolved' && t.resolutionNotes && (
+                  <p className="cx-meta mt-2 text-success">Resolved: {t.resolutionNotes}</p>
                 )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </AdminShell>
+              </div>
+              {t.status === 'open' ? (
+                <TicketResolveClient ticketId={t.id} />
+              ) : (
+                <StatusTag tone="success">Resolved</StatusTag>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </AdminAppShell>
   )
 }

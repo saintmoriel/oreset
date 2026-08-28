@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { ApiError } from './client'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -37,4 +38,19 @@ export async function serverApiFetch<T>(path: string, options: FetchOptions = {}
 
   if (res.status === 204) return undefined as T
   return res.json()
+}
+
+// A cookie can be structurally valid (right signature, not expired) while
+// referencing a user row that's gone — e.g. the DB was reseeded, or the
+// account was deleted in another tab. proxy.ts's Edge gate can't catch
+// this (it only verifies the JWT, never hits the DB), so an authenticated
+// Server Component page is the first place it actually surfaces. Call
+// this from a page's catch block instead of letting the ApiError bubble
+// into Next's generic error overlay — bounces to sign-in like a normal
+// expired session would.
+export function redirectIfSignedOut(err: unknown, signInPath: string): never {
+  if (err instanceof ApiError && err.status === 401) {
+    redirect(signInPath)
+  }
+  throw err
 }

@@ -33,6 +33,16 @@ const faqs = [
     a: 'Coverage is scoped per pilot: speech, language text, and agricultural imagery are in the Origin design. We do not publish inflated “N languages live” counts; we start from your languages, dialects, and deliverable.',
   },
   {
+    audience: 'Contributors',
+    q: 'Do I need special equipment to contribute?',
+    a: 'No. The Oreset Capture app runs on standard Android smartphones. Tasks are designed for on-device recording with built-in quality gates — you don’t need studio hardware or professional training.',
+  },
+  {
+    audience: 'Buyers',
+    q: 'What happens if a delivery fails quality checks?',
+    a: 'Every batch passes automated gatechecks and operator review before handoff. If a delivery falls below the agreed quality threshold, we re-collect or replace at no additional cost. The Trust Ledger audit trail shows exactly where any issue occurred.',
+  },
+  {
     audience: 'Everyone',
     q: 'Where is Oreset based?',
     a: 'Oreset Africa Hub is based in Abuja, Nigeria. The network is designed for distributed field collection and operator placement across African language communities.',

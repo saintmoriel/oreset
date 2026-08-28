@@ -20,6 +20,44 @@ function deviceInfo(): Record<string, unknown> {
   return { userAgent: navigator.userAgent, platform: navigator.platform, language: navigator.language }
 }
 
+// Real mic-amplitude feedback while recording — not decorative animation.
+// Reads the same MediaStream MediaRecorder is already capturing from, via a
+// separate AnalyserNode tap, so it costs nothing extra to request.
+function Waveform({ analyser, active }: { analyser: AnalyserNode | null; active: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const rafRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (!active || !analyser) return
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx) return
+    const data = new Uint8Array(analyser.frequencyBinCount)
+    const barCount = 32
+
+    function draw() {
+      analyser!.getByteTimeDomainData(data)
+      const { width, height } = canvas!
+      ctx!.clearRect(0, 0, width, height)
+      ctx!.fillStyle = '#c56a32'
+      const step = Math.floor(data.length / barCount)
+      const barWidth = width / barCount
+      for (let i = 0; i < barCount; i++) {
+        const amplitude = Math.abs(data[i * step] - 128) / 128
+        const barHeight = Math.max(3, amplitude * height)
+        ctx!.fillRect(i * barWidth + 1, (height - barHeight) / 2, Math.max(1, barWidth - 2), barHeight)
+      }
+      rafRef.current = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [analyser, active])
+
+  return <canvas ref={canvasRef} width={240} height={56} aria-hidden="true" />
+}
+
 export function TaskStep({
   isRetake,
   onBack,
@@ -48,6 +86,8 @@ export function TaskStep({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null)
 
   useEffect(() => {
     if (recordState !== 'recording') return
@@ -55,9 +95,16 @@ export function TaskStep({
     return () => clearInterval(timerId)
   }, [recordState])
 
+  function teardownAudioTap() {
+    audioContextRef.current?.close().catch(() => {})
+    audioContextRef.current = null
+    setAnalyser(null)
+  }
+
   useEffect(() => {
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop())
+      teardownAudioTap()
     }
   }, [])
 
@@ -75,6 +122,7 @@ export function TaskStep({
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
         stream.getTracks().forEach((t) => t.stop())
+        teardownAudioTap()
         update({
           capturedBlob: blob,
           capturedAt: new Date().toISOString(),
@@ -84,6 +132,18 @@ export function TaskStep({
         setRecordState('recorded')
       }
       mediaRecorderRef.current = recorder
+
+      // Real amplitude tap for the live waveform — a separate read-only
+      // consumer of the same stream, doesn't affect what MediaRecorder
+      // captures.
+      const audioContext = new AudioContext()
+      const source = audioContext.createMediaStreamSource(stream)
+      const analyserNode = audioContext.createAnalyser()
+      analyserNode.fftSize = 256
+      source.connect(analyserNode)
+      audioContextRef.current = audioContext
+      setAnalyser(analyserNode)
+
       setSeconds(0)
       recorder.start()
       setRecordState('recording')
@@ -193,7 +253,7 @@ export function TaskStep({
                 <div className="flex aspect-square items-center justify-center rounded-lg border border-success/30 bg-success/5 text-success">
                   <Camera className="size-10" />
                 </div>
-                <div className="cx-card cx-meta p-3 text-navy-400">
+                <div className="cx-card cx-mono-meta p-3 text-navy-400">
                   <p>Timestamp: {session.capturedAt && new Date(session.capturedAt).toLocaleString()}</p>
                   <p>
                     GPS:{' '}
@@ -251,13 +311,18 @@ export function TaskStep({
             {recordState === 'idle' && <p className="cx-body text-navy-400">Tap to start recording</p>}
             {recordState === 'requesting' && <p className="cx-body text-navy-400">Requesting microphone access…</p>}
             {recordState === 'recording' && (
-              <p className="cx-body tabular text-navy-800">
-                <span className="live-dot mr-1.5 inline-block size-2 rounded-full bg-destructive align-middle" />
-                Recording · 0:{String(seconds).padStart(2, '0')}
-              </p>
+              <>
+                <Waveform analyser={analyser} active={recordState === 'recording'} />
+                <p className="cx-body font-mono tabular-nums text-navy-800">
+                  <span className="live-dot mr-1.5 inline-block size-2 rounded-full bg-destructive align-middle" />
+                  Recording · 0:{String(seconds).padStart(2, '0')}
+                </p>
+              </>
             )}
             {recordState === 'recorded' && (
-              <p className="cx-body font-medium text-success">Take captured · 0:{String(seconds).padStart(2, '0')}</p>
+              <p className="cx-body font-mono font-medium tabular-nums text-success">
+                Take captured · 0:{String(seconds).padStart(2, '0')}
+              </p>
             )}
             {recordState === 'error' && recordError && (
               <p className="max-w-xs text-center cx-body text-destructive">{recordError}</p>

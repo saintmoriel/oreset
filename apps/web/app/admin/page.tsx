@@ -4,7 +4,7 @@ import { Suspense, useState, type FormEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { login } from '@/lib/api/endpoints/auth'
 import { ApiError } from '@/lib/api/client'
 
@@ -24,7 +24,7 @@ function AdminSignInContent() {
     setSubmitting(true)
     try {
       await login(email, password)
-      router.push(next ?? '/admin/dashboard')
+      router.push(next ?? '/admin/home')
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Sign-in failed. Try again.')
     } finally {
@@ -53,19 +53,16 @@ function AdminSignInContent() {
       </header>
 
       <main className="container-narrow py-16 sm:py-24">
-        <div className="card-surface-raised p-8 sm:p-10">
-          <span className="flex size-12 items-center justify-center rounded-xl bg-accent/10">
-            <ShieldCheck className="size-6 text-accent" />
-          </span>
-          <p className="text-eyebrow mt-5 text-accent">Admin · RBAC</p>
-          <h1 className="text-h1 mt-2 text-balance text-foreground">Staff sign-in</h1>
-          <p className="text-body mt-3 text-pretty text-muted-foreground">
+        <div className="cx-card p-8 sm:p-10">
+          <p className="cx-label text-accent">Admin · RBAC</p>
+          <h1 className="cx-page-title mt-2 text-navy-900">Staff sign-in</h1>
+          <p className="cx-body mt-3 text-navy-500">
             Role is assigned server-side from your account and enforced on every request.
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
             <div>
-              <label className="text-body-sm font-medium text-foreground">Email</label>
+              <label className="cx-meta font-medium text-navy-800">Email</label>
               <input
                 required
                 type="email"
@@ -76,7 +73,7 @@ function AdminSignInContent() {
               />
             </div>
             <div>
-              <label className="text-body-sm font-medium text-foreground">Password</label>
+              <label className="cx-meta font-medium text-navy-800">Password</label>
               <input
                 required
                 type="password"
@@ -86,7 +83,7 @@ function AdminSignInContent() {
               />
             </div>
             {error && (
-              <p className="text-caption text-destructive" role="alert">
+              <p className="cx-meta text-destructive" role="alert">
                 {error}
               </p>
             )}

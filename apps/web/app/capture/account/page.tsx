@@ -1,31 +1,23 @@
-import { serverApiFetch } from '@/lib/api/server'
+import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import { CaptureAppShell } from '@/components/capture/capture-app-shell'
 import { SignOutButton } from '@/components/shared/sign-out-button'
-import { maskPhone } from '@/lib/capture-format'
+import { Avatar } from '@/components/capture/avatar'
+import { StatusTag } from '@/components/capture/status-tag'
+import { maskPhone, computeStreak } from '@/lib/capture-format'
 import type { AuthUser } from '@oreset/shared'
 import type { SubmissionSummary } from '@/lib/api/endpoints/submissions'
 
-// A real derived stat, not a fabricated one — consecutive calendar days
-// (ending today or yesterday) with at least one submission.
-function computeStreak(createdAtDates: string[]): number {
-  const days = new Set(createdAtDates.map((d) => new Date(d).toISOString().slice(0, 10)))
-  const cursor = new Date()
-  const today = cursor.toISOString().slice(0, 10)
-  if (!days.has(today)) cursor.setDate(cursor.getDate() - 1)
-
-  let streak = 0
-  while (days.has(cursor.toISOString().slice(0, 10))) {
-    streak += 1
-    cursor.setDate(cursor.getDate() - 1)
-  }
-  return streak
-}
-
 export default async function CaptureAccountPage() {
-  const [{ user }, { submissions }] = await Promise.all([
-    serverApiFetch<{ user: AuthUser }>('/api/v1/auth/me'),
-    serverApiFetch<{ submissions: SubmissionSummary[] }>('/api/v1/submissions/me'),
-  ])
+  let user: AuthUser
+  let submissions: SubmissionSummary[]
+  try {
+    ;[{ user }, { submissions }] = await Promise.all([
+      serverApiFetch<{ user: AuthUser }>('/api/v1/auth/me'),
+      serverApiFetch<{ submissions: SubmissionSummary[] }>('/api/v1/submissions/me'),
+    ])
+  } catch (err) {
+    redirectIfSignedOut(err, '/capture')
+  }
   const streak = computeStreak(submissions.map((s) => s.createdAt))
   const memberSince = new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
@@ -33,27 +25,35 @@ export default async function CaptureAccountPage() {
     { label: 'Name', value: user.displayName ?? '—' },
     { label: 'Phone', value: user.phone ? maskPhone(user.phone) : '—' },
     { label: 'Role', value: 'Contributor' },
-    { label: 'Status', value: user.status },
   ]
 
   return (
-    <CaptureAppShell active="account">
+    <CaptureAppShell>
       <p className="cx-label text-navy-400">Identity</p>
       <h1 className="cx-page-title mt-1.5 text-navy-900">Account</h1>
 
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="cx-card p-5">
+      <div className="mt-6 flex items-center gap-4">
+        <Avatar displayName={user.displayName} className="size-16 text-xl" iconClassName="size-7" />
+        <div className="min-w-0">
+          <p className="cx-title truncate text-navy-900">{user.displayName ?? 'Contributor'}</p>
+          <p className="cx-body text-navy-500">{user.phone ? maskPhone(user.phone) : '—'}</p>
+        </div>
+        <StatusTag tone={user.status === 'active' ? 'success' : 'neutral'}>{user.status}</StatusTag>
+      </div>
+
+      <div className="cx-card mt-6 grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="p-5">
           <p className="cx-meta text-navy-400">Total submissions</p>
           <p className="cx-stat mt-1 text-navy-900">{submissions.length}</p>
         </div>
-        <div className="cx-card p-5">
+        <div className="p-5">
           <p className="cx-meta text-navy-400">Current streak</p>
           <p className="cx-stat mt-1 text-navy-900">
             {streak}
-            <span className="cx-body font-normal text-navy-400"> day{streak === 1 ? '' : 's'}</span>
+            <span className="cx-body font-sans font-normal text-navy-400"> day{streak === 1 ? '' : 's'}</span>
           </p>
         </div>
-        <div className="cx-card p-5">
+        <div className="p-5">
           <p className="cx-meta text-navy-400">Verified since</p>
           <p className="cx-stat mt-1 text-navy-900">{memberSince}</p>
         </div>

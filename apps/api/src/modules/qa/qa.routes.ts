@@ -12,6 +12,18 @@ qaRouter.get(
   requireRole('staff:qa_reviewer', 'staff:admin'),
   asyncHandler(controller.queue),
 )
+qaRouter.get(
+  '/me/stats',
+  requireAuth,
+  requireRole('staff:qa_reviewer', 'staff:admin'),
+  asyncHandler(controller.myStats),
+)
+qaRouter.get(
+  '/me/decisions',
+  requireAuth,
+  requireRole('staff:qa_reviewer', 'staff:admin'),
+  asyncHandler(controller.myDecisions),
+)
 qaRouter.post(
   '/items/:submissionId/decision',
   requireAuth,

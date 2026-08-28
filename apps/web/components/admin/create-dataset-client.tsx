@@ -42,24 +42,24 @@ export function CreateDatasetClient({ campaigns }: { campaigns: Campaign[] }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="card-surface-raised space-y-4 p-6">
+    <form onSubmit={onSubmit} className="cx-card space-y-4 p-6">
       <div>
-        <label className="text-body-sm font-medium text-foreground">Title</label>
+        <label className="cx-meta font-medium text-navy-800">Title</label>
         <input
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Yorùbá Read-Speech — Delivery 1"
-          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 cx-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
         />
       </div>
       <div>
-        <label className="text-body-sm font-medium text-foreground">Campaign</label>
+        <label className="cx-meta font-medium text-navy-800">Campaign</label>
         <select
           required
           value={campaignId}
           onChange={(e) => setCampaignId(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body-sm outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 cx-body outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
         >
           {campaigns.map((c) => (
             <option key={c.id} value={c.id}>
@@ -69,18 +69,18 @@ export function CreateDatasetClient({ campaigns }: { campaigns: Campaign[] }) {
         </select>
       </div>
       <div>
-        <label className="text-body-sm font-medium text-foreground">License terms</label>
+        <label className="cx-meta font-medium text-navy-800">License terms</label>
         <textarea
           required
           value={licenseTerms}
           onChange={(e) => setLicenseTerms(e.target.value)}
           rows={3}
           placeholder="Non-exclusive, perpetual, for model training use only."
-          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
+          className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 cx-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
         />
       </div>
       {error && (
-        <p className="text-caption text-destructive" role="alert">
+        <p className="cx-meta text-destructive" role="alert">
           {error}
         </p>
       )}

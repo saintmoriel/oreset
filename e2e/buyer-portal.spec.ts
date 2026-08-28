@@ -84,6 +84,8 @@ test('buyer sees a delivered dataset with a working download link', async ({ pag
   await page.locator('input[type=password]').fill('dev-password')
   await page.getByRole('button', { name: /^sign in$/i }).click()
 
+  await expect(page).toHaveURL(/\/buyer\/home/)
+  await page.locator('nav').getByRole('link', { name: 'Datasets', exact: true }).click()
   await expect(page).toHaveURL(/\/buyer\/datasets/)
   await page.getByText(datasetTitle).click()
 
@@ -97,7 +99,7 @@ test('a random dataset id 404s instead of leaking existence', async ({ page }) =
   await page.locator('input[type=email]').fill('buyer@oreset.dev')
   await page.locator('input[type=password]').fill('dev-password')
   await page.getByRole('button', { name: /^sign in$/i }).click()
-  await expect(page).toHaveURL(/\/buyer\/datasets/)
+  await expect(page).toHaveURL(/\/buyer\/home/)
 
   const response = await page.goto('/buyer/datasets/00000000-0000-0000-0000-000000000000')
   expect(response?.status()).toBe(404)

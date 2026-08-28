@@ -18,6 +18,8 @@ export type AuthUser = {
   // details form.
   payoutDetails: Record<string, unknown> | null
   phone: string | null
+  // Staff/operator-only; null for contributors (who sign in by phone).
+  email: string | null
   // ISO timestamp string.
   createdAt: string
 }

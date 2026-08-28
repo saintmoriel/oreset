@@ -4,7 +4,7 @@ import { ERR_TAGS, ERR_TAG_LABELS } from '@oreset/shared'
 
 export default function CaptureHelpPage() {
   return (
-    <CaptureAppShell active="help">
+    <CaptureAppShell>
       <p className="cx-label text-navy-400">Support</p>
       <h1 className="cx-page-title mt-1.5 text-navy-900">Help</h1>
 
