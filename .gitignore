@@ -35,3 +35,5 @@ apps/validation/__pycache__/
 test-results/
 playwright-report/
 blob-report/
+
+public/oreset_accessKeys.csv
