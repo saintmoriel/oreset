@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: oreset
+      POSTGRES_PASSWORD: oreset
+      POSTGRES_DB: oreset
+    ports:
+      - "5434:5432"
+    volumes:
+      - oreset_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  oreset_postgres_data:

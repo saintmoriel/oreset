@@ -15,3 +15,23 @@ node_modules
 .DS_Store
 # Local pnpm store (should not be committed)
 .pnpm-store/
+
+# Build artifacts
+*.tsbuildinfo
+dist/
+
+# Backend env files
+apps/api/.env
+apps/web/.env.local
+
+# Local dev file storage (LocalDiskStorageProvider)
+apps/api/.uploads/
+
+# apps/validation Python venv
+apps/validation/.venv/
+apps/validation/__pycache__/
+
+# Playwright output
+test-results/
+playwright-report/
+blob-report/
