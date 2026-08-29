@@ -12,3 +12,17 @@ adminRouter.get(
   requireRole('staff:admin', 'staff:compliance', 'staff:reviewer_lead'),
   asyncHandler(controller.overview),
 )
+
+adminRouter.get(
+  '/regressions',
+  requireAuth,
+  requireRole('staff:admin', 'staff:reviewer_lead'),
+  asyncHandler(controller.regressionSuite),
+)
+
+adminRouter.get(
+  '/regressions/stats',
+  requireAuth,
+  requireRole('staff:admin', 'staff:reviewer_lead'),
+  asyncHandler(controller.regressionStats),
+)
