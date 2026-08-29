@@ -32,12 +32,18 @@ export async function getQueue(operatorId?: string) {
   }
 
   // Return all pending items, language-matched first, then by creation date
+  // Build a CASE with individual OR comparisons to avoid array literal parsing
+  // issues with special characters (e.g. accented letters in "yorùbá")
+  const langConditions = operatorLanguages.map((lang) => sql`lower(trace_data->>'language') = ${lang}`)
+  const langMatch = langConditions.length === 1
+    ? langConditions[0]
+    : sql.join(langConditions, sql` OR `)
   const items = await db
     .select()
     .from(clientQueueItems)
     .where(eq(clientQueueItems.status, 'pending'))
     .orderBy(
-      sql`CASE WHEN lower(trace_data->>'language') = ANY(${operatorLanguages}) THEN 0 ELSE 1 END`,
+      sql`CASE WHEN (${langMatch}) THEN 0 ELSE 1 END`,
       asc(clientQueueItems.createdAt),
     )
 
