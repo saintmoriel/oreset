@@ -143,7 +143,7 @@ export function Hero() {
             >
               <ShieldCheck className="size-3.5 shrink-0 text-accent" aria-hidden="true" />
               <span className="text-balance">
-                Consented Ground Truth &amp; Certified Native Operator Infrastructure
+                Consented Ground Truth &amp; Certified Native Reviewer Infrastructure
               </span>
             </p>
 

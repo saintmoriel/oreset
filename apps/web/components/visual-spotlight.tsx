@@ -7,7 +7,7 @@ import { Award, CheckCircle2, MapPin, Sparkles } from 'lucide-react'
 const spotlights = [
   {
     name: 'Amina Bello',
-    role: 'Certified AI Operator. Hausa Track',
+    role: 'Certified AI Reviewer. Hausa Track',
     location: 'Kano, Nigeria',
     language: 'Hausa (Native)',
     domain: 'Agriculture & NLP',
@@ -40,7 +40,7 @@ const spotlights = [
   },
   {
     name: 'Tariq Al-Mansoor',
-    role: 'Certified AI Operator. Arabic Track',
+    role: 'Certified AI Reviewer. Arabic Track',
     location: 'Cairo, Egypt',
     language: 'Arabic (Egyptian Native)',
     domain: 'Medical & Healthcare QA',
@@ -63,7 +63,7 @@ export function VisualSpotlight() {
                 <span>Verified Talent Spotlight</span>
               </div>
               <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
-                Certified Operators in Action
+                Certified Reviewers in Action
               </h2>
               <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
                 Meet the certified native-language professionals power-testing and calibrating AI systems across the African continent.
@@ -73,7 +73,7 @@ export function VisualSpotlight() {
               href="#contact"
               className="inline-flex items-center justify-center rounded-full border border-foreground/20 bg-card px-6 py-2.5 text-sm font-semibold transition-all hover:bg-foreground hover:text-background"
             >
-              Request Operator Bench
+              Request Reviewer Access
             </a>
           </div>
         </MotionReveal>
@@ -82,7 +82,7 @@ export function VisualSpotlight() {
           {spotlights.map((person, idx) => (
             <MotionReveal key={person.name} delay={idx * 0.1}>
               <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-4 transition-all duration-300 hover:-translate-y-1 hover:border-border hover:shadow-xl">
-                {/* Operator Image */}
+                {/* Profile Image */}
                 <div className="relative h-60 w-full overflow-hidden rounded-xl bg-muted">
                   <img
                     src={person.image}

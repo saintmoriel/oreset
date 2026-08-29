@@ -45,7 +45,7 @@ const arms = [
   },
   {
     id: 'operators',
-    label: 'Oreset Operators',
+    label: 'Oreset Reviewers',
     arm: 'Talent arm',
     stages: OPERATOR_STAGES,
     stageCount: '6-stage track',
@@ -55,8 +55,8 @@ const arms = [
       'For enterprise ops and product leads with a recurring staffing budget for native-language evaluation.',
     image:
       'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'Professionals collaborating at a review workstation, illustrative of operator QA work',
-    imageCaption: 'Operator training & review workstations',
+    imageAlt: 'Professionals collaborating at a review workstation, illustrative of reviewer QA work',
+    imageCaption: 'Reviewer training & review workstations',
   },
 ] as const
 
@@ -76,7 +76,7 @@ export function TwoArms() {
               How Oreset is structured.
             </h2>
             <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-              Origin and Operators share one origination engine and one trust-verification
+              Origin and Reviewers share one origination engine and one trust-verification
               philosophy, reliability is earned before higher-stakes work is unlocked.
             </p>
           </div>

@@ -118,7 +118,7 @@ const operatorSubsections = [
     title: '3.1 & 3.2 LMS, Training & Certification Engine',
     description: 'Rigorous vetting, training modules, and timed evaluation workbench.',
     image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
-    imageAlt: 'Certified African AI operator training and evaluation',
+    imageAlt: 'Certified African AI reviewer training and evaluation',
     cards: [
       {
         icon: GraduationCap,
@@ -142,7 +142,7 @@ const operatorSubsections = [
         icon: Award,
         name: 'Automated Calibration Scoring',
         details:
-          'Grading engine with 5-point calibration rating scale (1 = Critical Failure, 5 = Exemplary) enforcing ≥ 90% threshold and zero-critical-error rules to issue Certified Operator Badges.',
+          'Grading engine with 5-point calibration rating scale (1 = Critical Failure, 5 = Exemplary) enforcing ≥ 90% threshold and zero-critical-error rules to issue Certified Reviewer Badges.',
       },
     ],
   },
@@ -154,15 +154,15 @@ const operatorSubsections = [
     cards: [
       {
         icon: Users,
-        name: 'Operator Bench & Matching Board',
+        name: 'Reviewer Bench & Matching Board',
         details:
-          'Status hub indicating availability (In-Training, Bench Ready, Deployed) with verified badges. Algorithm pairs operators with accounts based on language, shift hours, and domain specialization (Insurance, Banking, Agriculture).',
+          'Status hub indicating availability (In-Training, Bench Ready, Deployed) with verified badges. Algorithm pairs reviewers with accounts based on language, shift hours, and domain specialization (Insurance, Banking, Agriculture).',
       },
       {
         icon: BarChart3,
         name: 'Enterprise Operations Dashboard',
         details:
-          'Client portal monitoring operator teams reviewing live AI product outputs with real-time telemetry displaying review volume, throughput speed, IAA scores, and error distribution charts.',
+          'Client portal monitoring reviewer teams reviewing live AI product outputs with real-time telemetry displaying review volume, throughput speed, IAA scores, and error distribution charts.',
       },
       {
         icon: Layers,
@@ -187,11 +187,11 @@ const tabs = [
   },
   {
     id: 'operators',
-    label: 'Oreset Operators',
+    label: 'Oreset Reviewers',
     eyebrow: 'Talent Arm, 6-Stage Lifecycle',
     icon: Users,
     description:
-      'The Operators web portal operationalizes the 6-stage talent lifecycle: Sourcing, Training, Certification, Bench, Placement, and Account Management, providing enterprise-grade native AI evaluation.',
+      'The Reviewers web portal operationalizes the 6-stage talent lifecycle: Sourcing, Training, Certification, Bench, Placement, and Account Management, providing enterprise-grade native AI evaluation.',
     lifecycle: operatorLifecycle,
     subsections: operatorSubsections,
   },
@@ -213,7 +213,7 @@ export function NetworkSection() {
               Two arms. Built for precision.
             </h2>
             <p className="mt-5 text-pretty text-lg leading-relaxed text-muted-foreground">
-              Oreset combines field-level data origination with certified native operator talent
+              Oreset combines field-level data origination with certified native reviewer talent
               into a unified, end-to-end platform for African AI.
             </p>
           </div>

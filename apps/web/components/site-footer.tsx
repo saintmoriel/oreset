@@ -33,7 +33,7 @@ const columns = [
     title: 'Sign in',
     links: [
       { label: 'Contributor', href: '/capture' },
-      { label: 'Operator', href: '/operator' },
+      { label: 'Reviewer', href: '/operator' },
       { label: 'Buyer', href: '/buyer' },
       { label: 'QA (staff)', href: '/qa' },
       { label: 'Admin (staff)', href: '/admin' },

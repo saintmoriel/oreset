@@ -163,9 +163,9 @@ export default function OperatorsJoinPage() {
       <main className="container-wide py-12 sm:py-16 md:py-20">
         <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-5">
-            <p className="cx-label text-accent">Operators · Africa</p>
+            <p className="cx-label text-accent">Reviewers · Africa</p>
             <h1 className="cx-page-title mt-4 text-balance text-navy-900">
-              Apply to the native language operator cohort.
+              Apply to the native language reviewer cohort.
             </h1>
             <p className="cx-body mt-5 text-pretty text-navy-500">
               We are accepting applications from African native speakers for training,
@@ -175,7 +175,7 @@ export default function OperatorsJoinPage() {
               {[
                 'Native fluency with dialect baselines',
                 'Training and timed certification',
-                'Paid placement on enterprise review benches',
+                'Paid placement on enterprise review cases',
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="motif-dot mt-1.5 shrink-0" aria-hidden="true" />
@@ -194,7 +194,7 @@ export default function OperatorsJoinPage() {
                 <h2 className="cx-title text-navy-900">Application received.</h2>
                 {operatorCode && (
                   <p className="cx-meta text-navy-500">
-                    Your operator ID is <strong className="cx-mono-meta font-semibold text-navy-900">{operatorCode}</strong>.
+                    Your reviewer ID is <strong className="cx-mono-meta font-semibold text-navy-900">{operatorCode}</strong>.
                   </p>
                 )}
                 <p className="cx-body text-navy-500">

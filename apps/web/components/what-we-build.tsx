@@ -50,7 +50,7 @@ const tabs = [
   },
   {
     id: 'operators',
-    label: 'Oreset Operators',
+    label: 'Oreset Reviewers',
     eyebrow: 'Talent arm',
     icon: Users,
     summary:
@@ -107,7 +107,7 @@ export function WhatWeBuild() {
               Two arms. One rigorous network.
             </h2>
             <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-              Product surfaces for field data and certified operators, designed so contributors
+              Product surfaces for field data and certified reviewers, designed so contributors
               get paid fairly and buyers get audit-ready quality.
             </p>
           </div>

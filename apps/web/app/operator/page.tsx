@@ -54,8 +54,8 @@ function OperatorSignInContent() {
 
       <main className="container-narrow py-16 sm:py-24">
         <div className="cx-card p-8 sm:p-10">
-          <p className="cx-label text-accent">Operators · Client Placement</p>
-          <h1 className="cx-page-title mt-2 text-navy-900">Certified Operator sign-in</h1>
+          <p className="cx-label text-accent">Reviewers · Client Placement</p>
+          <h1 className="cx-page-title mt-2 text-navy-900">Certified Reviewer sign-in</h1>
           <p className="cx-body mt-3 text-navy-500">
             Not certified yet? Signing in will take you to Foundry to finish training.
           </p>
@@ -98,7 +98,7 @@ function OperatorSignInContent() {
           </form>
 
           <p className="mt-6 cx-meta text-navy-500">
-            Not an operator yet?{' '}
+            Not a reviewer yet?{' '}
             <Link href="/operators/join" className="font-semibold text-accent hover:text-copper-600">
               Apply here
             </Link>

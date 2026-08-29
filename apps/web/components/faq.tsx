@@ -45,7 +45,7 @@ const faqs = [
   {
     audience: 'Buyers',
     q: 'What happens if a delivery fails quality checks?',
-    a: 'Every batch passes automated gatechecks and operator review before handoff. If a delivery falls below the agreed quality threshold, we re-collect or replace at no additional cost. The Trust Ledger audit trail shows exactly where any issue occurred.',
+    a: 'Every batch passes automated gatechecks and reviewer sign-off before handoff. If a delivery falls below the agreed quality threshold, we re-collect or replace at no additional cost. The Trust Ledger audit trail shows exactly where any issue occurred.',
   },
   {
     audience: 'Everyone',

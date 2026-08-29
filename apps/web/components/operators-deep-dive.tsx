@@ -12,8 +12,8 @@ export const OPERATOR_STAGES = [
   { name: 'Scout', detail: 'Source native-language professionals with dialect and domain baselines.' },
   { name: 'Foundry', detail: 'Train on fluency baselines, error taxonomy, and live evaluation sprints. Quiz topics: Pacing, Clarity, and Spontaneity.' },
   { name: 'Certify', detail: 'Timed evaluation with calibration thresholds before badge issuance.' },
-  { name: 'Bench', detail: 'Certified operators wait on an availability bench by language and domain.' },
-  { name: 'Placement', detail: 'Pair operators to enterprise accounts by shift, language, and specialty.' },
+  { name: 'Bench', detail: 'Certified reviewers wait on an availability bench by language and domain.' },
+  { name: 'Placement', detail: 'Pair reviewers to enterprise accounts by shift, language, and specialty.' },
   { name: 'Account Management', detail: 'Ongoing telemetry, escalation queues, and dedicated account oversight.' },
 ] as const
 
@@ -98,7 +98,7 @@ export function OperatorsDeepDive() {
                   <SiteImage
                     data-scroll-media
                     src="/operator-oreset.jpeg"
-                    alt="Black professional working on a laptop, illustrative of operator review work"
+                    alt="Black professional working on a laptop, illustrative of reviewer work"
                     fill
                     sizes="(max-width: 1024px) 100vw, 40vw"
                     className="will-change-transform"
