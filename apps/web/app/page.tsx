@@ -6,6 +6,7 @@ import { OriginDeepDive } from '@/components/origin-deep-dive'
 import { OperatorsDeepDive } from '@/components/operators-deep-dive'
 import { TrustLedger } from '@/components/trust-ledger'
 import { WhyNow } from '@/components/why-now'
+import { AboutSection } from '@/components/about-section'
 import { FAQ } from '@/components/faq'
 import { Contact } from '@/components/contact'
 import { SiteFooter } from '@/components/site-footer'
@@ -30,6 +31,7 @@ export default function Page() {
         <OperatorsDeepDive />
         <TrustLedger />
         <WhyNow />
+        <AboutSection />
         <FAQ />
         <Contact />
       </main>

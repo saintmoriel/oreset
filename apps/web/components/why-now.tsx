@@ -6,7 +6,7 @@ import { ScrollWords } from './scroll-words'
 export function WhyNow() {
   return (
     <section
-      id="about"
+      id="why-now"
       data-scroll-section
       className="border-t border-border/60 bg-secondary/40 py-16 sm:py-24 md:py-32 lg:py-36"
     >

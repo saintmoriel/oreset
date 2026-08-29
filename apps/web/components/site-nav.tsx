@@ -89,7 +89,12 @@ const navItems: NavItem[] = [
       {
         label: 'About Oreset',
         href: '#about',
-        hint: 'Thesis and approach',
+        hint: 'What we do and where we operate',
+      },
+      {
+        label: 'Why now',
+        href: '#why-now',
+        hint: 'Thesis and timing',
       },
       {
         label: 'FAQ',
