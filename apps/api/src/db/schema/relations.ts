@@ -17,6 +17,7 @@ import { datasetDownloadEvents } from './dataset-download-events'
 import { clientTickets } from './client-tickets'
 import { identityVerifications } from './identity-verifications'
 import { operatorAgreements } from './operator-agreements'
+import { calibrationCases, calibrationAttempts } from './calibration'
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
@@ -155,4 +156,17 @@ export const operatorReviewDecisionsRelations = relations(operatorReviewDecision
 
 export const promptsRelations = relations(prompts, ({ one }) => ({
   batch: one(batches, { fields: [prompts.batchId], references: [batches.id] }),
+}))
+
+export const calibrationCasesRelations = relations(calibrationCases, ({ one, many }) => ({
+  createdByUser: one(users, { fields: [calibrationCases.createdBy], references: [users.id] }),
+  attempts: many(calibrationAttempts),
+}))
+
+export const calibrationAttemptsRelations = relations(calibrationAttempts, ({ one }) => ({
+  calibrationCase: one(calibrationCases, {
+    fields: [calibrationAttempts.calibrationCaseId],
+    references: [calibrationCases.id],
+  }),
+  operator: one(users, { fields: [calibrationAttempts.operatorId], references: [users.id] }),
 }))

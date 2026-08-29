@@ -24,6 +24,7 @@ import { buyersRouter, buyersAdminRouter } from './modules/buyers/buyers.routes'
 import { ticketsRouter } from './modules/tickets/tickets.routes'
 import { adminRouter } from './modules/admin/admin.routes'
 import { ingestionRouter } from './modules/ingestion/ingestion.routes'
+import { calibrationRouter } from './modules/calibration/calibration.routes'
 
 const allowedOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim())
 
@@ -63,6 +64,7 @@ app.use('/api/v1/admin/tickets', ticketsRouter)
 app.use('/api/v1/admin/operators', operatorsAdminRouter)
 app.use('/api/v1/admin', adminRouter)
 app.use('/api/v1/ingest', ingestionRouter)
+app.use('/api/v1/calibration', calibrationRouter)
 
 app.use((req, res) => {
   res.status(404).json({ error: { code: 'not_found', message: `No route for ${req.method} ${req.path}` } })

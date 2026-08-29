@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ListChecks, History, Settings, Menu, X, Mail } from 'lucide-react'
+import { LayoutDashboard, ListChecks, History, Settings, Menu, X, Mail, Target } from 'lucide-react'
 import { SignOutButton } from '@/components/shared/sign-out-button'
 import { Avatar } from '@/components/capture/avatar'
 import { getMe } from '@/lib/api/endpoints/auth'
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { label: 'Home', href: '/operator/home', icon: LayoutDashboard },
   { label: 'Queue', href: '/operator/queue', icon: ListChecks },
   { label: 'History', href: '/operator/history', icon: History },
+  { label: 'Calibration', href: '/operator/calibration', icon: Target },
   { label: 'Settings', href: '/operator/settings', icon: Settings },
 ]
 

@@ -82,3 +82,9 @@ export type DocumentType = (typeof DOCUMENT_TYPES)[number]
 
 export const AGREEMENT_TYPES = ['nda', 'code_of_conduct', 'data_handling'] as const
 export type AgreementType = (typeof AGREEMENT_TYPES)[number]
+
+export const CALIBRATION_STATUSES = ['active', 'retired'] as const
+export type CalibrationStatus = (typeof CALIBRATION_STATUSES)[number]
+
+export const CALIBRATION_RESULTS = ['pass', 'fail'] as const
+export type CalibrationResult = (typeof CALIBRATION_RESULTS)[number]

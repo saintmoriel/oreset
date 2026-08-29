@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Megaphone, Package, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical } from 'lucide-react'
+import { LayoutDashboard, Megaphone, Package, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target } from 'lucide-react'
 import { SignOutButton } from '@/components/shared/sign-out-button'
 import { Avatar } from '@/components/capture/avatar'
 import { getMe } from '@/lib/api/endpoints/auth'
@@ -25,6 +25,7 @@ const NAV_ITEMS = [
   { label: 'Tickets', href: '/admin/tickets', icon: TriangleAlert },
   { label: 'Payouts', href: '/admin/payouts', icon: Wallet },
   { label: 'Regressions', href: '/admin/regressions', icon: FlaskConical },
+  { label: 'Calibration', href: '/admin/calibration', icon: Target },
   { label: 'Audit Log', href: '/admin/audit-log', icon: ScrollText },
 ]
 
