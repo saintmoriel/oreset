@@ -47,3 +47,15 @@ operatorRouter.patch(
   requireRole('operator'),
   asyncHandler(controller.updateProfile),
 )
+operatorRouter.get(
+  '/me/verifications',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.getVerifications),
+)
+operatorRouter.post(
+  '/me/verifications',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.submitVerification),
+)

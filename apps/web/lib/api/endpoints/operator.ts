@@ -100,3 +100,40 @@ export function updateOperatorProfile(data: ProfileUpdateInput) {
     body: data,
   })
 }
+
+export type DocumentType = 'government_id' | 'education_certificate' | 'resume' | 'other'
+export type VerificationStatus = 'pending' | 'approved' | 'rejected'
+export type OverallVerificationStatus = 'incomplete' | 'pending' | 'verified' | 'rejected'
+
+export type IdentityVerification = {
+  id: string
+  documentType: DocumentType
+  fileName: string
+  fileUrl: string
+  fileSizeBytes: string | null
+  status: VerificationStatus
+  reviewNotes: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type VerificationsResponse = {
+  verifications: IdentityVerification[]
+  overallStatus: OverallVerificationStatus
+}
+
+export function getVerifications() {
+  return apiFetch<VerificationsResponse>('/api/v1/operator/me/verifications')
+}
+
+export function submitVerification(data: {
+  documentType: DocumentType
+  fileName: string
+  fileUrl: string
+  fileSizeBytes?: string
+}) {
+  return apiFetch<IdentityVerification>('/api/v1/operator/me/verifications', {
+    method: 'POST',
+    body: data,
+  })
+}

@@ -2,7 +2,7 @@ import { asc, count, desc, eq } from 'drizzle-orm'
 import type { ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
-import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications } from '../../db/schema'
+import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 
@@ -224,4 +224,51 @@ export async function updateProfile(
   }
 
   return getProfile(userId)
+}
+
+// ---------------------------------------------------------------------------
+// Identity Verifications
+// ---------------------------------------------------------------------------
+
+export async function getVerifications(userId: string) {
+  const verifications = await db.query.identityVerifications.findMany({
+    where: eq(identityVerifications.userId, userId),
+    orderBy: desc(identityVerifications.createdAt),
+  })
+
+  let overallStatus: 'incomplete' | 'rejected' | 'verified' | 'pending'
+  if (verifications.length === 0) {
+    overallStatus = 'incomplete'
+  } else if (verifications.some((v) => v.status === 'rejected')) {
+    overallStatus = 'rejected'
+  } else if (verifications.every((v) => v.status === 'approved')) {
+    overallStatus = 'verified'
+  } else {
+    overallStatus = 'pending'
+  }
+
+  return { verifications, overallStatus }
+}
+
+export async function submitVerification(
+  userId: string,
+  data: {
+    documentType: string
+    fileName: string
+    fileUrl: string
+    fileSizeBytes?: string
+  },
+) {
+  const [verification] = await db
+    .insert(identityVerifications)
+    .values({
+      userId,
+      documentType: data.documentType as 'government_id' | 'education_certificate' | 'resume' | 'other',
+      fileName: data.fileName,
+      fileUrl: data.fileUrl,
+      fileSizeBytes: data.fileSizeBytes,
+    })
+    .returning()
+
+  return verification
 }

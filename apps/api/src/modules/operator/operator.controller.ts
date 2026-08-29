@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
-import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS } from '@oreset/shared'
+import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS, DOCUMENT_TYPES } from '@oreset/shared'
 import * as operatorService from './operator.service'
 
 const decisionSchema = z
@@ -68,4 +68,26 @@ export async function updateProfile(req: Request, res: Response) {
   const body = updateProfileSchema.parse(req.body)
   const profile = await operatorService.updateProfile(req.user!.sub, body)
   res.status(200).json(profile)
+}
+
+// ---------------------------------------------------------------------------
+// Identity Verifications
+// ---------------------------------------------------------------------------
+
+const verificationSchema = z.object({
+  documentType: z.enum(DOCUMENT_TYPES),
+  fileName: z.string().min(1),
+  fileUrl: z.string().min(1),
+  fileSizeBytes: z.string().optional(),
+})
+
+export async function getVerifications(req: Request, res: Response) {
+  const result = await operatorService.getVerifications(req.user!.sub)
+  res.status(200).json(result)
+}
+
+export async function submitVerification(req: Request, res: Response) {
+  const body = verificationSchema.parse(req.body)
+  const verification = await operatorService.submitVerification(req.user!.sub, body)
+  res.status(201).json(verification)
 }

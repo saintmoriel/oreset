@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2, Save, User, Shield } from 'lucide-react'
+import { Loader2, User, Shield, BadgeCheck } from 'lucide-react'
 import { OperatorAppShell } from '@/components/operator/operator-app-shell'
 import { ProfileTab } from '@/components/operator/settings/profile-tab'
 import { SecurityTab } from '@/components/operator/settings/security-tab'
+import { VerificationTab } from '@/components/operator/settings/verification-tab'
 import {
   getOperatorProfile,
   updateOperatorProfile,
@@ -16,6 +17,7 @@ import { cn } from '@/lib/utils'
 
 const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
+  { id: 'verification', label: 'Verification', icon: BadgeCheck },
   { id: 'security', label: 'Security', icon: Shield },
 ] as const
 
@@ -58,7 +60,7 @@ export default function OperatorSettingsPage() {
   return (
     <OperatorAppShell>
       <h1 className="cx-page-title text-navy-900">Settings</h1>
-      <p className="cx-body mt-1 text-navy-400">Manage your reviewer profile and security.</p>
+      <p className="cx-body mt-1 text-navy-400">Manage your reviewer profile, verification, and security.</p>
 
       {/* Tabs */}
       <div className="mt-6 flex gap-1 rounded-lg border border-border bg-navy-50 p-1 w-fit">
@@ -81,6 +83,7 @@ export default function OperatorSettingsPage() {
 
       <div className="mt-6">
         {activeTab === 'profile' && <ProfileTab profile={profile} onSave={handleSave} />}
+        {activeTab === 'verification' && <VerificationTab />}
         {activeTab === 'security' && <SecurityTab />}
       </div>
     </OperatorAppShell>

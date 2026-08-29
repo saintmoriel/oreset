@@ -65,3 +65,9 @@ export type DatasetStatus = (typeof DATASET_STATUSES)[number]
 
 export const TICKET_STATUSES = ['open', 'resolved'] as const
 export type TicketStatus = (typeof TICKET_STATUSES)[number]
+
+export const VERIFICATION_STATUSES = ['pending', 'approved', 'rejected'] as const
+export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number]
+
+export const DOCUMENT_TYPES = ['government_id', 'education_certificate', 'resume', 'other'] as const
+export type DocumentType = (typeof DOCUMENT_TYPES)[number]
