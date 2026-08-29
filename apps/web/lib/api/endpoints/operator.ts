@@ -1,11 +1,28 @@
 import type { ErrTag, OperatorDecision, Severity, TicketStatus } from '@oreset/shared'
 import { apiFetch } from '../client'
 
+export type TraceData = {
+  domain?: string
+  scope?: string
+  language?: string
+  input?: {
+    type: 'audio' | 'text' | 'document' | 'conversation'
+    [key: string]: unknown
+  }
+  aiDecision?: string
+  aiOutcome?: string
+  decisionCriteria?: string | null
+  executionLogs?: Record<string, unknown>[]
+  isDualSolve?: boolean
+  isGoldStandard?: boolean
+}
+
 export type OperatorQueueItem = {
   id: string
   clientName: string
   externalRef: string
   content: string
+  traceData: TraceData | null
   status: string
   createdAt: string
 }

@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, jsonb, timestamp } from 'drizzle-orm/pg-core'
 import { clientQueueItemStatusEnum } from './enums'
 
 // A live enterprise client's AI output awaiting Certified Operator QA.
@@ -10,6 +10,7 @@ export const clientQueueItems = pgTable('client_queue_items', {
   clientName: text('client_name').notNull(),
   externalRef: text('external_ref').notNull(), // e.g. "txn_5521a"
   content: text('content').notNull(),
+  traceData: jsonb('trace_data'),
   status: clientQueueItemStatusEnum('status').notNull().default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })

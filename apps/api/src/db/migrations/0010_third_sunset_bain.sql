@@ -1,0 +1,1 @@
+ALTER TABLE "client_queue_items" ADD COLUMN "trace_data" jsonb;

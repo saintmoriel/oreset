@@ -71,6 +71,13 @@
       "when": 1788024959029,
       "tag": "0009_wonderful_zarda",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788026578528,
+      "tag": "0010_third_sunset_bain",
+      "breakpoints": true
     }
   ]
 }

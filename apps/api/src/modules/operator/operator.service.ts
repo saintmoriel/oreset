@@ -93,7 +93,7 @@ export async function decide(input: {
     .values({
       operatorId: input.operatorId,
       clientItemId: item.externalRef,
-      clientItemSnapshot: { content: item.content, clientName: item.clientName },
+      clientItemSnapshot: { content: item.content, clientName: item.clientName, traceData: item.traceData },
       decision: input.decision,
       errTag: input.errTag,
       severity: input.severity,
