@@ -27,10 +27,10 @@ export const ERR_TAGS = ['ERR-01', 'ERR-02', 'ERR-03', 'ERR-04'] as const
 export type ErrTag = (typeof ERR_TAGS)[number]
 
 export const ERR_TAG_LABELS: Record<ErrTag, string> = {
-  'ERR-01': 'Acoustic / environmental noise',
-  'ERR-02': 'Linguistic mismatch',
-  'ERR-03': 'Truncation / trailing-off',
-  'ERR-04': 'Compliance / metadata anomaly',
+  'ERR-01': 'Phonetic / acoustic clipping',
+  'ERR-02': 'Intent / entity misparsing',
+  'ERR-03': 'Consequential outcome mismatch',
+  'ERR-04': 'Dialect-triggered over-refusal',
 }
 
 export const SEVERITY_LEVELS = ['SEV-1', 'SEV-2', 'SEV-3'] as const
@@ -45,8 +45,16 @@ export const SEVERITY_LABELS: Record<Severity, string> = {
 export const QA_DECISIONS = ['approved', 'rejected'] as const
 export type QaDecision = (typeof QA_DECISIONS)[number]
 
-export const OPERATOR_DECISIONS = ['approved', 'escalated', 'rejected'] as const
+export const OPERATOR_DECISIONS = ['approved', 'corrected', 'rejected', 'escalated', 'declined'] as const
 export type OperatorDecision = (typeof OPERATOR_DECISIONS)[number]
+
+export const OPERATOR_DECISION_LABELS: Record<OperatorDecision, string> = {
+  approved: 'Approve — outcome correct',
+  corrected: 'Correct & Pass — cosmetic flaw, outcome safe',
+  rejected: 'Reject & Flag — consequential failure',
+  escalated: 'Escalate — ambiguous, route to Senior QA',
+  declined: 'Decline — corrupted data, return for re-sourcing',
+}
 
 export const CAMPAIGN_STATUSES = ['draft', 'live', 'paused'] as const
 export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number]
@@ -54,7 +62,7 @@ export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number]
 export const OTP_PURPOSES = ['login', 'signup'] as const
 export type OtpPurpose = (typeof OTP_PURPOSES)[number]
 
-export const CLIENT_QUEUE_ITEM_STATUSES = ['pending', 'approved', 'escalated', 'rejected'] as const
+export const CLIENT_QUEUE_ITEM_STATUSES = ['pending', 'approved', 'corrected', 'rejected', 'escalated', 'declined'] as const
 export type ClientQueueItemStatus = (typeof CLIENT_QUEUE_ITEM_STATUSES)[number]
 
 export const PAYOUT_STATUSES = ['pending', 'processing', 'paid', 'failed'] as const

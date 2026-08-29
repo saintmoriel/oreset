@@ -40,8 +40,10 @@ export async function getMyStats(operatorId: string) {
   const today = new Date().toISOString().slice(0, 10)
   const reviewedToday = decisions.filter((d) => d.createdAt.toISOString().slice(0, 10) === today).length
   const approvedAllTime = decisions.filter((d) => d.decision === 'approved').length
-  const escalatedAllTime = decisions.filter((d) => d.decision === 'escalated').length
+  const correctedAllTime = decisions.filter((d) => d.decision === 'corrected').length
   const rejectedAllTime = decisions.filter((d) => d.decision === 'rejected').length
+  const escalatedAllTime = decisions.filter((d) => d.decision === 'escalated').length
+  const declinedAllTime = decisions.filter((d) => d.decision === 'declined').length
   const reviewedAllTime = decisions.length
   const approvalRate = reviewedAllTime > 0 ? Math.round((approvedAllTime / reviewedAllTime) * 100) : null
 
@@ -57,8 +59,10 @@ export async function getMyStats(operatorId: string) {
     reviewedToday,
     reviewedAllTime,
     approvedAllTime,
-    escalatedAllTime,
+    correctedAllTime,
     rejectedAllTime,
+    escalatedAllTime,
+    declinedAllTime,
     approvalRate,
     errTagBreakdown,
     openTicketsFromMe,
@@ -73,6 +77,10 @@ export async function decide(input: {
   errTag?: ErrTag
   severity?: Severity
   notes?: string
+  correctedTranscript?: string
+  correctedIntent?: string
+  correctedOutcome?: string
+  reviewTimeMs?: number
 }) {
   const item = await db.query.clientQueueItems.findFirst({ where: eq(clientQueueItems.id, input.itemId) })
   if (!item) throw new HttpError(404, 'not_found', 'Queue item not found.')
@@ -90,6 +98,10 @@ export async function decide(input: {
       errTag: input.errTag,
       severity: input.severity,
       notes: input.notes,
+      correctedTranscript: input.correctedTranscript,
+      correctedIntent: input.correctedIntent,
+      correctedOutcome: input.correctedOutcome,
+      reviewTimeMs: input.reviewTimeMs,
     })
     .returning()
 

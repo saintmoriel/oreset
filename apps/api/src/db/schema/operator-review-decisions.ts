@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, jsonb, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, jsonb, timestamp, integer } from 'drizzle-orm/pg-core'
 import { operatorDecisionEnum, errTagEnum, severityEnum } from './enums'
 import { users } from './users'
 import { campaigns } from './campaigns'
@@ -19,6 +19,10 @@ export const operatorReviewDecisions = pgTable('operator_review_decisions', {
   errTag: errTagEnum('err_tag'), // required when decision='escalated'
   severity: severityEnum('severity'), // required when decision='escalated'
   notes: text('notes'),
+  correctedTranscript: text('corrected_transcript'),
+  correctedIntent: text('corrected_intent'),
+  correctedOutcome: text('corrected_outcome'),
+  reviewTimeMs: integer('review_time_ms'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 

@@ -15,8 +15,10 @@ export type OperatorStats = {
   reviewedToday: number
   reviewedAllTime: number
   approvedAllTime: number
+  correctedAllTime: number
   escalatedAllTime: number
   rejectedAllTime: number
+  declinedAllTime: number
   approvalRate: number | null
   errTagBreakdown: Record<ErrTag, number>
   openTicketsFromMe: number
@@ -38,10 +40,18 @@ export function getOperatorQueue() {
   return apiFetch<{ items: OperatorQueueItem[] }>('/api/v1/operator/queue')
 }
 
-export function submitOperatorDecision(
-  itemId: string,
-  input: { decision: OperatorDecision; errTag?: ErrTag; severity?: Severity; notes?: string },
-) {
+export type DecisionInput = {
+  decision: OperatorDecision
+  errTag?: ErrTag
+  severity?: Severity
+  notes?: string
+  correctedTranscript?: string
+  correctedIntent?: string
+  correctedOutcome?: string
+  reviewTimeMs?: number
+}
+
+export function submitOperatorDecision(itemId: string, input: DecisionInput) {
   return apiFetch<{ item: OperatorQueueItem }>(`/api/v1/operator/items/${itemId}/decision`, {
     method: 'POST',
     body: input,

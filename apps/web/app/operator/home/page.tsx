@@ -226,12 +226,14 @@ export default async function OperatorHomePage() {
                     <p className="cx-mono-meta text-navy-400">{new Date(d.createdAt).toLocaleString()}</p>
                   </div>
                   {d.decision === 'approved' && <VerificationSeal label="Approved" />}
+                  {d.decision === 'corrected' && <StatusTag tone="success">Corrected</StatusTag>}
                   {d.decision === 'rejected' && <StatusTag tone="destructive">Rejected</StatusTag>}
                   {d.decision === 'escalated' && (
                     <StatusTag tone={d.ticket?.status === 'resolved' ? 'success' : 'warning'}>
                       {d.ticket?.status === 'resolved' ? 'Ticket resolved' : 'Ticket open'}
                     </StatusTag>
                   )}
+                  {d.decision === 'declined' && <StatusTag tone="neutral">Declined</StatusTag>}
                 </div>
               ))}
             </div>

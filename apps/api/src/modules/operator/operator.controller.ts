@@ -9,6 +9,10 @@ const decisionSchema = z
     errTag: z.enum(ERR_TAGS).optional(),
     severity: z.enum(SEVERITY_LEVELS).optional(),
     notes: z.string().optional(),
+    correctedTranscript: z.string().optional(),
+    correctedIntent: z.string().optional(),
+    correctedOutcome: z.string().optional(),
+    reviewTimeMs: z.number().int().positive().optional(),
   })
   .refine((d) => d.decision !== 'escalated' || (Boolean(d.errTag) && Boolean(d.severity)), {
     message: 'errTag and severity are required when decision is escalated',

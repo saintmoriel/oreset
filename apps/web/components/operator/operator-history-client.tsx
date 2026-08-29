@@ -9,8 +9,10 @@ import type { OperatorDecisionRecord } from '@/lib/api/endpoints/operator'
 const STATUS_FILTERS = [
   { key: 'all', label: 'All' },
   { key: 'approved', label: 'Approved' },
-  { key: 'escalated', label: 'Escalated' },
+  { key: 'corrected', label: 'Corrected' },
   { key: 'rejected', label: 'Rejected' },
+  { key: 'escalated', label: 'Escalated' },
+  { key: 'declined', label: 'Declined' },
 ] as const
 
 export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisionRecord[] }) {
@@ -100,6 +102,7 @@ export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisi
                 </div>
                 <div className="flex items-center gap-2">
                   {d.decision === 'approved' && <VerificationSeal label="Approved" />}
+                  {d.decision === 'corrected' && <StatusTag tone="success">Corrected</StatusTag>}
                   {d.decision === 'rejected' && <StatusTag tone="destructive">Rejected</StatusTag>}
                   {d.decision === 'escalated' && (
                     <>
@@ -111,6 +114,7 @@ export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisi
                       </StatusTag>
                     </>
                   )}
+                  {d.decision === 'declined' && <StatusTag tone="neutral">Declined</StatusTag>}
                 </div>
               </div>
               {d.notes && <p className="cx-meta text-navy-400">{d.notes}</p>}
