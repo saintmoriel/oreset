@@ -35,3 +35,15 @@ operatorRouter.post(
   requireActive,
   asyncHandler(controller.decide),
 )
+operatorRouter.get(
+  '/me/profile',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.getProfile),
+)
+operatorRouter.patch(
+  '/me/profile',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.updateProfile),
+)

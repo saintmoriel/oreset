@@ -2,7 +2,7 @@ import { asc, count, desc, eq } from 'drizzle-orm'
 import type { ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
-import { clientQueueItems, operatorReviewDecisions, clientTickets } from '../../db/schema'
+import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 
@@ -122,4 +122,106 @@ export async function decide(input: {
   })
 
   return { item: { ...item, status: input.decision }, decision }
+}
+
+// ---------------------------------------------------------------------------
+// Profile
+// ---------------------------------------------------------------------------
+
+function computeProfileStrength(
+  user: { displayName: string | null },
+  application: {
+    location: string
+    languages: unknown
+    dialect: string | null
+    academicBackground: string
+    englishProficiency: string
+    availability: unknown
+    experience: string | null
+  } | null,
+): number {
+  let filled = 0
+  if (user.displayName) filled++
+  if (application) {
+    if (application.location) filled++
+    if (Array.isArray(application.languages) && application.languages.length > 0) filled++
+    if (application.dialect) filled++
+    if (application.academicBackground) filled++
+    if (application.englishProficiency) filled++
+    if (Array.isArray(application.availability) && application.availability.length > 0) filled++
+    if (application.experience) filled++
+  }
+  return Math.round((filled / 8) * 100)
+}
+
+export async function getProfile(userId: string) {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  })
+  if (!user) throw new HttpError(404, 'not_found', 'User not found.')
+
+  const application = await db.query.operatorApplications.findFirst({
+    where: eq(operatorApplications.userId, userId),
+  })
+
+  const profileStrength = computeProfileStrength(user, application ?? null)
+
+  return {
+    user: {
+      id: user.id,
+      displayName: user.displayName,
+      email: user.email,
+      status: user.status,
+      operatorCode: user.operatorCode,
+      createdAt: user.createdAt,
+    },
+    application: application
+      ? {
+          location: application.location,
+          languages: application.languages,
+          dialect: application.dialect,
+          academicBackground: application.academicBackground,
+          englishProficiency: application.englishProficiency,
+          availability: application.availability,
+          experience: application.experience,
+        }
+      : null,
+    profileStrength,
+  }
+}
+
+export async function updateProfile(
+  userId: string,
+  data: {
+    displayName?: string
+    location?: string
+    languages?: { language: string; fluency: string }[]
+    dialect?: string
+    academicBackground?: string
+    englishProficiency?: string
+    availability?: string[]
+    experience?: string
+  },
+) {
+  // Update users table if displayName is provided
+  if (data.displayName !== undefined) {
+    await db.update(users).set({ displayName: data.displayName }).where(eq(users.id, userId))
+  }
+
+  // Update operator_applications table for the remaining fields
+  const { displayName: _, ...appFields } = data
+  const appUpdate: Record<string, unknown> = {}
+  if (appFields.location !== undefined) appUpdate.location = appFields.location
+  if (appFields.languages !== undefined) appUpdate.languages = appFields.languages
+  if (appFields.dialect !== undefined) appUpdate.dialect = appFields.dialect
+  if (appFields.academicBackground !== undefined) appUpdate.academicBackground = appFields.academicBackground
+  if (appFields.englishProficiency !== undefined) appUpdate.englishProficiency = appFields.englishProficiency
+  if (appFields.availability !== undefined) appUpdate.availability = appFields.availability
+  if (appFields.experience !== undefined) appUpdate.experience = appFields.experience
+
+  if (Object.keys(appUpdate).length > 0) {
+    await db.update(operatorApplications).set(appUpdate).where(eq(operatorApplications.userId, userId))
+  }
+
+  return getProfile(userId)
 }

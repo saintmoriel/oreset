@@ -55,3 +55,48 @@ export function getMyOperatorStats() {
 export function getMyOperatorDecisions() {
   return apiFetch<{ decisions: OperatorDecisionRecord[] }>('/api/v1/operator/me/decisions')
 }
+
+export type OperatorLanguage = { language: string; fluency: string }
+
+export type OperatorProfile = {
+  user: {
+    id: string
+    displayName: string | null
+    email: string | null
+    status: string
+    operatorCode: string | null
+    createdAt: string
+  }
+  application: {
+    location: string
+    languages: OperatorLanguage[]
+    dialect: string | null
+    academicBackground: string
+    englishProficiency: string
+    availability: string[] | null
+    experience: string | null
+  } | null
+  profileStrength: number
+}
+
+export type ProfileUpdateInput = {
+  displayName?: string
+  location?: string
+  languages?: OperatorLanguage[]
+  dialect?: string
+  academicBackground?: string
+  englishProficiency?: string
+  availability?: string[]
+  experience?: string
+}
+
+export function getOperatorProfile() {
+  return apiFetch<OperatorProfile>('/api/v1/operator/me/profile')
+}
+
+export function updateOperatorProfile(data: ProfileUpdateInput) {
+  return apiFetch<OperatorProfile>('/api/v1/operator/me/profile', {
+    method: 'PATCH',
+    body: data,
+  })
+}

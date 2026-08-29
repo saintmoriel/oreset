@@ -40,3 +40,32 @@ export async function decide(req: Request, res: Response) {
   })
   res.status(200).json(result)
 }
+
+// ---------------------------------------------------------------------------
+// Profile
+// ---------------------------------------------------------------------------
+
+const updateProfileSchema = z.object({
+  displayName: z.string().min(1).max(100).optional(),
+  location: z.string().min(1).max(200).optional(),
+  languages: z
+    .array(z.object({ language: z.string(), fluency: z.string() }))
+    .min(1)
+    .optional(),
+  dialect: z.string().max(200).optional(),
+  academicBackground: z.string().min(1).optional(),
+  englishProficiency: z.string().min(1).optional(),
+  availability: z.array(z.string()).optional(),
+  experience: z.string().max(2000).optional(),
+})
+
+export async function getProfile(req: Request, res: Response) {
+  const profile = await operatorService.getProfile(req.user!.sub)
+  res.status(200).json(profile)
+}
+
+export async function updateProfile(req: Request, res: Response) {
+  const body = updateProfileSchema.parse(req.body)
+  const profile = await operatorService.updateProfile(req.user!.sub, body)
+  res.status(200).json(profile)
+}

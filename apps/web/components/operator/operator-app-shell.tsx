@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ListChecks, History, Menu, X, Mail } from 'lucide-react'
+import { LayoutDashboard, ListChecks, History, Settings, Menu, X, Mail } from 'lucide-react'
 import { SignOutButton } from '@/components/shared/sign-out-button'
 import { Avatar } from '@/components/capture/avatar'
 import { getMe } from '@/lib/api/endpoints/auth'
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { label: 'Home', href: '/operator/home', icon: LayoutDashboard },
   { label: 'Queue', href: '/operator/queue', icon: ListChecks },
   { label: 'History', href: '/operator/history', icon: History },
+  { label: 'Settings', href: '/operator/settings', icon: Settings },
 ]
 
 function useActiveNavItem() {
@@ -96,7 +97,9 @@ function SidebarContent({
       </nav>
 
       <div className="border-t border-border px-2 py-3">
-        <IdentityBlock user={user} className="mb-1 rounded-md px-3 py-2" />
+        <Link href="/operator/settings">
+          <IdentityBlock user={user} className="mb-1 rounded-md px-3 py-2 hover:bg-navy-100/60 cursor-pointer" />
+        </Link>
         <a
           href="mailto:hello@oreset.africa"
           className="cx-body flex w-full items-center gap-2.5 rounded-md px-3 py-2 font-medium text-navy-500 hover:bg-navy-100/60 hover:text-navy-800"
@@ -183,7 +186,9 @@ export function OperatorAppShell({ children }: { children: React.ReactNode }) {
           {/* Desktop header bar */}
           <div className="hidden h-14 items-center justify-between border-b border-border px-6 lg:flex">
             <p className="cx-body font-medium text-navy-800">{activeItem?.label ?? 'Oreset'}</p>
-            <IdentityBlock user={user} className="rounded-md py-1.5 pl-1.5 pr-3" />
+            <Link href="/operator/settings">
+              <IdentityBlock user={user} className="rounded-md py-1.5 pl-1.5 pr-3 hover:bg-navy-100/60 cursor-pointer" />
+            </Link>
           </div>
 
           <main className="px-4 py-5 sm:px-6 sm:py-6">
