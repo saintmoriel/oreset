@@ -19,8 +19,8 @@ const decisionSchema = z
     path: ['errTag'],
   })
 
-export async function queue(_req: Request, res: Response) {
-  const items = await operatorService.getQueue()
+export async function queue(req: Request, res: Response) {
+  const items = await operatorService.getQueue(req.user!.sub)
   res.status(200).json({ items })
 }
 

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq } from 'drizzle-orm'
+import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
 import type { AgreementType, ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
@@ -6,11 +6,42 @@ import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operat
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 
-export async function getQueue() {
-  return db.query.clientQueueItems.findMany({
-    where: eq(clientQueueItems.status, 'pending'),
-    orderBy: asc(clientQueueItems.createdAt),
+export async function getQueue(operatorId?: string) {
+  if (!operatorId) {
+    return db.query.clientQueueItems.findMany({
+      where: eq(clientQueueItems.status, 'pending'),
+      orderBy: asc(clientQueueItems.createdAt),
+    })
+  }
+
+  // Look up the operator's language profile
+  const application = await db.query.operatorApplications.findFirst({
+    where: eq(operatorApplications.userId, operatorId),
   })
+
+  const operatorLanguages = Array.isArray(application?.languages)
+    ? (application.languages as { language: string }[]).map((l) => l.language.toLowerCase())
+    : []
+
+  if (operatorLanguages.length === 0) {
+    // No language profile — return all pending items, oldest first
+    return db.query.clientQueueItems.findMany({
+      where: eq(clientQueueItems.status, 'pending'),
+      orderBy: asc(clientQueueItems.createdAt),
+    })
+  }
+
+  // Return all pending items, language-matched first, then by creation date
+  const items = await db
+    .select()
+    .from(clientQueueItems)
+    .where(eq(clientQueueItems.status, 'pending'))
+    .orderBy(
+      sql`CASE WHEN lower(trace_data->>'language') = ANY(${operatorLanguages}) THEN 0 ELSE 1 END`,
+      asc(clientQueueItems.createdAt),
+    )
+
+  return items
 }
 
 // Real COUNT — cheaper than getQueue().length, no per-row cost to throw away.
