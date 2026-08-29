@@ -57,6 +57,13 @@
       "when": 1788021680939,
       "tag": "0007_perfect_bloodstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788022417317,
+      "tag": "0008_busy_viper",
+      "breakpoints": true
     }
   ]
 }

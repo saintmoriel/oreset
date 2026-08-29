@@ -165,3 +165,37 @@ export function updatePayoutDetails(data: {
     body: data,
   })
 }
+
+export type AgreementType = 'nda' | 'code_of_conduct' | 'data_handling'
+
+export type OperatorAgreement = {
+  id: string
+  agreementType: AgreementType
+  version: string
+  signedAt: string
+  ipAddress: string | null
+  userAgent: string | null
+}
+
+export type RequiredAgreement = {
+  type: AgreementType
+  label: string
+  signed: boolean
+  signedAt: string | null
+}
+
+export type AgreementsResponse = {
+  agreements: OperatorAgreement[]
+  required: RequiredAgreement[]
+}
+
+export function getAgreements() {
+  return apiFetch<AgreementsResponse>('/api/v1/operator/me/agreements')
+}
+
+export function signAgreement(agreementType: AgreementType) {
+  return apiFetch<OperatorAgreement>('/api/v1/operator/me/agreements', {
+    method: 'POST',
+    body: { agreementType },
+  })
+}

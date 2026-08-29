@@ -60,6 +60,18 @@ operatorRouter.post(
   asyncHandler(controller.submitVerification),
 )
 operatorRouter.get(
+  '/me/agreements',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.getAgreements),
+)
+operatorRouter.post(
+  '/me/agreements',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.signAgreement),
+)
+operatorRouter.get(
   '/me/payout-details',
   requireAuth,
   requireRole('operator'),

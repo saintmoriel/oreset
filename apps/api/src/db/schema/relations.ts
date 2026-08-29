@@ -16,6 +16,7 @@ import { datasetItems } from './dataset-items'
 import { datasetDownloadEvents } from './dataset-download-events'
 import { clientTickets } from './client-tickets'
 import { identityVerifications } from './identity-verifications'
+import { operatorAgreements } from './operator-agreements'
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
@@ -34,6 +35,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   resolvedTickets: many(clientTickets),
   datasetDownloadEvents: many(datasetDownloadEvents),
   identityVerifications: many(identityVerifications),
+  operatorAgreements: many(operatorAgreements),
 }))
 
 export const datasetsRelations = relations(datasets, ({ one, many }) => ({
@@ -82,6 +84,10 @@ export const operatorApplicationsRelations = relations(operatorApplications, ({ 
 export const identityVerificationsRelations = relations(identityVerifications, ({ one }) => ({
   user: one(users, { fields: [identityVerifications.userId], references: [users.id] }),
   reviewer: one(users, { fields: [identityVerifications.reviewedBy], references: [users.id] }),
+}))
+
+export const operatorAgreementsRelations = relations(operatorAgreements, ({ one }) => ({
+  user: one(users, { fields: [operatorAgreements.userId], references: [users.id] }),
 }))
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({

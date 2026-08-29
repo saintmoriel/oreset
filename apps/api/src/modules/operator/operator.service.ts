@@ -1,8 +1,8 @@
 import { and, asc, count, desc, eq } from 'drizzle-orm'
-import type { ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
+import type { AgreementType, ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
-import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications } from '../../db/schema'
+import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 
@@ -296,6 +296,59 @@ export async function getPayoutDetails(userId: string) {
     payoutDetails: user.payoutDetails,
     identityVerified,
   }
+}
+
+// ---------------------------------------------------------------------------
+// Agreements
+// ---------------------------------------------------------------------------
+
+const REQUIRED_AGREEMENTS: { type: AgreementType; label: string }[] = [
+  { type: 'nda', label: 'Non-Disclosure Agreement' },
+  { type: 'code_of_conduct', label: 'Reviewer Code of Conduct' },
+  { type: 'data_handling', label: 'Data Handling Policy' },
+]
+
+export async function getAgreements(userId: string) {
+  const agreements = await db.query.operatorAgreements.findMany({
+    where: eq(operatorAgreements.userId, userId),
+    orderBy: desc(operatorAgreements.signedAt),
+  })
+
+  const required = REQUIRED_AGREEMENTS.map((r) => {
+    const signed = agreements.find((a) => a.agreementType === r.type)
+    return {
+      type: r.type,
+      label: r.label,
+      signed: Boolean(signed),
+      signedAt: signed?.signedAt?.toISOString() ?? null,
+    }
+  })
+
+  return { agreements, required }
+}
+
+export async function signAgreement(
+  userId: string,
+  data: { agreementType: AgreementType; ipAddress?: string; userAgent?: string },
+) {
+  const existing = await db.query.operatorAgreements.findFirst({
+    where: and(eq(operatorAgreements.userId, userId), eq(operatorAgreements.agreementType, data.agreementType)),
+  })
+  if (existing) {
+    throw new HttpError(409, 'already_signed', 'You have already signed this agreement.')
+  }
+
+  const [agreement] = await db
+    .insert(operatorAgreements)
+    .values({
+      userId,
+      agreementType: data.agreementType,
+      ipAddress: data.ipAddress,
+      userAgent: data.userAgent,
+    })
+    .returning()
+
+  return agreement
 }
 
 export async function updatePayoutDetails(

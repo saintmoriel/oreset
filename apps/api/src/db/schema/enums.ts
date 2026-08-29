@@ -19,6 +19,7 @@ import {
   TICKET_STATUSES,
   VERIFICATION_STATUSES,
   DOCUMENT_TYPES,
+  AGREEMENT_TYPES,
 } from '@oreset/shared'
 
 // Fed directly from packages/shared/src/enums.ts so the DB layer and the
@@ -42,3 +43,4 @@ export const datasetStatusEnum = pgEnum('dataset_status', DATASET_STATUSES)
 export const ticketStatusEnum = pgEnum('ticket_status', TICKET_STATUSES)
 export const verificationStatusEnum = pgEnum('verification_status', VERIFICATION_STATUSES)
 export const documentTypeEnum = pgEnum('document_type', DOCUMENT_TYPES)
+export const agreementTypeEnum = pgEnum('agreement_type', AGREEMENT_TYPES)

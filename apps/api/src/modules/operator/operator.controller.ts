@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
-import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS, DOCUMENT_TYPES } from '@oreset/shared'
+import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS, DOCUMENT_TYPES, AGREEMENT_TYPES } from '@oreset/shared'
 import * as operatorService from './operator.service'
 
 const decisionSchema = z
@@ -90,6 +90,29 @@ export async function submitVerification(req: Request, res: Response) {
   const body = verificationSchema.parse(req.body)
   const verification = await operatorService.submitVerification(req.user!.sub, body)
   res.status(201).json(verification)
+}
+
+// ---------------------------------------------------------------------------
+// Agreements
+// ---------------------------------------------------------------------------
+
+const signAgreementSchema = z.object({
+  agreementType: z.enum(AGREEMENT_TYPES),
+})
+
+export async function getAgreements(req: Request, res: Response) {
+  const result = await operatorService.getAgreements(req.user!.sub)
+  res.status(200).json(result)
+}
+
+export async function signAgreement(req: Request, res: Response) {
+  const body = signAgreementSchema.parse(req.body)
+  const agreement = await operatorService.signAgreement(req.user!.sub, {
+    agreementType: body.agreementType,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  })
+  res.status(201).json(agreement)
 }
 
 // ---------------------------------------------------------------------------

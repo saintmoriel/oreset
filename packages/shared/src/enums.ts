@@ -71,3 +71,6 @@ export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number]
 
 export const DOCUMENT_TYPES = ['government_id', 'education_certificate', 'resume', 'other'] as const
 export type DocumentType = (typeof DOCUMENT_TYPES)[number]
+
+export const AGREEMENT_TYPES = ['nda', 'code_of_conduct', 'data_handling'] as const
+export type AgreementType = (typeof AGREEMENT_TYPES)[number]
