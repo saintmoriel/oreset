@@ -1,4 +1,4 @@
-import { asc, count, desc, eq } from 'drizzle-orm'
+import { and, asc, count, desc, eq } from 'drizzle-orm'
 import type { ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
@@ -271,4 +271,38 @@ export async function submitVerification(
     .returning()
 
   return verification
+}
+
+// ---------------------------------------------------------------------------
+// Payout Details
+// ---------------------------------------------------------------------------
+
+async function checkIdentityVerified(userId: string): Promise<boolean> {
+  const approvedDocs = await db.query.identityVerifications.findFirst({
+    where: and(eq(identityVerifications.userId, userId), eq(identityVerifications.status, 'approved')),
+  })
+  return Boolean(approvedDocs)
+}
+
+export async function getPayoutDetails(userId: string) {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  })
+  if (!user) throw new HttpError(404, 'not_found', 'User not found.')
+
+  const identityVerified = await checkIdentityVerified(userId)
+
+  return {
+    payoutDetails: user.payoutDetails,
+    identityVerified,
+  }
+}
+
+export async function updatePayoutDetails(
+  userId: string,
+  data: { country: string; bankName: string; accountNumber: string; accountName: string },
+) {
+  await db.update(users).set({ payoutDetails: data, updatedAt: new Date() }).where(eq(users.id, userId))
+
+  return getPayoutDetails(userId)
 }

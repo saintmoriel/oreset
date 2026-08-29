@@ -59,3 +59,15 @@ operatorRouter.post(
   requireRole('operator'),
   asyncHandler(controller.submitVerification),
 )
+operatorRouter.get(
+  '/me/payout-details',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.getPayoutDetails),
+)
+operatorRouter.patch(
+  '/me/payout-details',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(controller.updatePayoutDetails),
+)

@@ -137,3 +137,31 @@ export function submitVerification(data: {
     body: data,
   })
 }
+
+export type PayoutDetails = {
+  country: string
+  bankName: string
+  accountNumber: string
+  accountName: string
+} | null
+
+export type PayoutDetailsResponse = {
+  payoutDetails: PayoutDetails
+  identityVerified: boolean
+}
+
+export function getPayoutDetails() {
+  return apiFetch<PayoutDetailsResponse>('/api/v1/operator/me/payout-details')
+}
+
+export function updatePayoutDetails(data: {
+  country: string
+  bankName: string
+  accountNumber: string
+  accountName: string
+}) {
+  return apiFetch<PayoutDetailsResponse>('/api/v1/operator/me/payout-details', {
+    method: 'PATCH',
+    body: data,
+  })
+}

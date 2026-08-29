@@ -91,3 +91,25 @@ export async function submitVerification(req: Request, res: Response) {
   const verification = await operatorService.submitVerification(req.user!.sub, body)
   res.status(201).json(verification)
 }
+
+// ---------------------------------------------------------------------------
+// Payout Details
+// ---------------------------------------------------------------------------
+
+const operatorPayoutDetailsSchema = z.object({
+  country: z.string().min(1),
+  bankName: z.string().min(1),
+  accountNumber: z.string().min(1),
+  accountName: z.string().min(1),
+})
+
+export async function getPayoutDetails(req: Request, res: Response) {
+  const result = await operatorService.getPayoutDetails(req.user!.sub)
+  res.status(200).json(result)
+}
+
+export async function updatePayoutDetails(req: Request, res: Response) {
+  const body = operatorPayoutDetailsSchema.parse(req.body)
+  const result = await operatorService.updatePayoutDetails(req.user!.sub, body)
+  res.status(200).json(result)
+}

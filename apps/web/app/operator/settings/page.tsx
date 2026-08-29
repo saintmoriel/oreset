@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2, User, Shield, BadgeCheck } from 'lucide-react'
+import { Loader2, User, Shield, BadgeCheck, Wallet } from 'lucide-react'
 import { OperatorAppShell } from '@/components/operator/operator-app-shell'
 import { ProfileTab } from '@/components/operator/settings/profile-tab'
 import { SecurityTab } from '@/components/operator/settings/security-tab'
 import { VerificationTab } from '@/components/operator/settings/verification-tab'
+import { PayoutsTab } from '@/components/operator/settings/payouts-tab'
 import {
   getOperatorProfile,
   updateOperatorProfile,
@@ -18,6 +19,7 @@ import { cn } from '@/lib/utils'
 const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'verification', label: 'Verification', icon: BadgeCheck },
+  { id: 'payouts', label: 'Payouts', icon: Wallet },
   { id: 'security', label: 'Security', icon: Shield },
 ] as const
 
@@ -84,6 +86,7 @@ export default function OperatorSettingsPage() {
       <div className="mt-6">
         {activeTab === 'profile' && <ProfileTab profile={profile} onSave={handleSave} />}
         {activeTab === 'verification' && <VerificationTab />}
+        {activeTab === 'payouts' && <PayoutsTab />}
         {activeTab === 'security' && <SecurityTab />}
       </div>
     </OperatorAppShell>
