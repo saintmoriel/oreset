@@ -1,9 +1,11 @@
-import { Lock } from 'lucide-react'
+import { Lock, AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
 import { AdminAppShell } from '@/components/admin/admin-app-shell'
 import { TicketResolveClient } from '@/components/admin/ticket-resolve-client'
+import { TicketFilters } from '@/components/admin/ticket-filters'
 import { StatusTag } from '@/components/capture/status-tag'
 import { serverApiFetch } from '@/lib/api/server'
-import type { AuthUser } from '@oreset/shared'
+import { ERR_TAG_LABELS } from '@oreset/shared'
+import type { AuthUser, ErrTag } from '@oreset/shared'
 import type { Ticket } from '@/lib/api/endpoints/tickets'
 
 export default async function TicketsPage() {
@@ -15,13 +17,16 @@ export default async function TicketsPage() {
     ? (await serverApiFetch<{ tickets: Ticket[] }>('/api/v1/admin/tickets')).tickets
     : []
 
+  const openCount = tickets.filter((t) => t.status === 'open').length
+  const resolvedCount = tickets.filter((t) => t.status === 'resolved').length
+
   return (
     <AdminAppShell>
-      <p className="cx-label text-navy-400">Operators · Oversight</p>
-      <h1 className="cx-page-title mt-1.5 text-navy-900">Client tickets</h1>
+      <p className="cx-label text-navy-400">Senior QA · Adjudication</p>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Escalation Queue</h1>
       <p className="cx-body mt-2 max-w-lg text-navy-500">
-        Where a Certified Operator&apos;s Escalate decision actually lands — real client output
-        flagged for follow-up.
+        Cases escalated by operators for ambiguous context, novel slang, or unclear policy.
+        Review the original evidence and resolve or re-route.
       </p>
 
       {!canView ? (
@@ -31,35 +36,48 @@ export default async function TicketsPage() {
           </span>
           <p className="cx-body font-semibold text-navy-900">Access restricted</p>
           <p className="cx-meta max-w-sm text-navy-500">
-            Your role cannot view client tickets. Admin and Reviewer Lead only.
+            Admin and Reviewer Lead roles only.
           </p>
         </div>
-      ) : tickets.length === 0 ? (
-        <p className="cx-body mt-6 text-navy-400">No tickets yet.</p>
       ) : (
-        <div className="cx-card mt-6 divide-y divide-border">
-          {tickets.map((t) => (
-            <div key={t.id} className="flex items-start justify-between gap-4 p-4">
+        <>
+          {/* Stats */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="cx-card flex items-center gap-3 p-4">
+              <span className="flex size-10 items-center justify-center rounded-lg bg-warning/10">
+                <AlertTriangle className="size-5 text-warning" />
+              </span>
               <div>
-                <div className="flex items-center gap-2">
-                  <p className="cx-mono-meta font-semibold text-navy-800">{t.externalRef}</p>
-                  {t.errTag && <span className="cx-mono-meta font-semibold text-accent">{t.errTag}</span>}
-                  {t.severity && <span className="cx-mono-meta text-navy-400">{t.severity}</span>}
-                </div>
-                <p className="cx-mono-meta mt-1 text-navy-400">{t.clientName}</p>
-                {t.notes && <p className="cx-body mt-2 text-navy-800">{t.notes}</p>}
-                {t.status === 'resolved' && t.resolutionNotes && (
-                  <p className="cx-meta mt-2 text-success">Resolved: {t.resolutionNotes}</p>
-                )}
+                <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">{openCount}</p>
+                <p className="cx-meta text-navy-400">Open</p>
               </div>
-              {t.status === 'open' ? (
-                <TicketResolveClient ticketId={t.id} />
-              ) : (
-                <StatusTag tone="success">Resolved</StatusTag>
-              )}
             </div>
-          ))}
-        </div>
+            <div className="cx-card flex items-center gap-3 p-4">
+              <span className="flex size-10 items-center justify-center rounded-lg bg-success/10">
+                <CheckCircle2 className="size-5 text-success" />
+              </span>
+              <div>
+                <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">{resolvedCount}</p>
+                <p className="cx-meta text-navy-400">Resolved</p>
+              </div>
+            </div>
+            <div className="cx-card flex items-center gap-3 p-4">
+              <span className="flex size-10 items-center justify-center rounded-lg bg-navy-100">
+                <Clock className="size-5 text-navy-500" />
+              </span>
+              <div>
+                <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">{tickets.length}</p>
+                <p className="cx-meta text-navy-400">Total</p>
+              </div>
+            </div>
+          </div>
+
+          {tickets.length === 0 ? (
+            <p className="cx-body mt-6 text-navy-400">No escalated tickets yet.</p>
+          ) : (
+            <TicketFilters tickets={tickets} />
+          )}
+        </>
       )}
     </AdminAppShell>
   )

@@ -1,4 +1,4 @@
-import { asc, eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { db } from '../../db/client'
 import { clientTickets, type ClientTicket } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
@@ -6,8 +6,11 @@ import { HttpError } from '../../middleware/error-handler'
 
 export async function listTickets() {
   return db.query.clientTickets.findMany({
-    orderBy: asc(clientTickets.createdAt),
-    with: { resolvedByUser: true },
+    orderBy: desc(clientTickets.createdAt),
+    with: {
+      resolvedByUser: true,
+      operatorReviewDecision: true,
+    },
   })
 }
 
