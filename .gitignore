@@ -37,3 +37,5 @@ playwright-report/
 blob-report/
 
 public/oreset_accessKeys.csv
+.vercel
+.env*
