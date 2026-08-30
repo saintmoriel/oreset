@@ -151,6 +151,19 @@ For certified reviewers checking live enterprise client AI output:
 - Side-by-side adjudication queue: both reviewer decisions shown, admin picks final decision
 - Bulk enable dual-solve on all pending items
 
+**Operator Performance** (`/admin/operators`)
+- Global stats: total/active operators, total reviews, calibration attempts, avg reviews per operator
+- Per-operator expandable cards with:
+  - Profile: languages, location, join date
+  - Review volume: today, 7d, 30d, all-time
+  - Decision distribution: color-coded stacked bar with percentages
+  - Review speed: average and median time per review
+  - Calibration: attempts, pass rate, avg score
+  - Consensus: pairs, agreed, agreement rate
+  - Error tags flagged
+- Search by name, code, language, location
+- Sort by total reviews, this week, approval rate, speed, calibration score, consensus agreement
+
 **Other admin pages:**
 - Applications — Operator application review
 - Payouts — Contributor payout management and batch processing
@@ -200,7 +213,6 @@ Key tables: users, sessions, campaigns, batches, submissions, operator_review_de
 
 ### Immediate (ready to build)
 
-- **Operator performance dashboard (admin)**: Per-operator metrics over time, calibration score trends, review speed, accuracy rates
 - **Client-facing portal**: Enterprise clients can submit cases, track status, view results, download regression suites (currently API-only via ingestion endpoints)
 
 ### Medium-term

@@ -37,3 +37,8 @@ export async function regressionStats(_req: Request, res: Response) {
   const stats = await ingestionService.getRegressionStats()
   res.status(200).json(stats)
 }
+
+export async function operatorPerformance(_req: Request, res: Response) {
+  const result = await adminService.getOperatorPerformance()
+  res.status(200).json(result)
+}

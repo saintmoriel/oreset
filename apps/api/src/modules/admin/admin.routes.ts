@@ -26,3 +26,10 @@ adminRouter.get(
   requireRole('staff:admin', 'staff:reviewer_lead'),
   asyncHandler(controller.regressionStats),
 )
+
+adminRouter.get(
+  '/operators/performance',
+  requireAuth,
+  requireRole('staff:admin', 'staff:reviewer_lead'),
+  asyncHandler(controller.operatorPerformance),
+)
