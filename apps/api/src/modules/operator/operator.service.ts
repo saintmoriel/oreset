@@ -1,20 +1,39 @@
-import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
+import { and, asc, count, desc, eq, sql, notInArray } from 'drizzle-orm'
 import type { AgreementType, ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
-import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements } from '../../db/schema'
+import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements, consensusPairs } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
+import { handleDualSolveDecision } from '../consensus/consensus.service'
 
 export async function getQueue(operatorId?: string) {
+  // Items this operator already reviewed in dual-solve mode
+  const alreadyReviewedSubquery = operatorId
+    ? db
+        .select({ itemId: consensusPairs.clientItemId })
+        .from(consensusPairs)
+        .where(sql`(${consensusPairs.reviewerOneId} = ${operatorId} OR ${consensusPairs.reviewerTwoId} = ${operatorId})`)
+    : null
+
+  // Show pending items + in_review items (dual-solve waiting for second reviewer)
+  const statusFilter = sql`${clientQueueItems.status} IN ('pending', 'in_review')`
+  const excludeAlreadyReviewed = alreadyReviewedSubquery
+    ? sql`${clientQueueItems.id} NOT IN (${alreadyReviewedSubquery})`
+    : null
+
+  const baseCondition = excludeAlreadyReviewed
+    ? sql`${statusFilter} AND ${excludeAlreadyReviewed}`
+    : statusFilter
+
   if (!operatorId) {
-    return db.query.clientQueueItems.findMany({
-      where: eq(clientQueueItems.status, 'pending'),
-      orderBy: asc(clientQueueItems.createdAt),
-    })
+    return db
+      .select()
+      .from(clientQueueItems)
+      .where(baseCondition)
+      .orderBy(asc(clientQueueItems.createdAt))
   }
 
-  // Look up the operator's language profile
   const application = await db.query.operatorApplications.findFirst({
     where: eq(operatorApplications.userId, operatorId),
   })
@@ -24,38 +43,33 @@ export async function getQueue(operatorId?: string) {
     : []
 
   if (operatorLanguages.length === 0) {
-    // No language profile — return all pending items, oldest first
-    return db.query.clientQueueItems.findMany({
-      where: eq(clientQueueItems.status, 'pending'),
-      orderBy: asc(clientQueueItems.createdAt),
-    })
+    return db
+      .select()
+      .from(clientQueueItems)
+      .where(baseCondition)
+      .orderBy(asc(clientQueueItems.createdAt))
   }
 
-  // Return all pending items, language-matched first, then by creation date
-  // Build a CASE with individual OR comparisons to avoid array literal parsing
-  // issues with special characters (e.g. accented letters in "yorùbá")
   const langConditions = operatorLanguages.map((lang) => sql`lower(trace_data->>'language') = ${lang}`)
   const langMatch = langConditions.length === 1
     ? langConditions[0]
     : sql.join(langConditions, sql` OR `)
-  const items = await db
+
+  return db
     .select()
     .from(clientQueueItems)
-    .where(eq(clientQueueItems.status, 'pending'))
+    .where(baseCondition)
     .orderBy(
       sql`CASE WHEN (${langMatch}) THEN 0 ELSE 1 END`,
       asc(clientQueueItems.createdAt),
     )
-
-  return items
 }
 
-// Real COUNT — cheaper than getQueue().length, no per-row cost to throw away.
 export async function getQueueCount(): Promise<number> {
   const [row] = await db
     .select({ value: count() })
     .from(clientQueueItems)
-    .where(eq(clientQueueItems.status, 'pending'))
+    .where(sql`${clientQueueItems.status} IN ('pending', 'in_review')`)
   return row?.value ?? 0
 }
 
@@ -121,6 +135,12 @@ export async function decide(input: {
 }) {
   const item = await db.query.clientQueueItems.findFirst({ where: eq(clientQueueItems.id, input.itemId) })
   if (!item) throw new HttpError(404, 'not_found', 'Queue item not found.')
+
+  // Dual-solve items route through the consensus system
+  if (item.requiresDualSolve) {
+    return handleDualSolveDecision(input)
+  }
+
   if (item.status !== 'pending') {
     throw new HttpError(409, 'invalid_state', 'This item is not awaiting review.')
   }
@@ -142,13 +162,8 @@ export async function decide(input: {
     })
     .returning()
 
-  // OPERATOR_DECISIONS ('approved'|'escalated'|'rejected') is exactly
-  // CLIENT_QUEUE_ITEM_STATUSES minus 'pending' — no status-mapping needed.
   await db.update(clientQueueItems).set({ status: input.decision }).where(eq(clientQueueItems.id, item.id))
 
-  // The real destination for an escalation — before this, escalating just
-  // flipped client_queue_items.status and nothing downstream ever
-  // surfaced it. One ticket per escalation.
   if (input.decision === 'escalated') {
     await db.insert(clientTickets).values({
       operatorReviewDecisionId: decision.id,

@@ -62,7 +62,7 @@ export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number]
 export const OTP_PURPOSES = ['login', 'signup'] as const
 export type OtpPurpose = (typeof OTP_PURPOSES)[number]
 
-export const CLIENT_QUEUE_ITEM_STATUSES = ['pending', 'approved', 'corrected', 'rejected', 'escalated', 'declined'] as const
+export const CLIENT_QUEUE_ITEM_STATUSES = ['pending', 'in_review', 'consensus_split', 'approved', 'corrected', 'rejected', 'escalated', 'declined'] as const
 export type ClientQueueItemStatus = (typeof CLIENT_QUEUE_ITEM_STATUSES)[number]
 
 export const PAYOUT_STATUSES = ['pending', 'processing', 'paid', 'failed'] as const
@@ -82,6 +82,9 @@ export type DocumentType = (typeof DOCUMENT_TYPES)[number]
 
 export const AGREEMENT_TYPES = ['nda', 'code_of_conduct', 'data_handling'] as const
 export type AgreementType = (typeof AGREEMENT_TYPES)[number]
+
+export const CONSENSUS_STATUSES = ['awaiting_reviews', 'agreed', 'disagreed', 'adjudicated'] as const
+export type ConsensusStatus = (typeof CONSENSUS_STATUSES)[number]
 
 export const CALIBRATION_STATUSES = ['active', 'retired'] as const
 export type CalibrationStatus = (typeof CALIBRATION_STATUSES)[number]

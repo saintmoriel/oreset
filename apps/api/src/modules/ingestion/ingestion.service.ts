@@ -8,6 +8,7 @@ type TraceUnitInput = {
   externalRef: string
   content: string
   traceData?: Record<string, unknown>
+  requiresDualSolve?: boolean
 }
 
 export async function ingestSingle(input: TraceUnitInput) {
@@ -18,6 +19,7 @@ export async function ingestSingle(input: TraceUnitInput) {
       externalRef: input.externalRef,
       content: input.content,
       traceData: input.traceData ?? null,
+      requiresDualSolve: input.requiresDualSolve ?? false,
     })
     .returning()
   return item
@@ -32,6 +34,7 @@ export async function ingestBatch(inputs: TraceUnitInput[]) {
         externalRef: input.externalRef,
         content: input.content,
         traceData: input.traceData ?? null,
+        requiresDualSolve: input.requiresDualSolve ?? false,
       })),
     )
     .returning()

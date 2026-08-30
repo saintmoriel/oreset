@@ -144,6 +144,13 @@ For certified reviewers checking live enterprise client AI output:
 - Gold-standard case management: create, view, retire
 - Full case detail with expected answer and explanation
 
+**Consensus / Dual-Solve** (`/admin/consensus`)
+- Stats: total pairs, agreement rate, Cohen's kappa, pending adjudication count
+- Breakdown: agreed, disagreed, adjudicated counts
+- Kappa interpretation guide (slight/fair/moderate/substantial/perfect)
+- Side-by-side adjudication queue: both reviewer decisions shown, admin picks final decision
+- Bulk enable dual-solve on all pending items
+
 **Other admin pages:**
 - Applications — Operator application review
 - Payouts — Contributor payout management and batch processing
@@ -165,6 +172,7 @@ For enterprise clients purchasing verified data:
 | `operator` | Queue, decisions, profile, verifications, agreements, payouts |
 | `ingestion` | Trace unit ingestion (single/batch), API key auth, regression export |
 | `calibration` | Gold-standard cases, operator attempts, scoring, stats |
+| `consensus` | Dual-solve pairs, adjudication, agreement stats, Cohen's kappa |
 | `tickets` | Escalation queue CRUD |
 | `admin` | Overview, regression export (staff auth) |
 | `qa` | Internal QA review queue and decisions |
@@ -182,9 +190,9 @@ For enterprise clients purchasing verified data:
 
 ### Database (21+ tables)
 
-Key tables: users, sessions, campaigns, batches, submissions, operator_review_decisions, client_queue_items, client_tickets, calibration_cases, calibration_attempts, identity_verifications, operator_agreements, datasets, dataset_items, payouts, audit_log
+Key tables: users, sessions, campaigns, batches, submissions, operator_review_decisions, client_queue_items, client_tickets, calibration_cases, calibration_attempts, consensus_pairs, identity_verifications, operator_agreements, datasets, dataset_items, payouts, audit_log
 
-11 migrations applied (0001 through 0011).
+12 migrations applied (0001 through 0012).
 
 ---
 
@@ -192,8 +200,6 @@ Key tables: users, sessions, campaigns, batches, submissions, operator_review_de
 
 ### Immediate (ready to build)
 
-- **Consensus scoring**: Multi-reviewer agreement on the same case, Cohen's kappa or Fleiss' kappa for inter-rater reliability measurement
-- **Dual-solve mode**: Same case sent to two reviewers independently, disagreements flagged for senior QA
 - **Operator performance dashboard (admin)**: Per-operator metrics over time, calibration score trends, review speed, accuracy rates
 - **Client-facing portal**: Enterprise clients can submit cases, track status, view results, download regression suites (currently API-only via ingestion endpoints)
 

@@ -17,7 +17,9 @@ import { datasetDownloadEvents } from './dataset-download-events'
 import { clientTickets } from './client-tickets'
 import { identityVerifications } from './identity-verifications'
 import { operatorAgreements } from './operator-agreements'
+import { clientQueueItems } from './client-queue-items'
 import { calibrationCases, calibrationAttempts } from './calibration'
+import { consensusPairs } from './consensus-pairs'
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
@@ -156,6 +158,38 @@ export const operatorReviewDecisionsRelations = relations(operatorReviewDecision
 
 export const promptsRelations = relations(prompts, ({ one }) => ({
   batch: one(batches, { fields: [prompts.batchId], references: [batches.id] }),
+}))
+
+export const consensusPairsRelations = relations(consensusPairs, ({ one }) => ({
+  clientItem: one(clientQueueItems, {
+    fields: [consensusPairs.clientItemId],
+    references: [clientQueueItems.id],
+  }),
+  reviewerOne: one(users, {
+    fields: [consensusPairs.reviewerOneId],
+    references: [users.id],
+    relationName: 'consensusReviewerOne',
+  }),
+  reviewerTwo: one(users, {
+    fields: [consensusPairs.reviewerTwoId],
+    references: [users.id],
+    relationName: 'consensusReviewerTwo',
+  }),
+  decisionOne: one(operatorReviewDecisions, {
+    fields: [consensusPairs.decisionOneId],
+    references: [operatorReviewDecisions.id],
+    relationName: 'consensusDecisionOne',
+  }),
+  decisionTwo: one(operatorReviewDecisions, {
+    fields: [consensusPairs.decisionTwoId],
+    references: [operatorReviewDecisions.id],
+    relationName: 'consensusDecisionTwo',
+  }),
+  adjudicator: one(users, {
+    fields: [consensusPairs.adjudicatorId],
+    references: [users.id],
+    relationName: 'consensusAdjudicator',
+  }),
 }))
 
 export const calibrationCasesRelations = relations(calibrationCases, ({ one, many }) => ({

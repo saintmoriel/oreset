@@ -20,6 +20,7 @@ import {
   VERIFICATION_STATUSES,
   DOCUMENT_TYPES,
   AGREEMENT_TYPES,
+  CONSENSUS_STATUSES,
   CALIBRATION_STATUSES,
   CALIBRATION_RESULTS,
 } from '@oreset/shared'
@@ -46,5 +47,6 @@ export const ticketStatusEnum = pgEnum('ticket_status', TICKET_STATUSES)
 export const verificationStatusEnum = pgEnum('verification_status', VERIFICATION_STATUSES)
 export const documentTypeEnum = pgEnum('document_type', DOCUMENT_TYPES)
 export const agreementTypeEnum = pgEnum('agreement_type', AGREEMENT_TYPES)
+export const consensusStatusEnum = pgEnum('consensus_status', CONSENSUS_STATUSES)
 export const calibrationStatusEnum = pgEnum('calibration_status', CALIBRATION_STATUSES)
 export const calibrationResultEnum = pgEnum('calibration_result', CALIBRATION_RESULTS)
