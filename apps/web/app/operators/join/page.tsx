@@ -11,8 +11,8 @@ import { ApiError } from '@/lib/api/client'
 const FLUENCY_LEVELS = ['Native', 'Level 4', 'Level 3', 'Level 2', 'Level 1']
 const ACADEMIC_BACKGROUNDS = [
   "Secondary",
-  "Tertiary — Bachelor's",
-  'Tertiary — Postgraduate',
+  "Tertiary (Bachelor's)",
+  'Tertiary (Postgraduate)',
   'Vocational / Technical',
   'No formal qualification',
 ]
@@ -198,7 +198,7 @@ export default function OperatorsJoinPage() {
                   </p>
                 )}
                 <p className="cx-body text-navy-500">
-                  Sign in to begin certification — a short training and quiz that unlocks your
+                  Sign in to begin certification: a short training and quiz that unlocks your
                   first placement.
                 </p>
                 <Link

@@ -4,18 +4,18 @@ import { SolutionPageLayout, type SolutionPageData } from '@/components/solution
 
 const data: SolutionPageData = {
   vertical: 'Claims & payouts',
-  headline: 'A language error shouldn’t decide who gets paid.',
+  headline: "A language error shouldn't decide who gets paid.",
   subheadline:
     'Insurance claims described in Pidgin, Yoruba, or Hausa get auto-denied when AI misreads intent as incompleteness. Oreset verifies that the decision matched what was actually said.',
   problem: {
     title: 'When the AI hears "I no fit work" and reads refusal instead of disability',
     description:
-      'Claims processing AI is trained on English-first data. When a claimant describes their situation in Nigerian Pidgin or another African language, the system parses unfamiliar syntax as missing information — and denies the claim automatically.',
+      'Claims processing AI is trained on English-first data. When a claimant describes their situation in Nigerian Pidgin or another African language, the system parses unfamiliar syntax as missing information and denies the claim automatically.',
     consequences: [
       {
         scenario: 'Pidgin description parsed as incomplete',
         impact:
-          'A valid claim is auto-rejected because "I no fit work since that time" doesn’t match the expected English-language injury template.',
+          "A valid claim is auto-rejected because \"I no fit work since that time\" doesn't match the expected English-language injury template.",
       },
       {
         scenario: 'Code-switched explanation flagged as inconsistent',
@@ -33,11 +33,11 @@ const data: SolutionPageData = {
     steps: [
       {
         label: 'Submit a real case',
-        detail: 'Send us the claim as-is — voice note, form text, or transcription. We take it in the language it arrived.',
+        detail: 'Send us the claim as-is: voice note, form text, or transcription. We take it in the language it arrived.',
       },
       {
         label: 'Route to a matched reviewer',
-        detail: 'A certified reviewer who speaks the claimant’s language and understands the insurance domain receives the case.',
+        detail: "A certified reviewer who speaks the claimant's language and understands the insurance domain receives the case.",
       },
       {
         label: 'Check understanding',
@@ -50,15 +50,15 @@ const data: SolutionPageData = {
     ],
   },
   exampleCase: {
-    title: 'Motor accident claim — Nigerian Pidgin',
+    title: 'Motor accident claim, Nigerian Pidgin',
     input:
-      '"I no fit work since that motor jam me for road. My hand no dey do anything again." — Submitted via voice note, transcribed by insurer’s ASR.',
+      "\"I no fit work since that motor jam me for road. My hand no dey do anything again.\" Submitted via voice note, transcribed by insurer's ASR.",
     failure:
       'ASR transcribed as "I no fit work... hand nothing again." Claims AI parsed this as an incomplete submission (missing injury detail, no medical reference) and auto-denied.',
     caught:
       'Reviewer confirmed: claimant described a motor accident causing loss of hand function. The statement contains a clear injury, clear causation, and clear functional impact. Understanding score: Failed. The AI missed the meaning entirely.',
     severity:
-      'Critical (Score 1/5) — Valid claim denied. Claimant left without payout due to language misinterpretation, not insufficient evidence.',
+      'Critical (Score 1/5). Valid claim denied. Claimant left without payout due to language misinterpretation, not insufficient evidence.',
   },
   evidence: [
     {

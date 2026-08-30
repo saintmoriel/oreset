@@ -8,7 +8,7 @@ const steps = [
     number: '01',
     label: 'Capture the real exchange',
     summary:
-      'Not a clean translation. The actual conversation — code-switching, Pidgin, mixed register — the way people really speak, not the way a textbook does.',
+      'Not a clean translation. The actual conversation: code-switching, Pidgin, mixed register. The way people really speak, not the way a textbook does.',
   },
   {
     id: 'separate',
@@ -22,7 +22,7 @@ const steps = [
     number: '03',
     label: 'Route to a certified, domain-matched reviewer',
     summary:
-      'Not just fluent in the language. Calibrated to the domain — claims, lending, service eligibility — so the review catches what generic language QA misses.',
+      'Not just fluent in the language. Calibrated to the domain: claims, lending, service eligibility. So the review catches what generic language QA misses.',
   },
   {
     id: 'score',

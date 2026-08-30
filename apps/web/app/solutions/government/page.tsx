@@ -4,9 +4,9 @@ import { SolutionPageLayout, type SolutionPageData } from '@/components/solution
 
 const data: SolutionPageData = {
   vertical: 'Government & public services',
-  headline: 'A citizen shouldn’t lose access because the system doesn’t speak their language.',
+  headline: "A citizen shouldn't lose access because the system doesn't speak their language.",
   subheadline:
-    'Government AI systems — chatbots, eligibility screeners, complaint routers — increasingly gate access to public services. When they can’t understand the citizen, the citizen loses.',
+    "Government AI systems like chatbots, eligibility screeners, and complaint routers increasingly gate access to public services. When they can't understand the citizen, the citizen loses.",
   problem: {
     title: 'When the chatbot routes a complaint to the wrong agency because it misread the language',
     description:
@@ -15,12 +15,12 @@ const data: SolutionPageData = {
       {
         scenario: 'Eligibility question misinterpreted',
         impact:
-          'A citizen applying for social benefits in Igbo describes household composition. The AI parses extended family references as multiple households — disqualifying them.',
+          'A citizen applying for social benefits in Igbo describes household composition. The AI parses extended family references as multiple households, disqualifying them.',
       },
       {
         scenario: 'Complaint misrouted entirely',
         impact:
-          'A Hausa-speaking citizen reports a water outage. The chatbot classifies the complaint as "billing dispute" because it can’t parse the local term for infrastructure failure.',
+          "A Hausa-speaking citizen reports a water outage. The chatbot classifies the complaint as \"billing dispute\" because it can't parse the local term for infrastructure failure.",
       },
       {
         scenario: 'Identity verification rejected',
@@ -33,11 +33,11 @@ const data: SolutionPageData = {
     steps: [
       {
         label: 'Submit the interaction',
-        detail: 'Send us the citizen’s input and the system’s decision — routing, classification, eligibility, or denial.',
+        detail: 'Send us the citizen\'s input and the system\'s decision: routing, classification, eligibility, or denial.',
       },
       {
         label: 'Matched reviewer assigned',
-        detail: 'A certified reviewer who speaks the citizen’s language and understands the service domain reviews the case.',
+        detail: "A certified reviewer who speaks the citizen's language and understands the service domain reviews the case.",
       },
       {
         label: 'Verify understanding',
@@ -50,15 +50,15 @@ const data: SolutionPageData = {
     ],
   },
   exampleCase: {
-    title: 'Social benefit application — Igbo language',
+    title: 'Social benefit application, Igbo language',
     input:
-      'Citizen applies for a household subsidy via government portal. In the household section, they write in Igbo: "Anyi bi n’otu — nne m, nna m, ịnwa m atọ" (We live together — my mother, my father, my three siblings).',
+      "Citizen applies for a household subsidy via government portal. In the household section, they write in Igbo: \"Anyi bi n'otu — nne m, nna m, ịnwa m atọ\" (We live together — my mother, my father, my three siblings).",
     failure:
-      'The AI eligibility screener parsed "nne m, nna m" as separate household heads and classified this as a multi-household application — which is ineligible for the single-household subsidy program. Application auto-rejected.',
+      'The AI eligibility screener parsed "nne m, nna m" as separate household heads and classified this as a multi-household application, which is ineligible for the single-household subsidy program. Application auto-rejected.',
     caught:
       'Reviewer confirmed: the citizen described one household with parents and siblings. This is a standard single-household structure. The AI misread family relationship terms as household boundary markers. Understanding score: Failed.',
     severity:
-      'Critical (Score 1/5) — Eligible citizen denied social benefits. No recourse path was offered in their language.',
+      'Critical (Score 1/5). Eligible citizen denied social benefits. No recourse path was offered in their language.',
   },
   evidence: [
     {
@@ -68,7 +68,7 @@ const data: SolutionPageData = {
     },
     {
       stat: '371 ethnic groups',
-      detail: 'In Nigeria alone. Language is explicitly cited as "a barrier to accessing health information and ensuring patient safety" — the same applies to every digitized public service.',
+      detail: 'In Nigeria alone. Language is explicitly cited as "a barrier to accessing health information and ensuring patient safety." The same applies to every digitized public service.',
       source: 'Wikipedia / Healthcare in Nigeria, citing WHO data',
     },
     {

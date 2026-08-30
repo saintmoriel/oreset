@@ -15,12 +15,12 @@ const faqs = [
   {
     audience: 'Buyers',
     q: 'How does verification actually work?',
-    a: "We check two things separately, not one blended score: did the AI correctly understand what the user meant, and separately, was the decision that followed actually correct. A model can pass one and fail the other — that's the gap most evaluation misses.",
+    a: "We check two things separately, not one blended score: did the AI correctly understand what the user meant, and separately, was the decision that followed actually correct. A model can pass one and fail the other. That's the gap most evaluation misses.",
   },
   {
     audience: 'Buyers',
     q: 'How are reviewers certified?',
-    a: 'Reviewers move through Sourcing → Training → Certification before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes cases require earned reliability scorecards — matched by language and domain, not language alone.',
+    a: 'Reviewers move through Sourcing, Training, and Certification before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes cases require earned reliability scorecards, matched by language and domain, not language alone.',
   },
   {
     audience: 'Contributors',
@@ -30,7 +30,7 @@ const faqs = [
   {
     audience: 'Buyers',
     q: 'Which languages and decision types do you cover?',
-    a: 'Coverage is scoped per case: we start from the language and decision type you bring us — claims, lending, government services, or another decision-driven AI product. We do not publish inflated "N languages live" counts; we verify against real examples, not assumed coverage.',
+    a: 'Coverage is scoped per case: we start from the language and decision type you bring us, whether that\'s claims, lending, government services, or another decision-driven AI product. We do not publish inflated "N languages live" counts. We verify against real examples, not assumed coverage.',
   },
   {
     audience: 'Everyone',
@@ -40,7 +40,7 @@ const faqs = [
   {
     audience: 'Contributors',
     q: 'Do I need special equipment to contribute?',
-    a: 'No. The Oreset Capture app runs on standard Android smartphones. Tasks are designed for on-device recording with built-in quality gates — you don’t need studio hardware or professional training.',
+    a: "No. The Oreset Capture app runs on standard Android smartphones. Tasks are designed for on-device recording with built-in quality gates, so you don't need studio hardware or professional training.",
   },
   {
     audience: 'Buyers',

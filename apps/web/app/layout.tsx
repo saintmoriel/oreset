@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.oreset.africa'),
   title: 'Oreset | Independent AI Decision Verification for African Languages',
   description:
-    "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+    "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong. It can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
   icons: {
     icon: '/oreset-logo v2.png',
     shortcut: '/oreset-logo v2.png',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Oreset | Independent AI Decision Verification for African Languages',
     description:
-      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong. It can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
     url: 'https://www.oreset.africa',
     siteName: 'Oreset',
     locale: 'en_US',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
         url: 'https://www.oreset.africa/og-image.jpeg',
         width: 1200,
         height: 630,
-        alt: 'Oreset — Independent AI Decision Verification for African Languages',
+        alt: 'Oreset: Independent AI Decision Verification for African Languages',
       },
     ],
   },
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Oreset | Independent AI Decision Verification for African Languages',
     description:
-      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong — it can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong. It can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
     images: ['https://www.oreset.africa/og-image.jpeg'],
   },
 }

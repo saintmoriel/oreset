@@ -159,7 +159,7 @@ export function Hero() {
               className="mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/70 sm:mt-5 sm:text-base md:text-lg"
             >
               A claim gets denied. A loan gets misjudged. 
-              A transaction gets flagged — not because the logic was wrong, 
+              A transaction gets flagged, not because the logic was wrong,
               but because the AI misread the Pidgin, Yoruba, or Hausa behind it. 
               Oreset verifies that AI-driven decisions across African languages are actually correct.
             </p>

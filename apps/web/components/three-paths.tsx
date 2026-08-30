@@ -14,7 +14,7 @@ export function ThreePaths() {
             <p className="text-eyebrow text-accent">Three paths in</p>
             <h2 className="text-h1 mt-4 text-balance text-foreground">How you work with Oreset.</h2>
             <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-              Whether you contribute data, certify as a reviewer, or verify a decision — every path runs through the same trust infrastructure.
+              Whether you contribute data, certify as a reviewer, or verify a decision, every path runs through the same trust infrastructure.
             </p>
           </div>
         </MotionReveal>
@@ -95,7 +95,7 @@ export function ThreePaths() {
 
               <ol className="space-y-4 mb-10 flex-grow">
                 {[
-                  "Send us a real case — a claim, loan, or transaction",
+                  "Send us a real case: a claim, loan, or transaction",
                   "We route to a certified, domain-matched reviewer",
                   "Understanding and outcome checked separately",
                   "Receive a severity-scored evidence trace"

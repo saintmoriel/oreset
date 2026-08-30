@@ -25,13 +25,13 @@ export function WhyNow() {
             <MotionReveal delay={0.08}>
               <div className="space-y-8">
                 <p className="text-body-lg text-pretty text-muted-foreground">
-                  Real benchmarks exist for African-language accuracy — 
-                  but none of them measure whether a language failure changed the actual decision it produced: 
+                  Real benchmarks exist for African-language accuracy,
+                  but none of them measure whether a language failure changed the actual decision it produced:
                   a claim, a loan, a transaction. Fluency gets tested. Consequence doesn't.
                 </p>
                 <p className="text-body text-pretty text-muted-foreground">
                   At the same time, enterprises shipping AI products into African markets
-                  need proof that language-driven decisions — a claim, a loan, a transaction — 
+                  need proof that language-driven decisions (a claim, a loan, a transaction)
                   are actually correct, not just fluent-sounding.
                 </p>
                 <div className="border-l-2 border-accent pl-5">

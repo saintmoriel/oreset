@@ -4,13 +4,13 @@ import { SolutionPageLayout, type SolutionPageData } from '@/components/solution
 
 const data: SolutionPageData = {
   vertical: 'Healthcare',
-  headline: 'A misunderstood symptom shouldn’t become a missed diagnosis.',
+  headline: "A misunderstood symptom shouldn't become a missed diagnosis.",
   subheadline:
-    'AI triage systems, symptom checkers, and telehealth bots are entering African healthcare. When they can’t parse how patients describe pain, history, or medication — in their own language — clinical decisions go wrong.',
+    "AI triage systems, symptom checkers, and telehealth bots are entering African healthcare. When they can't parse how patients describe pain, history, or medication in their own language, clinical decisions go wrong.",
   problem: {
     title: 'When "my body dey hot" gets triaged as low-priority instead of fever',
     description:
-      'Healthcare AI tools are trained on clinical English. But patients in Africa describe symptoms using idioms, metaphors, and local terms that don’t map to medical terminology. The AI doesn’t fail loudly — it silently misclassifies, undertriages, or routes to the wrong specialist.',
+      "Healthcare AI tools are trained on clinical English. But patients in Africa describe symptoms using idioms, metaphors, and local terms that don't map to medical terminology. The AI doesn't fail loudly. It silently misclassifies, undertriages, or routes to the wrong specialist.",
     consequences: [
       {
         scenario: 'Symptom idiom missed entirely',
@@ -25,7 +25,7 @@ const data: SolutionPageData = {
       {
         scenario: 'Referral blocked by language mismatch',
         impact:
-          'A community health worker’s referral note in Hausa is summarized by AI as "unclear complaint" — the specialist never sees the clinical detail.',
+          "A community health worker's referral note in Hausa is summarized by AI as \"unclear complaint.\" The specialist never sees the clinical detail.",
       },
     ],
   },
@@ -33,7 +33,7 @@ const data: SolutionPageData = {
     steps: [
       {
         label: 'Submit the clinical interaction',
-        detail: 'Send us the patient input and the AI’s triage/classification/routing decision. We handle any language or format.',
+        detail: "Send us the patient input and the AI's triage/classification/routing decision. We handle any language or format.",
       },
       {
         label: 'Clinical + language reviewer',
@@ -41,7 +41,7 @@ const data: SolutionPageData = {
       },
       {
         label: 'Verify clinical understanding',
-        detail: 'Did the AI correctly interpret the patient’s symptoms, history, and intent? Scored against what was actually communicated.',
+        detail: "Did the AI correctly interpret the patient's symptoms, history, and intent? Scored against what was actually communicated.",
       },
       {
         label: 'Verify the clinical decision',
@@ -50,30 +50,30 @@ const data: SolutionPageData = {
     ],
   },
   exampleCase: {
-    title: 'Symptom triage — Nigerian Pidgin',
+    title: 'Symptom triage, Nigerian Pidgin',
     input:
       'Patient to telehealth chatbot: "My body dey hot since three day. My belle dey do me somehow, I no fit chop. The pikin wey I born last month, e dey suck well but I weak."',
     failure:
-      'Chatbot classified as: "General malaise — self-care advice." Recommended rest and hydration. Did not flag: postpartum fever (3 days), inability to eat, or potential puerperal infection risk in a breastfeeding mother.',
+      'Chatbot classified as: "General malaise, self-care advice." Recommended rest and hydration. Did not flag: postpartum fever (3 days), inability to eat, or potential puerperal infection risk in a breastfeeding mother.',
     caught:
-      'Reviewer confirmed: patient is a postpartum mother with 3-day fever, appetite loss, and weakness while breastfeeding. This is a potential obstetric emergency (puerperal sepsis). The chatbot missed every clinical red flag because it couldn’t parse Pidgin symptom descriptions. Understanding score: Failed.',
+      "Reviewer confirmed: patient is a postpartum mother with 3-day fever, appetite loss, and weakness while breastfeeding. This is a potential obstetric emergency (puerperal sepsis). The chatbot missed every clinical red flag because it couldn't parse Pidgin symptom descriptions. Understanding score: Failed.",
     severity:
-      'Critical (Score 1/5) — Life-threatening condition triaged as routine. Patient directed away from urgent care.',
+      'Critical (Score 1/5). Life-threatening condition triaged as routine. Patient directed away from urgent care.',
   },
   evidence: [
     {
       stat: '<5%',
-      detail: 'Of Nigerians have health insurance. When AI triage fails, patients pay out-of-pocket for the wrong treatment — or don’t seek care at all.',
+      detail: 'Of Nigerians have health insurance. When AI triage fails, patients pay out-of-pocket for the wrong treatment, or don\'t seek care at all.',
       source: 'WHO / World Bank, via Healthcare in Nigeria data',
     },
     {
       stat: '1M+ annually',
-      detail: 'Nigerians pushed into poverty by health-related expenses. A misrouted case doesn’t just delay care — it destroys household finances.',
+      detail: 'Nigerians pushed into poverty by health-related expenses. A misrouted case doesn\'t just delay care. It destroys household finances.',
       source: 'World Bank national health expenditure data',
     },
     {
       stat: 'Language = barrier',
-      detail: '"A barrier to accessing health information and ensuring patient safety" — explicitly documented in Nigeria’s 371-ethnic-group healthcare system.',
+      detail: '"A barrier to accessing health information and ensuring patient safety," explicitly documented in Nigeria\'s 371-ethnic-group healthcare system.',
       source: 'WHO country health profile / Wikipedia Healthcare in Nigeria',
     },
   ],
