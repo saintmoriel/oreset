@@ -9,6 +9,7 @@ type TraceUnitInput = {
   content: string
   traceData?: Record<string, unknown>
   requiresDualSolve?: boolean
+  submittedBy?: string
 }
 
 export async function ingestSingle(input: TraceUnitInput) {
@@ -20,12 +21,13 @@ export async function ingestSingle(input: TraceUnitInput) {
       content: input.content,
       traceData: input.traceData ?? null,
       requiresDualSolve: input.requiresDualSolve ?? false,
+      submittedBy: input.submittedBy ?? null,
     })
     .returning()
   return item
 }
 
-export async function ingestBatch(inputs: TraceUnitInput[]) {
+export async function ingestBatch(inputs: TraceUnitInput[], submittedBy?: string) {
   const items = await db
     .insert(clientQueueItems)
     .values(
@@ -35,6 +37,7 @@ export async function ingestBatch(inputs: TraceUnitInput[]) {
         content: input.content,
         traceData: input.traceData ?? null,
         requiresDualSolve: input.requiresDualSolve ?? false,
+        submittedBy: submittedBy ?? null,
       })),
     )
     .returning()

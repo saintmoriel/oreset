@@ -1,12 +1,13 @@
-import { eq, and, desc, sql } from 'drizzle-orm'
+import { eq, and, count, desc, inArray, sql } from 'drizzle-orm'
 import type { AuthUser } from '@oreset/shared'
 import { db } from '../../db/client'
-import { users, datasets, datasetDownloadEvents, type User } from '../../db/schema'
+import { users, datasets, datasetDownloadEvents, clientQueueItems, operatorReviewDecisions, type User } from '../../db/schema'
 import { hashPassword } from '../../lib/password'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 import { toAuthUser } from '../auth/auth.service'
 import { getDownloadUrl } from '../uploads/uploads.service'
+import { ingestSingle } from '../ingestion/ingestion.service'
 
 export async function provisionBuyer(input: {
   email: string
@@ -165,4 +166,117 @@ export async function recordDownload(
 
   const url = await getDownloadUrl(item.submission.storageKey)
   return { url }
+}
+
+// ---------------------------------------------------------------------------
+// Verification Cases (Client Portal)
+// ---------------------------------------------------------------------------
+
+export async function submitCase(buyerId: string, input: {
+  clientName: string
+  externalRef: string
+  content: string
+  traceData?: Record<string, unknown>
+  requiresDualSolve?: boolean
+}) {
+  const item = await ingestSingle({
+    ...input,
+    submittedBy: buyerId,
+  })
+
+  await writeAuditLog({
+    actorId: buyerId,
+    actorLabel: buyerId,
+    actorRole: 'buyer',
+    action: 'buyer.case.submitted',
+    resourceType: 'client_queue_item',
+    resourceId: item.id,
+  })
+
+  return item
+}
+
+export async function getMyCases(buyerId: string, statusFilter?: string) {
+  const conditions = [eq(clientQueueItems.submittedBy, buyerId)]
+  if (statusFilter && statusFilter !== 'all') {
+    conditions.push(eq(clientQueueItems.status, statusFilter as any))
+  }
+
+  return db
+    .select()
+    .from(clientQueueItems)
+    .where(and(...conditions))
+    .orderBy(desc(clientQueueItems.createdAt))
+    .limit(200)
+}
+
+export async function getMyCaseDetail(buyerId: string, caseId: string) {
+  const item = await db.query.clientQueueItems.findFirst({
+    where: and(eq(clientQueueItems.id, caseId), eq(clientQueueItems.submittedBy, buyerId)),
+  })
+  if (!item) throw new HttpError(404, 'not_found', 'Case not found.')
+
+  const decisions = await db.query.operatorReviewDecisions.findMany({
+    where: eq(operatorReviewDecisions.clientItemId, item.externalRef),
+    orderBy: desc(operatorReviewDecisions.createdAt),
+  })
+
+  return { item, decisions }
+}
+
+export async function getMyCaseStats(buyerId: string) {
+  const items = await db
+    .select({ status: clientQueueItems.status })
+    .from(clientQueueItems)
+    .where(eq(clientQueueItems.submittedBy, buyerId))
+
+  const total = items.length
+  const pending = items.filter((i) => i.status === 'pending' || i.status === 'in_review').length
+  const approved = items.filter((i) => i.status === 'approved').length
+  const corrected = items.filter((i) => i.status === 'corrected').length
+  const rejected = items.filter((i) => i.status === 'rejected').length
+  const escalated = items.filter((i) => i.status === 'escalated').length
+  const consensusSplit = items.filter((i) => i.status === 'consensus_split').length
+
+  return { total, pending, approved, corrected, rejected, escalated, consensusSplit }
+}
+
+export async function getMyRegressions(buyerId: string) {
+  const myItems = await db
+    .select({ externalRef: clientQueueItems.externalRef })
+    .from(clientQueueItems)
+    .where(eq(clientQueueItems.submittedBy, buyerId))
+
+  const refs = myItems.map((i) => i.externalRef)
+  if (refs.length === 0) return []
+
+  const decisions = await db.query.operatorReviewDecisions.findMany({
+    where: and(
+      inArray(operatorReviewDecisions.clientItemId, refs),
+      inArray(operatorReviewDecisions.decision, ['rejected', 'corrected']),
+    ),
+    orderBy: desc(operatorReviewDecisions.createdAt),
+    limit: 500,
+  })
+
+  return decisions.map((d) => {
+    const snapshot = d.clientItemSnapshot as Record<string, unknown> | null
+    const traceData = snapshot?.traceData as Record<string, unknown> | null
+    return {
+      testCaseId: `OMAT-${d.createdAt.getFullYear()}-${d.id.slice(0, 8).toUpperCase()}`,
+      externalRef: d.clientItemId,
+      domain: traceData?.domain ?? null,
+      language: traceData?.language ?? null,
+      sourceInput: snapshot?.content ?? null,
+      modelOutput: traceData?.aiDecision ?? null,
+      groundTruth: d.correctedOutcome ?? null,
+      correctedTranscript: d.correctedTranscript ?? null,
+      correctedIntent: d.correctedIntent ?? null,
+      errTag: d.errTag,
+      severity: d.severity,
+      decision: d.decision,
+      reviewerNotes: d.notes,
+      reviewedAt: d.createdAt.toISOString(),
+    }
+  })
 }

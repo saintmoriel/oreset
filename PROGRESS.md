@@ -170,12 +170,33 @@ For certified reviewers checking live enterprise client AI output:
 - Audit Log — System audit trail
 - Batches — Data batch management
 
-### Buyer Dashboard (`/buyer`)
+### Buyer / Client Portal (`/buyer`)
 
-For enterprise clients purchasing verified data:
+For enterprise clients purchasing verified data and submitting AI decisions for verification:
 - Home with delivered dataset inventory
 - Dataset browser with download
 - Activity feed
+
+**Verification Cases** (`/buyer/cases`)
+- Stats bar: total, pending, approved, rejected, plus corrected/escalated/adjudication badges
+- Submit case form: client name, external ref, content, language, domain, AI decision/outcome, dual-solve toggle
+- Case list with status filter (all/pending/in_review/approved/corrected/rejected/escalated)
+- Expandable cards showing input content, AI output, language, domain
+- Link to full case detail
+
+**Case Detail** (`/buyer/cases/[id]`)
+- Full case content with metadata (language, domain, dual-solve flag, submission time)
+- AI output section (decision + outcome)
+- Review decisions with color-coded left border per decision type
+- Error tags, severity labels, reviewer notes
+- Ground-truth corrections (transcript, intent, outcome)
+- Review time per reviewer
+
+**Regression Suite** (`/buyer/regressions`)
+- Load/refresh button to fetch regression test cases from rejected and corrected reviews
+- Expandable test case cards: source input, model output, ground truth, corrections, error taxonomy
+- JSON and JSONL download buttons
+- Scoped to this client's submitted cases only
 
 ### API Modules
 
@@ -205,15 +226,13 @@ For enterprise clients purchasing verified data:
 
 Key tables: users, sessions, campaigns, batches, submissions, operator_review_decisions, client_queue_items, client_tickets, calibration_cases, calibration_attempts, consensus_pairs, identity_verifications, operator_agreements, datasets, dataset_items, payouts, audit_log
 
-12 migrations applied (0001 through 0012).
+13 migrations applied (0001 through 0013).
 
 ---
 
 ## What's Next
 
 ### Immediate (ready to build)
-
-- **Client-facing portal**: Enterprise clients can submit cases, track status, view results, download regression suites (currently API-only via ingestion endpoints)
 
 ### Medium-term
 

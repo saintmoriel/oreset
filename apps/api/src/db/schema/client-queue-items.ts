@@ -1,5 +1,6 @@
 import { pgTable, uuid, text, jsonb, timestamp, boolean } from 'drizzle-orm/pg-core'
 import { clientQueueItemStatusEnum } from './enums'
+import { users } from './users'
 
 export const clientQueueItems = pgTable('client_queue_items', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -9,6 +10,7 @@ export const clientQueueItems = pgTable('client_queue_items', {
   traceData: jsonb('trace_data'),
   status: clientQueueItemStatusEnum('status').notNull().default('pending'),
   requiresDualSolve: boolean('requires_dual_solve').notNull().default(false),
+  submittedBy: uuid('submitted_by').references(() => users.id, { onDelete: 'set null' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 

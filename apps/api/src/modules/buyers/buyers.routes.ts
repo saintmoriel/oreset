@@ -19,6 +19,13 @@ buyersRouter.get(
   asyncHandler(controller.downloadItem),
 )
 
+// Verification Cases
+buyersRouter.post('/cases', requireAuth, requireRole('buyer'), asyncHandler(controller.submitCase))
+buyersRouter.get('/cases', requireAuth, requireRole('buyer'), asyncHandler(controller.myCases))
+buyersRouter.get('/cases/stats', requireAuth, requireRole('buyer'), asyncHandler(controller.myCaseStats))
+buyersRouter.get('/cases/:id', requireAuth, requireRole('buyer'), asyncHandler(controller.myCaseDetail))
+buyersRouter.get('/regressions', requireAuth, requireRole('buyer'), asyncHandler(controller.myRegressions))
+
 // Mounted at /api/v1/admin/buyers — admin provisioning + the handoff picker.
 export const buyersAdminRouter = Router()
 
