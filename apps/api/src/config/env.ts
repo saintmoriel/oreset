@@ -25,6 +25,8 @@ const envSchema = z.object({
   // lesson content.
   MEDIA_RETENTION_DAYS: z.coerce.number().default(90),
   PAYMENT_PROVIDER: z.enum(['dev-stub', 'paystack', 'flutterwave']).default('dev-stub'),
+  FLW_SECRET_KEY: z.string().optional(),
+  FLW_WEBHOOK_HASH: z.string().optional(),
 })
 
 export type Env = z.infer<typeof envSchema> & { API_PUBLIC_URL: string }

@@ -3,16 +3,16 @@ import { db } from '../../db/client'
 import { submissions, users, payouts, type Payout } from '../../db/schema'
 import { env } from '../../config/env'
 import { writeAuditLog } from '../../lib/audit'
-import { DevStubPaymentProvider, type PaymentProvider } from './payment.provider'
+import {
+  DevStubPaymentProvider,
+  FlutterwavePaymentProvider,
+  type PaymentProvider,
+} from './payment.provider'
 
-// Mirrors auth.service.ts's / uploads.service.ts's one-line provider
-// selection — no separate config-file abstraction invented here either.
 const paymentProvider: PaymentProvider =
-  env.PAYMENT_PROVIDER === 'dev-stub'
-    ? new DevStubPaymentProvider()
-    : (() => {
-        throw new Error(`${env.PAYMENT_PROVIDER} PaymentProvider not implemented yet — set PAYMENT_PROVIDER=dev-stub`)
-      })()
+  env.PAYMENT_PROVIDER === 'flutterwave'
+    ? new FlutterwavePaymentProvider()
+    : new DevStubPaymentProvider()
 
 export async function getMyPayouts(contributorId: string): Promise<Payout[]> {
   return db.query.payouts.findMany({

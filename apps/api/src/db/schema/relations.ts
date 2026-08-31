@@ -21,6 +21,7 @@ import { clientQueueItems } from './client-queue-items'
 import { calibrationCases, calibrationAttempts } from './calibration'
 import { consensusPairs } from './consensus-pairs'
 import { webhookConfigs } from './webhook-configs'
+import { invoices } from './invoices'
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
@@ -41,6 +42,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   identityVerifications: many(identityVerifications),
   operatorAgreements: many(operatorAgreements),
   webhookConfigs: many(webhookConfigs),
+  invoices: many(invoices),
 }))
 
 export const datasetsRelations = relations(datasets, ({ one, many }) => ({
@@ -192,6 +194,10 @@ export const consensusPairsRelations = relations(consensusPairs, ({ one }) => ({
     references: [users.id],
     relationName: 'consensusAdjudicator',
   }),
+}))
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+  buyer: one(users, { fields: [invoices.buyerId], references: [users.id] }),
 }))
 
 export const webhookConfigsRelations = relations(webhookConfigs, ({ one }) => ({

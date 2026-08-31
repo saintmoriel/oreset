@@ -26,6 +26,7 @@ import { adminRouter } from './modules/admin/admin.routes'
 import { ingestionRouter } from './modules/ingestion/ingestion.routes'
 import { calibrationRouter } from './modules/calibration/calibration.routes'
 import { consensusRouter } from './modules/consensus/consensus.routes'
+import { billingRouter } from './modules/billing/billing.routes'
 
 const allowedOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim())
 
@@ -67,6 +68,7 @@ app.use('/api/v1/admin', adminRouter)
 app.use('/api/v1/ingest', ingestionRouter)
 app.use('/api/v1/calibration', calibrationRouter)
 app.use('/api/v1/consensus', consensusRouter)
+app.use('/api/v1/billing', billingRouter)
 
 app.use((req, res) => {
   res.status(404).json({ error: { code: 'not_found', message: `No route for ${req.method} ${req.path}` } })
