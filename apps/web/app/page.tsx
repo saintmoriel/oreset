@@ -4,6 +4,7 @@ import { Problem } from '@/components/problem'
 import { TwoArmsOverview } from '@/components/two-arms-overview'
 import { OriginDeepDive } from '@/components/origin-deep-dive'
 import { OperatorsDeepDive } from '@/components/operators-deep-dive'
+import { QualityMethodology } from '@/components/quality-methodology'
 import { TrustLedger } from '@/components/trust-ledger'
 import { WhyNow } from '@/components/why-now'
 import { AboutSection } from '@/components/about-section'
@@ -29,6 +30,7 @@ export default function Page() {
         <TwoArmsOverview />
         <OriginDeepDive />
         <OperatorsDeepDive />
+        <QualityMethodology />
         <TrustLedger />
         <WhyNow />
         <AboutSection />
