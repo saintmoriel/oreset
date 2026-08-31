@@ -30,7 +30,7 @@ export function Problem() {
             <MotionReveal delay={0.14}>
               <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground sm:mt-6">
                 Real benchmarks test whether an AI is fluent in a language. Almost none test
-                whether a language failure changed the decision that followed — a claim, a loan,
+                whether a language failure changed the decision that followed: a claim, a loan,
                 a transaction.
               </p>
             </MotionReveal>
@@ -59,7 +59,7 @@ export function Problem() {
                   <p className="text-body-sm mt-2 text-muted-foreground">
                     Without certification and scorecards, 
                     buyers cannot trust that a language-driven decision was actually correct
-                     — and experts get treated as disposable gig labor, not professionals.
+                    and experts get treated as disposable gig labor, not professionals.
                   </p>
                 </div>
               </div>

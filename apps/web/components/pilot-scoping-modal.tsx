@@ -96,7 +96,7 @@ export function PilotScopingModal() {
     if (!values.domain) next.domain = 'Select the decision type.'
     if (!values.language.trim()) next.language = 'Which language or dialect is involved?'
     if (!values.caseDescription.trim() || values.caseDescription.trim().length < 20) {
-      next.caseDescription = 'Describe the real decision or exchange — a few sentences is enough.'
+      next.caseDescription = 'Describe the real decision or exchange. A few sentences is enough.'
     }
     setErrors(next)
     if (Object.keys(next).length) return

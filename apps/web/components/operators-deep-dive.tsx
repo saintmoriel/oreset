@@ -86,7 +86,7 @@ export function OperatorsDeepDive() {
                 Certified, not just fluent.
               </h2>
               <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-                Every case is routed to a reviewer who cleared this track — calibrated on
+                Every case is routed to a reviewer who cleared this track, calibrated on
                 language, domain, and the error taxonomy that separates a cosmetic slip from a
                 decision that went wrong.
               </p>

@@ -42,9 +42,9 @@ export function OriginDeepDive() {
                 Where verification needs fresh data.
               </h2>
               <p className="text-body-lg mt-5 text-pretty text-muted-foreground">
-                Most cases arrive as a real exchange you send us. Some need fresh field data first
-                — original speech, text, or imagery, consented and licensed from the point of
-                capture — before verification can happen at all.
+                Most cases arrive as a real exchange you send us. Some need fresh field data first:
+                original speech, text, or imagery, consented and licensed from the point of
+                capture, before verification can happen at all.
               </p>
               <Link
                 href="/capture"

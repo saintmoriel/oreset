@@ -8,19 +8,19 @@ const pillars = [
     icon: Target,
     title: 'Decision-level verification',
     detail:
-      'We don’t just check fluency. We check whether a language failure changed the outcome — a denied claim, a misjudged loan, a flagged transaction.',
+      ‘We don’t just check fluency. We check whether a language failure changed the outcome: a denied claim, a misjudged loan, a flagged transaction.’,
   },
   {
     icon: Shield,
     title: 'Certified native reviewers',
     detail:
-      'Every case is routed to a domain-matched, language-certified professional who passed calibration — not a crowdsourced annotator.',
+      'Every case is routed to a domain-matched, language-certified professional who passed calibration, not a crowdsourced annotator.',
   },
   {
     icon: MapPin,
     title: 'Built in Africa, for Africa',
     detail:
-      'Headquartered in Abuja, Nigeria. Our reviewer network spans West, East, and North Africa — the regions where these decisions happen.',
+      'Headquartered in Abuja, Nigeria. Our reviewer network spans West, East, and North Africa, the regions where these decisions happen.',
   },
 ]
 
@@ -43,14 +43,14 @@ export function AboutSection() {
               <p className="text-body-lg text-pretty text-muted-foreground">
                 Oreset is a verification layer that sits between AI systems and the high-stakes
                 decisions they make in African languages. When an AI denies a claim, scores a loan,
-                or triages a patient — and that decision flowed through Pidgin, Hausa, Yoruba,
-                or Swahili — we verify whether the language was understood correctly and whether
+                or triages a patient, and that decision flowed through Pidgin, Hausa, Yoruba,
+                or Swahili, we verify whether the language was understood correctly and whether
                 the outcome it produced is defensible.
               </p>
               <p className="text-body mt-5 text-pretty text-muted-foreground">
                 We exist because fluency benchmarks don’t catch decision failures. A model can
                 score well on translation and still deny a valid insurance claim because it
-                misread a colloquial phrase. Oreset catches that gap — case by case,
+                misread a colloquial phrase. Oreset catches that gap, case by case,
                 with evidence.
               </p>
             </MotionReveal>
