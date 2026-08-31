@@ -189,7 +189,7 @@ export function ProfileTab({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-navy-600">Operator code</label>
+              <label className="text-xs font-medium text-navy-600">Reviewer code</label>
               <input
                 value={profile.user.operatorCode ?? ''}
                 disabled

@@ -58,7 +58,7 @@ function IdentityBlock({ user, className }: { user: AuthUser | null; className?:
       <Avatar displayName={user?.displayName} className="size-8 text-xs" iconClassName="size-4" />
       <span className="min-w-0">
         <span className="cx-body block truncate font-medium text-navy-900">
-          {user?.displayName ?? 'Operator'}
+          {user?.displayName ?? 'Reviewer'}
         </span>
         <span className="cx-mono-meta block truncate text-navy-400">{user?.operatorCode ?? ' '}</span>
       </span>

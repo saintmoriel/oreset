@@ -17,9 +17,9 @@ export default async function AdminOperatorsPage() {
   return (
     <AdminAppShell>
       <p className="cx-label text-navy-400">Workforce &middot; Reviewer Metrics</p>
-      <h1 className="cx-page-title mt-1.5 text-navy-900">Operator Performance</h1>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Reviewer Performance</h1>
       <p className="cx-body mt-2 max-w-lg text-navy-500">
-        Per-operator metrics: review volume, speed, decision patterns, calibration scores,
+        Per-reviewer metrics: review volume, speed, decision patterns, calibration scores,
         and consensus agreement rates.
       </p>
 
@@ -77,7 +77,7 @@ export default async function AdminOperatorsPage() {
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
                   {data.globalStats.avgReviewsPerOperator}
                 </p>
-                <p className="cx-meta text-navy-400">Avg Reviews / Operator</p>
+                <p className="cx-meta text-navy-400">Avg Reviews / Reviewer</p>
               </div>
             </div>
           </div>

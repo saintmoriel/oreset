@@ -27,7 +27,7 @@ const NAV_ITEMS = [
   { label: 'Regressions', href: '/admin/regressions', icon: FlaskConical },
   { label: 'Calibration', href: '/admin/calibration', icon: Target },
   { label: 'Consensus', href: '/admin/consensus', icon: GitCompare },
-  { label: 'Operators', href: '/admin/operators', icon: Users },
+  { label: 'Reviewers', href: '/admin/operators', icon: Users },
   { label: 'Audit Log', href: '/admin/audit-log', icon: ScrollText },
 ]
 
