@@ -8,7 +8,7 @@ const pillars = [
     icon: Target,
     title: 'Decision-level verification',
     detail:
-      ‘We don’t just check fluency. We check whether a language failure changed the outcome: a denied claim, a misjudged loan, a flagged transaction.’,
+      "We don’t just check fluency. We check whether a language failure changed the outcome: a denied claim, a misjudged loan, a flagged transaction.",
   },
   {
     icon: Shield,
