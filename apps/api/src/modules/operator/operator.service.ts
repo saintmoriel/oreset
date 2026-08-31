@@ -1,11 +1,12 @@
-import { and, asc, count, desc, eq, sql, notInArray } from 'drizzle-orm'
+import { and, asc, count, desc, eq, sql, notInArray, avg } from 'drizzle-orm'
 import type { AgreementType, ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { ERR_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
-import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements, consensusPairs } from '../../db/schema'
+import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements, consensusPairs, calibrationAttempts } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 import { handleDualSolveDecision } from '../consensus/consensus.service'
+import { fireWebhooksForItem } from '../../lib/webhooks'
 
 export async function getQueue(operatorId?: string) {
   // Items this operator already reviewed in dual-solve mode
@@ -42,27 +43,44 @@ export async function getQueue(operatorId?: string) {
     ? (application.languages as { language: string }[]).map((l) => l.language.toLowerCase())
     : []
 
-  if (operatorLanguages.length === 0) {
-    return db
-      .select()
-      .from(clientQueueItems)
-      .where(baseCondition)
-      .orderBy(asc(clientQueueItems.createdAt))
+  // Domains this operator has reviewed before (experience signal)
+  const domainExperience = await db
+    .select({ domain: sql<string>`client_item_snapshot->'traceData'->>'domain'` })
+    .from(operatorReviewDecisions)
+    .where(eq(operatorReviewDecisions.operatorId, operatorId))
+    .groupBy(sql`client_item_snapshot->'traceData'->>'domain'`)
+
+  const knownDomains = domainExperience
+    .map((d) => d.domain)
+    .filter(Boolean)
+    .map((d) => d.toLowerCase())
+
+  // Build multi-factor sort: language match (40%), domain match (30%), FIFO (30%)
+  const sortExpressions: ReturnType<typeof sql>[] = []
+
+  if (operatorLanguages.length > 0) {
+    const langConditions = operatorLanguages.map((lang) => sql`lower(trace_data->>'language') = ${lang}`)
+    const langMatch = langConditions.length === 1
+      ? langConditions[0]
+      : sql.join(langConditions, sql` OR `)
+    sortExpressions.push(sql`CASE WHEN (${langMatch}) THEN 0 ELSE 1 END`)
   }
 
-  const langConditions = operatorLanguages.map((lang) => sql`lower(trace_data->>'language') = ${lang}`)
-  const langMatch = langConditions.length === 1
-    ? langConditions[0]
-    : sql.join(langConditions, sql` OR `)
+  if (knownDomains.length > 0) {
+    const domainConditions = knownDomains.map((d) => sql`lower(trace_data->>'domain') = ${d}`)
+    const domainMatch = domainConditions.length === 1
+      ? domainConditions[0]
+      : sql.join(domainConditions, sql` OR `)
+    sortExpressions.push(sql`CASE WHEN (${domainMatch}) THEN 0 ELSE 1 END`)
+  }
+
+  sortExpressions.push(sql`${clientQueueItems.createdAt} ASC`)
 
   return db
     .select()
     .from(clientQueueItems)
     .where(baseCondition)
-    .orderBy(
-      sql`CASE WHEN (${langMatch}) THEN 0 ELSE 1 END`,
-      asc(clientQueueItems.createdAt),
-    )
+    .orderBy(...sortExpressions)
 }
 
 export async function getQueueCount(): Promise<number> {
@@ -183,6 +201,13 @@ export async function decide(input: {
     resourceType: 'client_queue_item',
     resourceId: item.id,
     metadata: { errTag: input.errTag, severity: input.severity, notes: input.notes },
+  })
+
+  const webhookEvent = input.decision === 'escalated' ? 'case.escalated' as const : 'case.completed' as const
+  fireWebhooksForItem(item.id, webhookEvent, {
+    decision: input.decision,
+    errTag: input.errTag ?? null,
+    severity: input.severity ?? null,
   })
 
   return { item: { ...item, status: input.decision }, decision }

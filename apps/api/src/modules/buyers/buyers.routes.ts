@@ -21,10 +21,19 @@ buyersRouter.get(
 
 // Verification Cases
 buyersRouter.post('/cases', requireAuth, requireRole('buyer'), asyncHandler(controller.submitCase))
+buyersRouter.post('/cases/batch', requireAuth, requireRole('buyer'), asyncHandler(controller.submitCasesBatch))
+buyersRouter.get('/cases/export', requireAuth, requireRole('buyer'), asyncHandler(controller.exportCases))
 buyersRouter.get('/cases', requireAuth, requireRole('buyer'), asyncHandler(controller.myCases))
 buyersRouter.get('/cases/stats', requireAuth, requireRole('buyer'), asyncHandler(controller.myCaseStats))
 buyersRouter.get('/cases/:id', requireAuth, requireRole('buyer'), asyncHandler(controller.myCaseDetail))
 buyersRouter.get('/regressions', requireAuth, requireRole('buyer'), asyncHandler(controller.myRegressions))
+
+// Webhooks
+buyersRouter.get('/webhooks', requireAuth, requireRole('buyer'), asyncHandler(controller.listWebhooks))
+buyersRouter.post('/webhooks', requireAuth, requireRole('buyer'), asyncHandler(controller.createWebhook))
+buyersRouter.patch('/webhooks/:id', requireAuth, requireRole('buyer'), asyncHandler(controller.updateWebhook))
+buyersRouter.delete('/webhooks/:id', requireAuth, requireRole('buyer'), asyncHandler(controller.deleteWebhook))
+buyersRouter.post('/webhooks/:id/rotate', requireAuth, requireRole('buyer'), asyncHandler(controller.rotateWebhookSecret))
 
 // Mounted at /api/v1/admin/buyers — admin provisioning + the handoff picker.
 export const buyersAdminRouter = Router()

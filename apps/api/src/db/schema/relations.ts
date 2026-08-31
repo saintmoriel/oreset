@@ -20,6 +20,7 @@ import { operatorAgreements } from './operator-agreements'
 import { clientQueueItems } from './client-queue-items'
 import { calibrationCases, calibrationAttempts } from './calibration'
 import { consensusPairs } from './consensus-pairs'
+import { webhookConfigs } from './webhook-configs'
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
@@ -39,6 +40,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   datasetDownloadEvents: many(datasetDownloadEvents),
   identityVerifications: many(identityVerifications),
   operatorAgreements: many(operatorAgreements),
+  webhookConfigs: many(webhookConfigs),
 }))
 
 export const datasetsRelations = relations(datasets, ({ one, many }) => ({
@@ -190,6 +192,10 @@ export const consensusPairsRelations = relations(consensusPairs, ({ one }) => ({
     references: [users.id],
     relationName: 'consensusAdjudicator',
   }),
+}))
+
+export const webhookConfigsRelations = relations(webhookConfigs, ({ one }) => ({
+  buyer: one(users, { fields: [webhookConfigs.buyerId], references: [users.id] }),
 }))
 
 export const calibrationCasesRelations = relations(calibrationCases, ({ one, many }) => ({

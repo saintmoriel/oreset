@@ -9,6 +9,7 @@ import {
   users,
 } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
+import { fireWebhooksForItem } from '../../lib/webhooks'
 import { HttpError } from '../../middleware/error-handler'
 
 // ---------------------------------------------------------------------------
@@ -190,6 +191,15 @@ export async function handleDualSolveDecision(input: {
       })
     }
 
+    const webhookEvent = input.decision === 'escalated' ? 'case.escalated' as const : 'case.completed' as const
+    fireWebhooksForItem(input.itemId, webhookEvent, {
+      decision: input.decision,
+      errTag: input.errTag ?? null,
+      severity: input.severity ?? null,
+      consensusAgreed: true,
+      agreementScore: Math.round(agreementScore * 100),
+    })
+
     return {
       item: { ...item, status: input.decision },
       decision,
@@ -207,6 +217,10 @@ export async function handleDualSolveDecision(input: {
     .update(clientQueueItems)
     .set({ status: 'consensus_split' })
     .where(eq(clientQueueItems.id, input.itemId))
+
+  fireWebhooksForItem(input.itemId, 'case.consensus_split', {
+    agreementScore: Math.round(agreementScore * 100),
+  })
 
   return {
     item: { ...item, status: 'consensus_split' as const },
@@ -278,6 +292,12 @@ export async function adjudicate(input: {
     resourceType: 'consensus_pair',
     resourceId: input.pairId,
     metadata: { finalDecision: input.finalDecision, notes: input.notes },
+  })
+
+  fireWebhooksForItem(pair.clientItemId, 'case.adjudicated', {
+    finalDecision: input.finalDecision,
+    finalErrTag: input.finalErrTag ?? null,
+    finalSeverity: input.finalSeverity ?? null,
   })
 
   return { pairId: input.pairId, status: 'adjudicated', finalDecision: input.finalDecision }

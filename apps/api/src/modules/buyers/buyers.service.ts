@@ -1,13 +1,14 @@
+import crypto from 'node:crypto'
 import { eq, and, count, desc, inArray, sql } from 'drizzle-orm'
 import type { AuthUser } from '@oreset/shared'
 import { db } from '../../db/client'
-import { users, datasets, datasetDownloadEvents, clientQueueItems, operatorReviewDecisions, type User } from '../../db/schema'
+import { users, datasets, datasetDownloadEvents, clientQueueItems, operatorReviewDecisions, webhookConfigs, type User } from '../../db/schema'
 import { hashPassword } from '../../lib/password'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 import { toAuthUser } from '../auth/auth.service'
 import { getDownloadUrl } from '../uploads/uploads.service'
-import { ingestSingle } from '../ingestion/ingestion.service'
+import { ingestSingle, ingestBatch } from '../ingestion/ingestion.service'
 
 export async function provisionBuyer(input: {
   email: string
@@ -239,6 +240,188 @@ export async function getMyCaseStats(buyerId: string) {
   const consensusSplit = items.filter((i) => i.status === 'consensus_split').length
 
   return { total, pending, approved, corrected, rejected, escalated, consensusSplit }
+}
+
+export async function submitCasesBatch(
+  buyerId: string,
+  cases: Array<{
+    clientName: string
+    externalRef: string
+    content: string
+    traceData?: Record<string, unknown>
+    requiresDualSolve?: boolean
+  }>,
+) {
+  const items = await ingestBatch(
+    cases.map((c) => ({ ...c, submittedBy: buyerId })),
+    buyerId,
+  )
+
+  await writeAuditLog({
+    actorId: buyerId,
+    actorLabel: buyerId,
+    actorRole: 'buyer',
+    action: 'buyer.cases.batch_submitted',
+    resourceType: 'client_queue_item',
+    metadata: { count: items.length },
+  })
+
+  return items
+}
+
+export async function exportMyCases(buyerId: string, statusFilter?: string) {
+  const conditions = [eq(clientQueueItems.submittedBy, buyerId)]
+  if (statusFilter && statusFilter !== 'all') {
+    conditions.push(eq(clientQueueItems.status, statusFilter as any))
+  }
+
+  const items = await db
+    .select()
+    .from(clientQueueItems)
+    .where(and(...conditions))
+    .orderBy(desc(clientQueueItems.createdAt))
+
+  const itemRefs = items.map((i) => i.externalRef)
+  const decisions = itemRefs.length > 0
+    ? await db.query.operatorReviewDecisions.findMany({
+        where: inArray(operatorReviewDecisions.clientItemId, itemRefs),
+        orderBy: desc(operatorReviewDecisions.createdAt),
+      })
+    : []
+
+  const decisionsByRef = new Map<string, typeof decisions>()
+  for (const d of decisions) {
+    const existing = decisionsByRef.get(d.clientItemId) ?? []
+    existing.push(d)
+    decisionsByRef.set(d.clientItemId, existing)
+  }
+
+  return items.map((item) => {
+    const itemDecisions = decisionsByRef.get(item.externalRef) ?? []
+    const traceData = item.traceData as Record<string, unknown> | null
+    return {
+      id: item.id,
+      externalRef: item.externalRef,
+      clientName: item.clientName,
+      status: item.status,
+      language: traceData?.language ?? null,
+      domain: traceData?.domain ?? null,
+      aiDecision: traceData?.aiDecision ?? null,
+      aiOutcome: traceData?.aiOutcome ?? null,
+      requiresDualSolve: item.requiresDualSolve,
+      submittedAt: item.createdAt.toISOString(),
+      reviews: itemDecisions.map((d) => ({
+        decision: d.decision,
+        errTag: d.errTag,
+        severity: d.severity,
+        notes: d.notes,
+        correctedTranscript: d.correctedTranscript,
+        correctedIntent: d.correctedIntent,
+        correctedOutcome: d.correctedOutcome,
+        reviewedAt: d.createdAt.toISOString(),
+      })),
+    }
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Webhook Configuration
+// ---------------------------------------------------------------------------
+
+export async function getMyWebhooks(buyerId: string) {
+  return db.query.webhookConfigs.findMany({
+    where: eq(webhookConfigs.buyerId, buyerId),
+    orderBy: desc(webhookConfigs.createdAt),
+  })
+}
+
+export async function createWebhook(
+  buyerId: string,
+  input: { url: string; events: string[]; description?: string },
+) {
+  const secret = crypto.randomBytes(32).toString('hex')
+
+  const [config] = await db
+    .insert(webhookConfigs)
+    .values({
+      buyerId,
+      url: input.url,
+      secret,
+      events: input.events,
+      description: input.description,
+    })
+    .returning()
+
+  await writeAuditLog({
+    actorId: buyerId,
+    actorLabel: buyerId,
+    actorRole: 'buyer',
+    action: 'buyer.webhook.created',
+    resourceType: 'webhook_config',
+    resourceId: config.id,
+  })
+
+  return config
+}
+
+export async function updateWebhook(
+  buyerId: string,
+  webhookId: string,
+  input: { url?: string; events?: string[]; description?: string; active?: boolean },
+) {
+  const existing = await db.query.webhookConfigs.findFirst({
+    where: and(eq(webhookConfigs.id, webhookId), eq(webhookConfigs.buyerId, buyerId)),
+  })
+  if (!existing) throw new HttpError(404, 'not_found', 'Webhook not found.')
+
+  const updates: Record<string, unknown> = { updatedAt: new Date() }
+  if (input.url !== undefined) updates.url = input.url
+  if (input.events !== undefined) updates.events = input.events
+  if (input.description !== undefined) updates.description = input.description
+  if (input.active !== undefined) updates.active = input.active
+
+  const [updated] = await db
+    .update(webhookConfigs)
+    .set(updates)
+    .where(eq(webhookConfigs.id, webhookId))
+    .returning()
+
+  return updated
+}
+
+export async function deleteWebhook(buyerId: string, webhookId: string) {
+  const existing = await db.query.webhookConfigs.findFirst({
+    where: and(eq(webhookConfigs.id, webhookId), eq(webhookConfigs.buyerId, buyerId)),
+  })
+  if (!existing) throw new HttpError(404, 'not_found', 'Webhook not found.')
+
+  await db.delete(webhookConfigs).where(eq(webhookConfigs.id, webhookId))
+
+  await writeAuditLog({
+    actorId: buyerId,
+    actorLabel: buyerId,
+    actorRole: 'buyer',
+    action: 'buyer.webhook.deleted',
+    resourceType: 'webhook_config',
+    resourceId: webhookId,
+  })
+}
+
+export async function rotateWebhookSecret(buyerId: string, webhookId: string) {
+  const existing = await db.query.webhookConfigs.findFirst({
+    where: and(eq(webhookConfigs.id, webhookId), eq(webhookConfigs.buyerId, buyerId)),
+  })
+  if (!existing) throw new HttpError(404, 'not_found', 'Webhook not found.')
+
+  const newSecret = crypto.randomBytes(32).toString('hex')
+
+  const [updated] = await db
+    .update(webhookConfigs)
+    .set({ secret: newSecret, updatedAt: new Date() })
+    .where(eq(webhookConfigs.id, webhookId))
+    .returning()
+
+  return updated
 }
 
 export async function getMyRegressions(buyerId: string) {

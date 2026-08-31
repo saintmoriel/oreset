@@ -99,6 +99,13 @@
       "when": 1788092530809,
       "tag": "0013_new_grim_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788162920776,
+      "tag": "0014_tiresome_lord_hawal",
+      "breakpoints": true
     }
   ]
 }
