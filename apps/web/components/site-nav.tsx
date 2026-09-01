@@ -198,16 +198,16 @@ export function SiteNav() {
           <a href="#top" className="flex items-center gap-2.5 rounded-md" aria-label="Oreset home">
             <span
               className={cn(
-                'flex size-12 items-center justify-center overflow-hidden rounded-md sm:size-14 sm:rounded-lg',
+                'flex size-8 items-center justify-center overflow-hidden rounded-md sm:size-9 sm:rounded-lg',
                 onDark ? 'bg-white/10 ring-1 ring-white/20' : 'bg-paper-200',
               )}
             >
               <Image
                 src="/oreset-logo v2.png"
                 alt=""
-                width={56}
-                height={56}
-                className={cn('size-12 sm:size-14', onDark && 'brightness-200')}
+                width={36}
+                height={36}
+                className={cn('size-8 sm:size-9', onDark && 'brightness-200')}
                 priority
               />
             </span>
