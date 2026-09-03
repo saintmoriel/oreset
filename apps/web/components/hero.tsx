@@ -173,7 +173,7 @@ export function Hero() {
                 onClick={() => openPilotModal()}
                 className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground shadow-[0_10px_30px_rgba(197,106,50,0.35)] transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-copper-600 sm:w-auto"
               >
-                Verify a Decision
+                Request Early Access
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </button>
               <a
@@ -193,7 +193,7 @@ export function Hero() {
               <span aria-hidden="true">·</span>
               <a href="/operators/join" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Get certified</a>
               <span aria-hidden="true">·</span>
-              <a href="#contact" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Start a pilot</a>
+              <a href="#contact" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Request early access</a>
             </nav>
           </div>
         </div>

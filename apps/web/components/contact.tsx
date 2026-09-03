@@ -125,7 +125,7 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
             >
-              Verify a decision with Oreset.
+              Request early access to Oreset.
             </motion.h2>
             <motion.p
               className="text-body-lg mt-5 text-pretty text-muted-foreground"
@@ -134,8 +134,8 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             >
-              Send us a real case, discuss a field data need, or apply as a certified reviewer.
-              We&apos;ll follow up personally. No automated drip.
+              We're onboarding a select group of early partners in fintech and insurance.
+              Tell us what you're building and we&apos;ll follow up personally.
             </motion.p>
             <p className="mt-8 text-body-sm text-muted-foreground">
               Or email{' '}

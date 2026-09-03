@@ -109,7 +109,7 @@ export function ThreePaths() {
 
               <div className="mt-auto">
                 <button onClick={() => openPilotModal()} className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-accent hover:text-copper-600 transition-colors group/cta text-left">
-                  Start a pilot
+                  Request early access
                   <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-1" />
                 </button>
               </div>
