@@ -58,7 +58,7 @@ export function SiteFooter() {
             The penetration test for AI&nbsp;decisions.
           </p>
           <p className="mt-4 max-w-xl text-body text-ink-muted">
-            We stress-test your AI agent for security failures and wrong decisions —
+            We stress-test your AI agent for security failures and wrong decisions,
             before your users find them first.
           </p>
         </motion.div>

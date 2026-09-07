@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
-import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS } from '@oreset/shared'
+import { OPERATOR_DECISIONS, VULN_TAGS, SEVERITY_LEVELS, EXPLOIT_STATUSES } from '@oreset/shared'
 import * as calibrationService from './calibration.service'
 
 const createCaseSchema = z.object({
@@ -8,9 +8,9 @@ const createCaseSchema = z.object({
   content: z.string().min(1),
   traceData: z.record(z.unknown()).optional(),
   expectedDecision: z.enum(OPERATOR_DECISIONS),
-  expectedErrTag: z.enum(ERR_TAGS).optional(),
+  expectedVulnTag: z.enum(VULN_TAGS).optional(),
   expectedSeverity: z.enum(SEVERITY_LEVELS).optional(),
-  expectedOutcome: z.string().optional(),
+  expectedExploitStatus: z.enum(EXPLOIT_STATUSES).optional(),
   explanation: z.string().min(1),
   domain: z.string().optional(),
   language: z.string().optional(),
@@ -19,9 +19,10 @@ const createCaseSchema = z.object({
 const attemptSchema = z.object({
   calibrationCaseId: z.string().uuid(),
   decision: z.enum(OPERATOR_DECISIONS),
-  errTag: z.enum(ERR_TAGS).optional(),
+  vulnTag: z.enum(VULN_TAGS).optional(),
   severity: z.enum(SEVERITY_LEVELS).optional(),
-  correctedOutcome: z.string().optional(),
+  exploitStatus: z.enum(EXPLOIT_STATUSES).optional(),
+  reproductionSteps: z.string().optional(),
   notes: z.string().optional(),
   reviewTimeMs: z.number().int().positive().optional(),
 })

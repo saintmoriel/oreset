@@ -4,8 +4,8 @@ import { useState, useTransition } from 'react'
 import { ChevronDown, ChevronUp, Plus, Archive } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { StatusTag } from '@/components/capture/status-tag'
-import { OPERATOR_DECISION_LABELS, ERR_TAG_LABELS, SEVERITY_LABELS, OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS } from '@oreset/shared'
-import type { OperatorDecision, ErrTag, Severity } from '@oreset/shared'
+import { OPERATOR_DECISION_LABELS, VULN_TAG_LABELS, SEVERITY_LABELS, OPERATOR_DECISIONS, VULN_TAGS, SEVERITY_LEVELS, EXPLOIT_STATUSES, EXPLOIT_STATUS_LABELS } from '@oreset/shared'
+import type { OperatorDecision, VulnTag, Severity, ExploitStatus } from '@oreset/shared'
 import { createCalibrationCase, retireCalibrationCase } from '@/lib/api/endpoints/calibration'
 import type { CalibrationCaseFull } from '@/lib/api/endpoints/calibration'
 
@@ -18,10 +18,10 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
   // Form state
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [expectedDecision, setExpectedDecision] = useState<OperatorDecision>('approved')
-  const [expectedErrTag, setExpectedErrTag] = useState<ErrTag | null>(null)
+  const [expectedDecision, setExpectedDecision] = useState<OperatorDecision>('exploited')
+  const [expectedVulnTag, setExpectedVulnTag] = useState<VulnTag | null>(null)
   const [expectedSeverity, setExpectedSeverity] = useState<Severity | null>(null)
-  const [expectedOutcome, setExpectedOutcome] = useState('')
+  const [expectedExploitStatus, setExpectedExploitStatus] = useState<ExploitStatus | null>(null)
   const [explanation, setExplanation] = useState('')
   const [domain, setDomain] = useState('')
   const [language, setLanguage] = useState('en')
@@ -29,10 +29,10 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
   function resetForm() {
     setTitle('')
     setContent('')
-    setExpectedDecision('approved')
-    setExpectedErrTag(null)
+    setExpectedDecision('exploited')
+    setExpectedVulnTag(null)
     setExpectedSeverity(null)
-    setExpectedOutcome('')
+    setExpectedExploitStatus(null)
     setExplanation('')
     setDomain('')
     setLanguage('en')
@@ -45,9 +45,9 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
         title,
         content,
         expectedDecision,
-        expectedErrTag: expectedErrTag ?? undefined,
+        expectedVulnTag: expectedVulnTag ?? undefined,
         expectedSeverity: expectedSeverity ?? undefined,
-        expectedOutcome: expectedOutcome || undefined,
+        expectedExploitStatus: expectedExploitStatus ?? undefined,
         explanation,
         domain: domain || undefined,
         language: language || undefined,
@@ -92,7 +92,7 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="cx-body w-full rounded-lg border border-border bg-card px-3 py-2 text-navy-800 focus:border-accent/50 focus:outline-none"
-              placeholder="e.g. Yorùbá loan approval — dialect misparsing"
+              placeholder="e.g. Prompt injection on loan approval agent"
             />
           </div>
 
@@ -116,7 +116,7 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
                 className="cx-body w-full rounded-lg border border-border bg-card px-3 py-2 text-navy-800"
               >
                 {OPERATOR_DECISIONS.map((d) => (
-                  <option key={d} value={d}>{d} — {OPERATOR_DECISION_LABELS[d].split(' — ')[1]}</option>
+                  <option key={d} value={d}>{OPERATOR_DECISION_LABELS[d]}</option>
                 ))}
               </select>
             </div>
@@ -138,15 +138,15 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="cx-meta font-medium text-navy-500 mb-1 block">Expected Error Tag</label>
+              <label className="cx-meta font-medium text-navy-500 mb-1 block">Expected Vulnerability</label>
               <select
-                value={expectedErrTag ?? ''}
-                onChange={(e) => setExpectedErrTag((e.target.value || null) as ErrTag | null)}
+                value={expectedVulnTag ?? ''}
+                onChange={(e) => setExpectedVulnTag((e.target.value || null) as VulnTag | null)}
                 className="cx-body w-full rounded-lg border border-border bg-card px-3 py-2 text-navy-800"
               >
                 <option value="">None</option>
-                {ERR_TAGS.map((tag) => (
-                  <option key={tag} value={tag}>{tag} — {ERR_TAG_LABELS[tag]}</option>
+                {VULN_TAGS.map((tag) => (
+                  <option key={tag} value={tag}>{tag}: {VULN_TAG_LABELS[tag]}</option>
                 ))}
               </select>
             </div>
@@ -159,7 +159,7 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
               >
                 <option value="">None</option>
                 {SEVERITY_LEVELS.map((sev) => (
-                  <option key={sev} value={sev}>{sev} — {SEVERITY_LABELS[sev]}</option>
+                  <option key={sev} value={sev}>{sev}: {SEVERITY_LABELS[sev]}</option>
                 ))}
               </select>
             </div>
@@ -176,13 +176,17 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
           </div>
 
           <div>
-            <label className="cx-meta font-medium text-navy-500 mb-1 block">Expected Outcome (optional)</label>
-            <input
-              value={expectedOutcome}
-              onChange={(e) => setExpectedOutcome(e.target.value)}
-              className="cx-body w-full rounded-lg border border-border bg-card px-3 py-2 text-navy-800 focus:border-accent/50 focus:outline-none"
-              placeholder="The correct outcome for this case"
-            />
+            <label className="cx-meta font-medium text-navy-500 mb-1 block">Expected Exploit Status</label>
+            <select
+              value={expectedExploitStatus ?? ''}
+              onChange={(e) => setExpectedExploitStatus((e.target.value || null) as ExploitStatus | null)}
+              className="cx-body w-full rounded-lg border border-border bg-card px-3 py-2 text-navy-800"
+            >
+              <option value="">None</option>
+              {EXPLOIT_STATUSES.map((s) => (
+                <option key={s} value={s}>{EXPLOIT_STATUS_LABELS[s]}</option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -192,7 +196,7 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
               onChange={(e) => setExplanation(e.target.value)}
               rows={3}
               className="cx-body w-full rounded-lg border border-border bg-card px-3 py-2 text-navy-800 focus:border-accent/50 focus:outline-none"
-              placeholder="Why this is the correct answer — shown to operators after they submit…"
+              placeholder="Why this is the correct answer. Shown to operators after they submit."
             />
           </div>
 
@@ -275,12 +279,10 @@ export function CalibrationManager({ initialCases }: { initialCases: Calibration
                       <p className="text-[11px] font-medium uppercase tracking-wider text-accent mb-1">Expected Answer</p>
                       <p className="cx-body text-navy-800">
                         <span className="font-semibold capitalize">{c.expectedDecision}</span>
-                        {c.expectedErrTag && <> · {c.expectedErrTag}</>}
+                        {c.expectedVulnTag && <> · {c.expectedVulnTag}</>}
                         {c.expectedSeverity && <> · {c.expectedSeverity}</>}
+                        {c.expectedExploitStatus && <> · {c.expectedExploitStatus}</>}
                       </p>
-                      {c.expectedOutcome && (
-                        <p className="cx-meta mt-1 text-navy-600">Outcome: {c.expectedOutcome}</p>
-                      )}
                     </div>
                     <div className="rounded-lg border border-border bg-background p-3">
                       <p className="text-[11px] font-medium uppercase tracking-wider text-navy-400 mb-1">Explanation</p>

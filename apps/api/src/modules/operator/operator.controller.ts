@@ -1,23 +1,27 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
-import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS, DOCUMENT_TYPES, AGREEMENT_TYPES } from '@oreset/shared'
+import { OPERATOR_DECISIONS, VULN_TAGS, SEVERITY_LEVELS, EXPLOIT_STATUSES, DOCUMENT_TYPES, AGREEMENT_TYPES } from '@oreset/shared'
 import * as operatorService from './operator.service'
 
 const decisionSchema = z
   .object({
     decision: z.enum(OPERATOR_DECISIONS),
-    errTag: z.enum(ERR_TAGS).optional(),
+    vulnTag: z.enum(VULN_TAGS),
     severity: z.enum(SEVERITY_LEVELS).optional(),
+    exploitStatus: z.enum(EXPLOIT_STATUSES),
     notes: z.string().optional(),
-    correctedTranscript: z.string().optional(),
-    correctedIntent: z.string().optional(),
-    correctedOutcome: z.string().optional(),
+    reproductionSteps: z.string().optional(),
+    recommendedFix: z.string().optional(),
     reviewTimeMs: z.number().int().positive().optional(),
   })
-  .refine((d) => d.decision !== 'escalated' || (Boolean(d.errTag) && Boolean(d.severity)), {
-    message: 'errTag and severity are required when decision is escalated',
-    path: ['errTag'],
-  })
+  .refine(
+    (d) => d.decision === 'defended' || d.decision === 'inconclusive' || Boolean(d.severity),
+    { message: 'severity is required when exploit is successful or partial', path: ['severity'] },
+  )
+  .refine(
+    (d) => d.decision === 'defended' || d.decision === 'inconclusive' || Boolean(d.reproductionSteps),
+    { message: 'reproduction steps are required for exploited findings', path: ['reproductionSteps'] },
+  )
 
 export async function queue(req: Request, res: Response) {
   const items = await operatorService.getQueue(req.user!.sub)

@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
-import { ticketStatusEnum, errTagEnum, severityEnum } from './enums'
+import { ticketStatusEnum, vulnTagEnum, severityEnum } from './enums'
 import { operatorReviewDecisions } from './operator-review-decisions'
 import { users } from './users'
 
@@ -17,7 +17,7 @@ export const clientTickets = pgTable(
     // operator_review_decisions.clientItemSnapshot already uses.
     clientName: text('client_name').notNull(),
     externalRef: text('external_ref').notNull(),
-    errTag: errTagEnum('err_tag'),
+    vulnTag: vulnTagEnum('vuln_tag'),
     severity: severityEnum('severity'),
     notes: text('notes'),
     status: ticketStatusEnum('status').notNull().default('open'),

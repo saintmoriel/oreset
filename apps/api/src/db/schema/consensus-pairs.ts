@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, real, timestamp } from 'drizzle-orm/pg-core'
-import { consensusStatusEnum, operatorDecisionEnum, errTagEnum, severityEnum } from './enums'
+import { consensusStatusEnum, operatorDecisionEnum, vulnTagEnum, severityEnum } from './enums'
 import { clientQueueItems } from './client-queue-items'
 import { operatorReviewDecisions } from './operator-review-decisions'
 import { users } from './users'
@@ -20,7 +20,7 @@ export const consensusPairs = pgTable('consensus_pairs', {
     .references(() => operatorReviewDecisions.id, { onDelete: 'set null' }),
   status: consensusStatusEnum('status').notNull().default('awaiting_reviews'),
   finalDecision: operatorDecisionEnum('final_decision'),
-  finalErrTag: errTagEnum('final_err_tag'),
+  finalVulnTag: vulnTagEnum('final_vuln_tag'),
   finalSeverity: severityEnum('final_severity'),
   agreementScore: real('agreement_score'),
   adjudicatorId: uuid('adjudicator_id')

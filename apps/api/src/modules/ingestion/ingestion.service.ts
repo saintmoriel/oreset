@@ -64,7 +64,7 @@ type RegressionFilters = {
 
 export async function getRegressionSuite(filters: RegressionFilters) {
   const conditions = [
-    inArray(operatorReviewDecisions.decision, ['rejected', 'corrected']),
+    inArray(operatorReviewDecisions.decision, ['exploited']),
   ]
 
   if (filters.since) {
@@ -89,22 +89,21 @@ export async function getRegressionSuite(filters: RegressionFilters) {
     const traceData = snapshot?.traceData as Record<string, unknown> | null
 
     const testCase: Record<string, unknown> = {
-      test_case_id: `OMAT-${d.createdAt.getFullYear()}-${d.id.slice(0, 8).toUpperCase()}`,
+      test_case_id: `ORT-${d.createdAt.getFullYear()}-${d.id.slice(0, 8).toUpperCase()}`,
       external_ref: d.clientItemId,
       client_name: snapshot?.clientName ?? null,
       domain: traceData?.domain ?? null,
       language: traceData?.language ?? null,
-      source_input: snapshot?.content ?? null,
-      model_executed_output: traceData?.aiDecision ?? null,
-      ground_truth_correct_output: d.correctedOutcome ?? null,
-      corrected_transcript: d.correctedTranscript ?? null,
-      corrected_intent: d.correctedIntent ?? null,
-      error_taxonomy: [d.errTag].filter(Boolean),
+      attack_prompt: snapshot?.content ?? null,
+      model_response: traceData?.aiDecision ?? null,
+      vuln_tag: d.vulnTag ?? null,
+      exploit_status: d.exploitStatus ?? null,
       severity: d.severity ?? null,
+      reproduction_steps: d.reproductionSteps ?? null,
+      recommended_fix: d.recommendedFix ?? null,
       decision: d.decision,
       reviewer_notes: d.notes ?? null,
       reviewed_at: d.createdAt.toISOString(),
-      status: d.decision === 'rejected' ? 'FAILED_PRODUCTION_GATE' : 'CORRECTED_PASS',
     }
 
     return testCase
@@ -112,28 +111,28 @@ export async function getRegressionSuite(filters: RegressionFilters) {
 }
 
 export async function getRegressionStats() {
-  const [rejected] = await db
+  const [exploited] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(operatorReviewDecisions)
-    .where(eq(operatorReviewDecisions.decision, 'rejected'))
+    .where(eq(operatorReviewDecisions.decision, 'exploited'))
 
-  const [corrected] = await db
+  const [defended] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(operatorReviewDecisions)
-    .where(eq(operatorReviewDecisions.decision, 'corrected'))
+    .where(eq(operatorReviewDecisions.decision, 'defended'))
 
   const clientNames = await db
     .select({
       clientName: sql<string>`client_item_snapshot->>'clientName'`,
     })
     .from(operatorReviewDecisions)
-    .where(inArray(operatorReviewDecisions.decision, ['rejected', 'corrected']))
+    .where(eq(operatorReviewDecisions.decision, 'exploited'))
     .groupBy(sql`client_item_snapshot->>'clientName'`)
 
   return {
-    rejectedCount: rejected?.count ?? 0,
-    correctedCount: corrected?.count ?? 0,
-    totalTestCases: (rejected?.count ?? 0) + (corrected?.count ?? 0),
+    exploitedCount: exploited?.count ?? 0,
+    defendedCount: defended?.count ?? 0,
+    totalTestCases: exploited?.count ?? 0,
     clients: clientNames.map((c) => c.clientName).filter(Boolean),
   }
 }

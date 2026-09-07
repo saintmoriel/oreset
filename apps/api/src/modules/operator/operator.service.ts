@@ -1,6 +1,6 @@
 import { and, asc, count, desc, eq, sql, notInArray, avg } from 'drizzle-orm'
-import type { AgreementType, ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
-import { ERR_TAGS } from '@oreset/shared'
+import type { AgreementType, VulnTag, ExploitStatus, OperatorDecision, RoleType, Severity } from '@oreset/shared'
+import { VULN_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
 import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements, consensusPairs, calibrationAttempts } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
@@ -108,17 +108,16 @@ export async function getMyStats(operatorId: string) {
 
   const today = new Date().toISOString().slice(0, 10)
   const reviewedToday = decisions.filter((d) => d.createdAt.toISOString().slice(0, 10) === today).length
-  const approvedAllTime = decisions.filter((d) => d.decision === 'approved').length
-  const correctedAllTime = decisions.filter((d) => d.decision === 'corrected').length
-  const rejectedAllTime = decisions.filter((d) => d.decision === 'rejected').length
+  const exploitedAllTime = decisions.filter((d) => d.decision === 'exploited').length
+  const defendedAllTime = decisions.filter((d) => d.decision === 'defended').length
   const escalatedAllTime = decisions.filter((d) => d.decision === 'escalated').length
-  const declinedAllTime = decisions.filter((d) => d.decision === 'declined').length
+  const inconclusiveAllTime = decisions.filter((d) => d.decision === 'inconclusive').length
   const reviewedAllTime = decisions.length
-  const approvalRate = reviewedAllTime > 0 ? Math.round((approvedAllTime / reviewedAllTime) * 100) : null
+  const exploitRate = reviewedAllTime > 0 ? Math.round((exploitedAllTime / reviewedAllTime) * 100) : null
 
-  const errTagBreakdown = Object.fromEntries(ERR_TAGS.map((tag) => [tag, 0])) as Record<ErrTag, number>
+  const vulnTagBreakdown = Object.fromEntries(VULN_TAGS.map((tag) => [tag, 0])) as Record<VulnTag, number>
   for (const d of decisions) {
-    if (d.errTag) errTagBreakdown[d.errTag] += 1
+    if (d.vulnTag) vulnTagBreakdown[d.vulnTag] += 1
   }
 
   const openTicketsFromMe = decisions.filter((d) => d.ticket && d.ticket.status === 'open').length
@@ -127,13 +126,12 @@ export async function getMyStats(operatorId: string) {
     queueRemaining: await getQueueCount(),
     reviewedToday,
     reviewedAllTime,
-    approvedAllTime,
-    correctedAllTime,
-    rejectedAllTime,
+    exploitedAllTime,
+    defendedAllTime,
     escalatedAllTime,
-    declinedAllTime,
-    approvalRate,
-    errTagBreakdown,
+    inconclusiveAllTime,
+    exploitRate,
+    vulnTagBreakdown,
     openTicketsFromMe,
   }
 }
@@ -143,18 +141,17 @@ export async function decide(input: {
   operatorId: string
   operatorRole: RoleType
   decision: OperatorDecision
-  errTag?: ErrTag
+  vulnTag?: VulnTag
   severity?: Severity
+  exploitStatus?: ExploitStatus
   notes?: string
-  correctedTranscript?: string
-  correctedIntent?: string
-  correctedOutcome?: string
+  reproductionSteps?: string
+  recommendedFix?: string
   reviewTimeMs?: number
 }) {
   const item = await db.query.clientQueueItems.findFirst({ where: eq(clientQueueItems.id, input.itemId) })
   if (!item) throw new HttpError(404, 'not_found', 'Queue item not found.')
 
-  // Dual-solve items route through the consensus system
   if (item.requiresDualSolve) {
     return handleDualSolveDecision(input)
   }
@@ -170,12 +167,12 @@ export async function decide(input: {
       clientItemId: item.externalRef,
       clientItemSnapshot: { content: item.content, clientName: item.clientName, traceData: item.traceData },
       decision: input.decision,
-      errTag: input.errTag,
+      vulnTag: input.vulnTag,
       severity: input.severity,
+      exploitStatus: input.exploitStatus,
       notes: input.notes,
-      correctedTranscript: input.correctedTranscript,
-      correctedIntent: input.correctedIntent,
-      correctedOutcome: input.correctedOutcome,
+      reproductionSteps: input.reproductionSteps,
+      recommendedFix: input.recommendedFix,
       reviewTimeMs: input.reviewTimeMs,
     })
     .returning()
@@ -187,7 +184,7 @@ export async function decide(input: {
       operatorReviewDecisionId: decision.id,
       clientName: item.clientName,
       externalRef: item.externalRef,
-      errTag: input.errTag,
+      vulnTag: input.vulnTag,
       severity: input.severity,
       notes: input.notes,
     })
@@ -200,14 +197,15 @@ export async function decide(input: {
     action: `operator.decision.${input.decision}`,
     resourceType: 'client_queue_item',
     resourceId: item.id,
-    metadata: { errTag: input.errTag, severity: input.severity, notes: input.notes },
+    metadata: { vulnTag: input.vulnTag, severity: input.severity, exploitStatus: input.exploitStatus },
   })
 
   const webhookEvent = input.decision === 'escalated' ? 'case.escalated' as const : 'case.completed' as const
   fireWebhooksForItem(item.id, webhookEvent, {
     decision: input.decision,
-    errTag: input.errTag ?? null,
+    vulnTag: input.vulnTag ?? null,
     severity: input.severity ?? null,
+    exploitStatus: input.exploitStatus ?? null,
   })
 
   return { item: { ...item, status: input.decision }, decision }

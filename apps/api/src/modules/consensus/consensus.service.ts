@@ -1,5 +1,5 @@
 import { and, count, eq, isNull, sql, desc, avg } from 'drizzle-orm'
-import type { ErrTag, OperatorDecision, RoleType, Severity } from '@oreset/shared'
+import type { VulnTag, ExploitStatus, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { db } from '../../db/client'
 import {
   clientQueueItems,
@@ -17,12 +17,12 @@ import { HttpError } from '../../middleware/error-handler'
 // ---------------------------------------------------------------------------
 
 function computeAgreementScore(
-  d1: { decision: string; errTag: string | null; severity: string | null },
-  d2: { decision: string; errTag: string | null; severity: string | null },
+  d1: { decision: string; vulnTag: string | null; severity: string | null },
+  d2: { decision: string; vulnTag: string | null; severity: string | null },
 ): number {
   let score = 0
   if (d1.decision === d2.decision) score += 0.6
-  if (d1.errTag === d2.errTag) score += 0.2
+  if (d1.vulnTag === d2.vulnTag) score += 0.2
   if (d1.severity === d2.severity) score += 0.2
   return score
 }
@@ -68,12 +68,12 @@ export async function handleDualSolveDecision(input: {
   operatorId: string
   operatorRole: RoleType
   decision: OperatorDecision
-  errTag?: ErrTag
+  vulnTag?: VulnTag
   severity?: Severity
+  exploitStatus?: ExploitStatus
   notes?: string
-  correctedTranscript?: string
-  correctedIntent?: string
-  correctedOutcome?: string
+  reproductionSteps?: string
+  recommendedFix?: string
   reviewTimeMs?: number
 }) {
   const item = await db.query.clientQueueItems.findFirst({
@@ -102,12 +102,12 @@ export async function handleDualSolveDecision(input: {
       clientItemId: item.externalRef,
       clientItemSnapshot: { content: item.content, clientName: item.clientName, traceData: item.traceData },
       decision: input.decision,
-      errTag: input.errTag,
+      vulnTag: input.vulnTag,
       severity: input.severity,
+      exploitStatus: input.exploitStatus,
       notes: input.notes,
-      correctedTranscript: input.correctedTranscript,
-      correctedIntent: input.correctedIntent,
-      correctedOutcome: input.correctedOutcome,
+      reproductionSteps: input.reproductionSteps,
+      recommendedFix: input.recommendedFix,
       reviewTimeMs: input.reviewTimeMs,
     })
     .returning()
@@ -119,7 +119,7 @@ export async function handleDualSolveDecision(input: {
     action: `operator.decision.${input.decision}`,
     resourceType: 'client_queue_item',
     resourceId: item.id,
-    metadata: { errTag: input.errTag, severity: input.severity, dualSolve: true },
+    metadata: { vulnTag: input.vulnTag, severity: input.severity, exploitStatus: input.exploitStatus, dualSolve: true },
   })
 
   if (!existingPair) {
@@ -157,8 +157,8 @@ export async function handleDualSolveDecision(input: {
   })
 
   const agreementScore = computeAgreementScore(
-    { decision: decisionOne!.decision, errTag: decisionOne!.errTag, severity: decisionOne!.severity },
-    { decision: input.decision, errTag: input.errTag ?? null, severity: input.severity ?? null },
+    { decision: decisionOne!.decision, vulnTag: decisionOne!.vulnTag, severity: decisionOne!.severity },
+    { decision: input.decision, vulnTag: input.vulnTag ?? null, severity: input.severity ?? null },
   )
 
   const agreed = decisionOne!.decision === input.decision
@@ -169,7 +169,7 @@ export async function handleDualSolveDecision(input: {
       .set({
         status: 'agreed',
         finalDecision: input.decision,
-        finalErrTag: input.errTag,
+        finalVulnTag: input.vulnTag,
         finalSeverity: input.severity,
         agreementScore,
       })
@@ -185,7 +185,7 @@ export async function handleDualSolveDecision(input: {
         operatorReviewDecisionId: decision.id,
         clientName: item.clientName,
         externalRef: item.externalRef,
-        errTag: input.errTag,
+        vulnTag: input.vulnTag,
         severity: input.severity,
         notes: input.notes,
       })
@@ -194,7 +194,7 @@ export async function handleDualSolveDecision(input: {
     const webhookEvent = input.decision === 'escalated' ? 'case.escalated' as const : 'case.completed' as const
     fireWebhooksForItem(input.itemId, webhookEvent, {
       decision: input.decision,
-      errTag: input.errTag ?? null,
+      vulnTag: input.vulnTag ?? null,
       severity: input.severity ?? null,
       consensusAgreed: true,
       agreementScore: Math.round(agreementScore * 100),
@@ -238,7 +238,7 @@ export async function adjudicate(input: {
   adjudicatorId: string
   adjudicatorRole: RoleType
   finalDecision: OperatorDecision
-  finalErrTag?: ErrTag
+  finalVulnTag?: VulnTag
   finalSeverity?: Severity
   notes?: string
 }) {
@@ -255,7 +255,7 @@ export async function adjudicate(input: {
     .set({
       status: 'adjudicated',
       finalDecision: input.finalDecision,
-      finalErrTag: input.finalErrTag,
+      finalVulnTag: input.finalVulnTag,
       finalSeverity: input.finalSeverity,
       adjudicatorId: input.adjudicatorId,
       adjudicatorNotes: input.notes,
@@ -277,7 +277,7 @@ export async function adjudicate(input: {
         operatorReviewDecisionId: pair.decisionOneId!,
         clientName: item.clientName,
         externalRef: item.externalRef,
-        errTag: input.finalErrTag,
+        vulnTag: input.finalVulnTag,
         severity: input.finalSeverity,
         notes: input.notes,
       })
@@ -296,7 +296,7 @@ export async function adjudicate(input: {
 
   fireWebhooksForItem(pair.clientItemId, 'case.adjudicated', {
     finalDecision: input.finalDecision,
-    finalErrTag: input.finalErrTag ?? null,
+    finalVulnTag: input.finalVulnTag ?? null,
     finalSeverity: input.finalSeverity ?? null,
   })
 
@@ -390,7 +390,7 @@ export async function getConsensusStats() {
       with: { decisionOne: true, decisionTwo: true },
     })
 
-    const decisions = ['approved', 'corrected', 'rejected', 'escalated', 'declined']
+    const decisions = ['exploited', 'defended', 'escalated', 'inconclusive']
     const n = pairsWithDecisions.length
     if (n > 0) {
       const r1Counts: Record<string, number> = {}

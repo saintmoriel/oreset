@@ -22,6 +22,7 @@ import { calibrationCases, calibrationAttempts } from './calibration'
 import { consensusPairs } from './consensus-pairs'
 import { webhookConfigs } from './webhook-configs'
 import { invoices } from './invoices'
+import { verifiedFindings } from './verified-findings'
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
@@ -215,4 +216,16 @@ export const calibrationAttemptsRelations = relations(calibrationAttempts, ({ on
     references: [calibrationCases.id],
   }),
   operator: one(users, { fields: [calibrationAttempts.operatorId], references: [users.id] }),
+}))
+
+export const verifiedFindingsRelations = relations(verifiedFindings, ({ one }) => ({
+  clientItem: one(clientQueueItems, {
+    fields: [verifiedFindings.clientItemId],
+    references: [clientQueueItems.id],
+  }),
+  reviewDecision: one(operatorReviewDecisions, {
+    fields: [verifiedFindings.reviewDecisionId],
+    references: [operatorReviewDecisions.id],
+  }),
+  auditor: one(users, { fields: [verifiedFindings.auditorId], references: [users.id] }),
 }))

@@ -8,8 +8,11 @@ import {
   SUBMISSION_STATUSES,
   VALIDATION_OUTCOMES,
   ERR_TAGS,
+  VULN_TAGS,
   SEVERITY_LEVELS,
+  EXPLOIT_STATUSES,
   QA_DECISIONS,
+  AUDITOR_DECISIONS,
   OPERATOR_DECISIONS,
   CAMPAIGN_STATUSES,
   OTP_PURPOSES,
@@ -35,8 +38,11 @@ export const batchStatusEnum = pgEnum('batch_status', BATCH_STATUSES)
 export const submissionStatusEnum = pgEnum('submission_status', SUBMISSION_STATUSES)
 export const validationOutcomeEnum = pgEnum('validation_outcome', VALIDATION_OUTCOMES)
 export const errTagEnum = pgEnum('err_tag', ERR_TAGS)
+export const vulnTagEnum = pgEnum('vuln_tag', VULN_TAGS)
 export const severityEnum = pgEnum('severity', SEVERITY_LEVELS)
+export const exploitStatusEnum = pgEnum('exploit_status', EXPLOIT_STATUSES)
 export const qaDecisionEnum = pgEnum('qa_decision', QA_DECISIONS)
+export const auditorDecisionEnum = pgEnum('auditor_decision', AUDITOR_DECISIONS)
 export const operatorDecisionEnum = pgEnum('operator_decision', OPERATOR_DECISIONS)
 export const campaignStatusEnum = pgEnum('campaign_status', CAMPAIGN_STATUSES)
 export const otpPurposeEnum = pgEnum('otp_purpose', OTP_PURPOSES)

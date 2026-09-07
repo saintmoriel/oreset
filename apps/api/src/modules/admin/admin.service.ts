@@ -1,6 +1,6 @@
 import { and, avg, count, desc, eq, gte, isNull, sql } from 'drizzle-orm'
 import type { StaffRole } from '@oreset/shared'
-import { ERR_TAGS, type ErrTag } from '@oreset/shared'
+import { VULN_TAGS, type VulnTag } from '@oreset/shared'
 import { db } from '../../db/client'
 import { campaigns, users, submissions, operatorReviewDecisions, calibrationAttempts, consensusPairs, operatorApplications } from '../../db/schema'
 import { getQueueCount as getQaQueueCount } from '../qa/qa.service'
@@ -109,7 +109,7 @@ export async function getOperatorPerformance() {
       id: true,
       operatorId: true,
       decision: true,
-      errTag: true,
+      vulnTag: true,
       severity: true,
       reviewTimeMs: true,
       createdAt: true,
@@ -162,16 +162,15 @@ export async function getOperatorPerformance() {
     const reviews7d = decisions.filter((d) => d.createdAt >= sevenDaysAgo).length
     const reviews30d = decisions.filter((d) => d.createdAt >= thirtyDaysAgo).length
 
-    const approved = decisions.filter((d) => d.decision === 'approved').length
-    const corrected = decisions.filter((d) => d.decision === 'corrected').length
-    const rejected = decisions.filter((d) => d.decision === 'rejected').length
+    const exploited = decisions.filter((d) => d.decision === 'exploited').length
+    const defended = decisions.filter((d) => d.decision === 'defended').length
     const escalated = decisions.filter((d) => d.decision === 'escalated').length
-    const declined = decisions.filter((d) => d.decision === 'declined').length
-    const approvalRate = totalReviews > 0 ? Math.round((approved / totalReviews) * 100) : null
+    const inconclusive = decisions.filter((d) => d.decision === 'inconclusive').length
+    const exploitRate = totalReviews > 0 ? Math.round((exploited / totalReviews) * 100) : null
 
-    const errTagBreakdown = Object.fromEntries(ERR_TAGS.map((tag) => [tag, 0])) as Record<ErrTag, number>
+    const vulnTagBreakdown = Object.fromEntries(VULN_TAGS.map((tag) => [tag, 0])) as Record<VulnTag, number>
     for (const d of decisions) {
-      if (d.errTag) errTagBreakdown[d.errTag] += 1
+      if (d.vulnTag) vulnTagBreakdown[d.vulnTag] += 1
     }
 
     const reviewTimes = decisions.filter((d) => d.reviewTimeMs != null).map((d) => d.reviewTimeMs!)
@@ -213,9 +212,9 @@ export async function getOperatorPerformance() {
       reviewsToday,
       reviews7d,
       reviews30d,
-      decisionBreakdown: { approved, corrected, rejected, escalated, declined },
-      approvalRate,
-      errTagBreakdown,
+      decisionBreakdown: { exploited, defended, escalated, inconclusive },
+      exploitRate,
+      vulnTagBreakdown,
       avgReviewTimeMs,
       medianReviewTimeMs,
       calibrationAttempts,

@@ -233,13 +233,13 @@ export async function getMyCaseStats(buyerId: string) {
 
   const total = items.length
   const pending = items.filter((i) => i.status === 'pending' || i.status === 'in_review').length
-  const approved = items.filter((i) => i.status === 'approved').length
-  const corrected = items.filter((i) => i.status === 'corrected').length
-  const rejected = items.filter((i) => i.status === 'rejected').length
+  const exploited = items.filter((i) => i.status === 'exploited').length
+  const defended = items.filter((i) => i.status === 'defended').length
   const escalated = items.filter((i) => i.status === 'escalated').length
+  const inconclusive = items.filter((i) => i.status === 'inconclusive').length
   const consensusSplit = items.filter((i) => i.status === 'consensus_split').length
 
-  return { total, pending, approved, corrected, rejected, escalated, consensusSplit }
+  return { total, pending, exploited, defended, escalated, inconclusive, consensusSplit }
 }
 
 export async function submitCasesBatch(
@@ -312,12 +312,12 @@ export async function exportMyCases(buyerId: string, statusFilter?: string) {
       submittedAt: item.createdAt.toISOString(),
       reviews: itemDecisions.map((d) => ({
         decision: d.decision,
-        errTag: d.errTag,
+        vulnTag: d.vulnTag,
         severity: d.severity,
+        exploitStatus: d.exploitStatus,
         notes: d.notes,
-        correctedTranscript: d.correctedTranscript,
-        correctedIntent: d.correctedIntent,
-        correctedOutcome: d.correctedOutcome,
+        reproductionSteps: d.reproductionSteps,
+        recommendedFix: d.recommendedFix,
         reviewedAt: d.createdAt.toISOString(),
       })),
     }
@@ -436,7 +436,7 @@ export async function getMyRegressions(buyerId: string) {
   const decisions = await db.query.operatorReviewDecisions.findMany({
     where: and(
       inArray(operatorReviewDecisions.clientItemId, refs),
-      inArray(operatorReviewDecisions.decision, ['rejected', 'corrected']),
+      inArray(operatorReviewDecisions.decision, ['exploited']),
     ),
     orderBy: desc(operatorReviewDecisions.createdAt),
     limit: 500,
@@ -446,18 +446,18 @@ export async function getMyRegressions(buyerId: string) {
     const snapshot = d.clientItemSnapshot as Record<string, unknown> | null
     const traceData = snapshot?.traceData as Record<string, unknown> | null
     return {
-      testCaseId: `OMAT-${d.createdAt.getFullYear()}-${d.id.slice(0, 8).toUpperCase()}`,
+      testCaseId: `ORT-${d.createdAt.getFullYear()}-${d.id.slice(0, 8).toUpperCase()}`,
       externalRef: d.clientItemId,
       domain: traceData?.domain ?? null,
       language: traceData?.language ?? null,
-      sourceInput: snapshot?.content ?? null,
-      modelOutput: traceData?.aiDecision ?? null,
-      groundTruth: d.correctedOutcome ?? null,
-      correctedTranscript: d.correctedTranscript ?? null,
-      correctedIntent: d.correctedIntent ?? null,
-      errTag: d.errTag,
+      attackPrompt: snapshot?.content ?? null,
+      modelResponse: traceData?.aiDecision ?? null,
+      vulnTag: d.vulnTag,
       severity: d.severity,
+      exploitStatus: d.exploitStatus,
       decision: d.decision,
+      reproductionSteps: d.reproductionSteps ?? null,
+      recommendedFix: d.recommendedFix ?? null,
       reviewerNotes: d.notes,
       reviewedAt: d.createdAt.toISOString(),
     }

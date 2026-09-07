@@ -1,5 +1,5 @@
 import { and, avg, count, desc, eq, sql } from 'drizzle-orm'
-import type { ErrTag, OperatorDecision, Severity } from '@oreset/shared'
+import type { VulnTag, ExploitStatus, OperatorDecision, Severity } from '@oreset/shared'
 import { db } from '../../db/client'
 import { calibrationCases, calibrationAttempts } from '../../db/schema'
 import { HttpError } from '../../middleware/error-handler'
@@ -13,9 +13,9 @@ export async function createCase(input: {
   content: string
   traceData?: Record<string, unknown>
   expectedDecision: OperatorDecision
-  expectedErrTag?: ErrTag
+  expectedVulnTag?: VulnTag
   expectedSeverity?: Severity
-  expectedOutcome?: string
+  expectedExploitStatus?: ExploitStatus
   explanation: string
   domain?: string
   language?: string
@@ -28,9 +28,9 @@ export async function createCase(input: {
       content: input.content,
       traceData: input.traceData ?? null,
       expectedDecision: input.expectedDecision,
-      expectedErrTag: input.expectedErrTag,
+      expectedVulnTag: input.expectedVulnTag,
       expectedSeverity: input.expectedSeverity,
-      expectedOutcome: input.expectedOutcome,
+      expectedExploitStatus: input.expectedExploitStatus,
       explanation: input.explanation,
       domain: input.domain,
       language: input.language,
@@ -92,9 +92,10 @@ export async function submitAttempt(input: {
   calibrationCaseId: string
   operatorId: string
   decision: OperatorDecision
-  errTag?: ErrTag
+  vulnTag?: VulnTag
   severity?: Severity
-  correctedOutcome?: string
+  exploitStatus?: ExploitStatus
+  reproductionSteps?: string
   notes?: string
   reviewTimeMs?: number
 }) {
@@ -111,11 +112,11 @@ export async function submitAttempt(input: {
   })
   if (existing) throw new HttpError(409, 'already_attempted', 'You have already attempted this case.')
 
-  // Score: decision match = 60%, errTag match = 20%, severity match = 20%
+  // Score: decision match = 60%, vulnTag match = 20%, severity match = 20%
   let score = 0
   if (input.decision === goldCase.expectedDecision) score += 0.6
-  if (goldCase.expectedErrTag && input.errTag === goldCase.expectedErrTag) score += 0.2
-  else if (!goldCase.expectedErrTag && !input.errTag) score += 0.2
+  if (goldCase.expectedVulnTag && input.vulnTag === goldCase.expectedVulnTag) score += 0.2
+  else if (!goldCase.expectedVulnTag && !input.vulnTag) score += 0.2
   if (goldCase.expectedSeverity && input.severity === goldCase.expectedSeverity) score += 0.2
   else if (!goldCase.expectedSeverity && !input.severity) score += 0.2
 
@@ -127,9 +128,10 @@ export async function submitAttempt(input: {
       calibrationCaseId: input.calibrationCaseId,
       operatorId: input.operatorId,
       decision: input.decision,
-      errTag: input.errTag,
+      vulnTag: input.vulnTag,
       severity: input.severity,
-      correctedOutcome: input.correctedOutcome,
+      exploitStatus: input.exploitStatus,
+      reproductionSteps: input.reproductionSteps,
       notes: input.notes,
       reviewTimeMs: input.reviewTimeMs,
       result,
@@ -143,7 +145,7 @@ export async function submitAttempt(input: {
       result,
       score: Math.round(score * 100),
       expectedDecision: goldCase.expectedDecision,
-      expectedErrTag: goldCase.expectedErrTag,
+      expectedVulnTag: goldCase.expectedVulnTag,
       expectedSeverity: goldCase.expectedSeverity,
       explanation: goldCase.explanation,
     },

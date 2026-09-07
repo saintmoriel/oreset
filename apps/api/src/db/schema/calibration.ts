@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, jsonb, timestamp, integer, real } from 'drizzle-orm/pg-core'
-import { calibrationStatusEnum, calibrationResultEnum, operatorDecisionEnum, errTagEnum, severityEnum } from './enums'
+import { calibrationStatusEnum, calibrationResultEnum, operatorDecisionEnum, vulnTagEnum, severityEnum, exploitStatusEnum } from './enums'
 import { users } from './users'
 
 export const calibrationCases = pgTable('calibration_cases', {
@@ -8,9 +8,9 @@ export const calibrationCases = pgTable('calibration_cases', {
   content: text('content').notNull(),
   traceData: jsonb('trace_data'),
   expectedDecision: operatorDecisionEnum('expected_decision').notNull(),
-  expectedErrTag: errTagEnum('expected_err_tag'),
+  expectedVulnTag: vulnTagEnum('expected_vuln_tag'),
   expectedSeverity: severityEnum('expected_severity'),
-  expectedOutcome: text('expected_outcome'),
+  expectedExploitStatus: exploitStatusEnum('expected_exploit_status'),
   explanation: text('explanation').notNull(),
   domain: text('domain'),
   language: text('language').default('en'),
@@ -30,9 +30,10 @@ export const calibrationAttempts = pgTable('calibration_attempts', {
     .notNull()
     .references(() => users.id, { onDelete: 'restrict' }),
   decision: operatorDecisionEnum('decision').notNull(),
-  errTag: errTagEnum('err_tag'),
+  vulnTag: vulnTagEnum('vuln_tag'),
   severity: severityEnum('severity'),
-  correctedOutcome: text('corrected_outcome'),
+  exploitStatus: exploitStatusEnum('exploit_status'),
+  reproductionSteps: text('reproduction_steps'),
   notes: text('notes'),
   reviewTimeMs: integer('review_time_ms'),
   result: calibrationResultEnum('result').notNull(),

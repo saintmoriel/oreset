@@ -143,18 +143,18 @@ export async function exportCases(req: Request, res: Response) {
     const headers = [
       'id', 'externalRef', 'clientName', 'status', 'language', 'domain',
       'aiDecision', 'aiOutcome', 'requiresDualSolve', 'submittedAt',
-      'reviewDecision', 'reviewErrTag', 'reviewSeverity', 'reviewNotes', 'reviewedAt',
+      'reviewDecision', 'reviewVulnTag', 'reviewSeverity', 'reviewExploitStatus', 'reviewNotes', 'reviewedAt',
     ]
     const rows = results.flatMap((r) => {
       if (r.reviews.length === 0) {
         return [[r.id, r.externalRef, r.clientName, r.status, r.language, r.domain,
           r.aiDecision, r.aiOutcome, r.requiresDualSolve, r.submittedAt,
-          '', '', '', '', ''].map(csvEscape).join(',')]
+          '', '', '', '', '', ''].map(csvEscape).join(',')]
       }
       return r.reviews.map((rev) =>
         [r.id, r.externalRef, r.clientName, r.status, r.language, r.domain,
           r.aiDecision, r.aiOutcome, r.requiresDualSolve, r.submittedAt,
-          rev.decision, rev.errTag, rev.severity, rev.notes, rev.reviewedAt,
+          rev.decision, rev.vulnTag, rev.severity, rev.exploitStatus, rev.notes, rev.reviewedAt,
         ].map(csvEscape).join(','),
       )
     })

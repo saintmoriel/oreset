@@ -1,4 +1,4 @@
-import type { ErrTag, OperatorDecision, Severity } from '@oreset/shared'
+import type { VulnTag, ExploitStatus, OperatorDecision, Severity } from '@oreset/shared'
 import { apiFetch } from '../client'
 
 export type CalibrationCase = {
@@ -12,9 +12,9 @@ export type CalibrationCase = {
 
 export type CalibrationCaseFull = CalibrationCase & {
   expectedDecision: OperatorDecision
-  expectedErrTag: ErrTag | null
+  expectedVulnTag: VulnTag | null
   expectedSeverity: Severity | null
-  expectedOutcome: string | null
+  expectedExploitStatus: ExploitStatus | null
   explanation: string
   status: 'active' | 'retired'
   createdBy: string
@@ -27,9 +27,10 @@ export type CalibrationAttempt = {
   calibrationCaseId: string
   operatorId: string
   decision: OperatorDecision
-  errTag: ErrTag | null
+  vulnTag: VulnTag | null
   severity: Severity | null
-  correctedOutcome: string | null
+  exploitStatus: ExploitStatus | null
+  reproductionSteps: string | null
   notes: string | null
   reviewTimeMs: number | null
   result: 'pass' | 'fail'
@@ -42,7 +43,7 @@ export type CalibrationFeedback = {
   result: 'pass' | 'fail'
   score: number
   expectedDecision: OperatorDecision
-  expectedErrTag: ErrTag | null
+  expectedVulnTag: VulnTag | null
   expectedSeverity: Severity | null
   explanation: string
 }
@@ -71,9 +72,9 @@ export function createCalibrationCase(data: {
   content: string
   traceData?: Record<string, unknown>
   expectedDecision: OperatorDecision
-  expectedErrTag?: ErrTag
+  expectedVulnTag?: VulnTag
   expectedSeverity?: Severity
-  expectedOutcome?: string
+  expectedExploitStatus?: ExploitStatus
   explanation: string
   domain?: string
   language?: string
@@ -102,9 +103,10 @@ export function getNextCalibrationCase() {
 export function submitCalibrationAttempt(data: {
   calibrationCaseId: string
   decision: OperatorDecision
-  errTag?: ErrTag
+  vulnTag?: VulnTag
   severity?: Severity
-  correctedOutcome?: string
+  exploitStatus?: ExploitStatus
+  reproductionSteps?: string
   notes?: string
   reviewTimeMs?: number
 }) {

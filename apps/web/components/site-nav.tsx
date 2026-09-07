@@ -63,12 +63,12 @@ const navItems: NavItem[] = [
       {
         label: 'Blog',
         href: '/blog',
-        hint: 'Insights on AI risk and testing — coming soon',
+        hint: 'Insights on AI risk and testing. Coming soon',
       },
       {
         label: 'Documentation',
         href: '/docs',
-        hint: 'Technical guides — coming soon',
+        hint: 'Technical guides. Coming soon',
       },
     ],
   },

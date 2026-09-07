@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
-import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS, CONSENSUS_STATUSES } from '@oreset/shared'
+import { OPERATOR_DECISIONS, VULN_TAGS, SEVERITY_LEVELS, CONSENSUS_STATUSES } from '@oreset/shared'
 import * as consensusService from './consensus.service'
 
 const adjudicateSchema = z.object({
   finalDecision: z.enum(OPERATOR_DECISIONS),
-  finalErrTag: z.enum(ERR_TAGS).optional(),
+  finalVulnTag: z.enum(VULN_TAGS).optional(),
   finalSeverity: z.enum(SEVERITY_LEVELS).optional(),
   notes: z.string().optional(),
 })
