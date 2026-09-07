@@ -8,10 +8,19 @@ const columns = [
   {
     title: 'Service',
     links: [
-      { label: 'What we test', href: '#what-we-test' },
+      { label: 'AI Agent Risk Assessment', href: '#what-we-test' },
+      { label: 'Data Origination', href: '/services/data-origination' },
+      { label: 'African AI Assurance', href: '/services/african-ai-assurance' },
       { label: 'How it works', href: '#how-it-works' },
       { label: 'Methodology', href: '#methodology' },
-      { label: 'Request early access', href: '#contact' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { label: 'FAQ', href: '#faq' },
+      { label: 'Blog', href: '/blog' },
+      { label: 'Documentation', href: '/docs' },
     ],
   },
   {
@@ -19,7 +28,7 @@ const columns = [
     links: [
       { label: 'About', href: '#about' },
       { label: 'Why now', href: '#why-now' },
-      { label: 'FAQ', href: '#faq' },
+      { label: 'Contact', href: '#contact' },
     ],
   },
   {

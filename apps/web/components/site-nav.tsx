@@ -25,9 +25,19 @@ const navItems: NavItem[] = [
     href: '#what-we-test',
     children: [
       {
-        label: 'What we test',
+        label: 'AI Agent Risk Assessment',
         href: '#what-we-test',
-        hint: 'Security, judgment, and business impact',
+        hint: 'Security, judgment, and business impact testing',
+      },
+      {
+        label: 'Data Origination',
+        href: '/services/data-origination',
+        hint: 'Field-sourced language and decision data',
+      },
+      {
+        label: 'African AI Decision Assurance',
+        href: '/services/african-ai-assurance',
+        hint: 'Verification for African-language AI systems',
       },
       {
         label: 'How it works',
@@ -38,6 +48,27 @@ const navItems: NavItem[] = [
         label: 'Methodology',
         href: '#methodology',
         hint: 'Calibrated testers and dual review',
+      },
+    ],
+  },
+  {
+    label: 'Resources',
+    href: '#faq',
+    children: [
+      {
+        label: 'FAQ',
+        href: '#faq',
+        hint: 'Straight answers about our service',
+      },
+      {
+        label: 'Blog',
+        href: '/blog',
+        hint: 'Insights on AI risk and testing — coming soon',
+      },
+      {
+        label: 'Documentation',
+        href: '/docs',
+        hint: 'Technical guides — coming soon',
       },
     ],
   },
@@ -56,9 +87,9 @@ const navItems: NavItem[] = [
         hint: 'Thesis and timing',
       },
       {
-        label: 'FAQ',
-        href: '#faq',
-        hint: 'Straight answers',
+        label: 'Careers',
+        href: '#contact',
+        hint: 'Join the testing team',
       },
       {
         label: 'Contact',
