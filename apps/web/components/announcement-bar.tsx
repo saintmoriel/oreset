@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
@@ -28,19 +27,18 @@ export function AnnouncementBar() {
         >
           <div className="container-wide flex items-center justify-center gap-2 py-2.5 text-center">
             <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-            <Link
-              href="/operators/join"
+            <a
+              href="#contact"
               className="group inline-flex flex-wrap items-center justify-center gap-x-1.5 text-xs font-medium tracking-wide text-ink-foreground/90 transition-colors hover:text-white sm:text-sm"
             >
               <span>
-                Oreset is accepting reviewer applications for African native language
-                cohorts
+                Hiring AI security testers and red-team analysts
               </span>
               <span className="inline-flex items-center gap-1 text-accent transition-transform group-hover:translate-x-0.5">
-                Join
+                Apply
                 <ArrowRight className="size-3.5" />
               </span>
-            </Link>
+            </a>
           </div>
         </motion.div>
       )}

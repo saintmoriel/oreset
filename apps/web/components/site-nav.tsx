@@ -21,12 +21,25 @@ type NavItem =
 
 const navItems: NavItem[] = [
   {
-    label: 'What we test',
+    label: 'Service',
     href: '#what-we-test',
-  },
-  {
-    label: 'How it works',
-    href: '#how-it-works',
+    children: [
+      {
+        label: 'What we test',
+        href: '#what-we-test',
+        hint: 'Security, judgment, and business impact',
+      },
+      {
+        label: 'How it works',
+        href: '#how-it-works',
+        hint: 'Scope, test, report',
+      },
+      {
+        label: 'Methodology',
+        href: '#methodology',
+        hint: 'Calibrated testers and dual review',
+      },
+    ],
   },
   {
     label: 'Company',
@@ -57,9 +70,8 @@ const navItems: NavItem[] = [
 ]
 
 const signInItems = [
-  { label: 'Contributor', href: '/capture', hint: 'Field data capture' },
-  { label: 'Reviewer', href: '/operator', hint: 'Certified review work' },
-  { label: 'Client', href: '/buyer', hint: 'Verification cases & evidence' },
+  { label: 'Client', href: '/buyer', hint: 'Engagement reports & findings' },
+  { label: 'Reviewer', href: '/operator', hint: 'Testing & analysis' },
 ] as const
 
 const staffItems = [

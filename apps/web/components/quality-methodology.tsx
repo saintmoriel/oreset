@@ -26,16 +26,16 @@ const PILLARS = [
 
 export function QualityMethodology() {
   return (
-    <section className="border-t border-border/60 py-16 sm:py-24 md:py-32">
+    <section id="methodology" className="border-t border-border/60 py-16 sm:py-24 md:py-32">
       <div className="container-wide">
         <MotionReveal>
-          <p className="text-eyebrow text-accent">Verification methodology</p>
+          <p className="text-eyebrow text-accent">Testing methodology</p>
           <h2 className="text-h1 mt-4 max-w-2xl text-balance text-foreground">
             Rigorous by design, not by claim.
           </h2>
           <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground">
-            Every verification case passes through a structured process built for
-            auditability. This is how we ensure the review itself is trustworthy.
+            Every engagement follows a structured process built for
+            auditability. This is how we ensure the assessment itself is trustworthy.
           </p>
         </MotionReveal>
 

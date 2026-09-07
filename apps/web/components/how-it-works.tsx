@@ -8,21 +8,21 @@ const STEPS = [
     title: 'Scope',
     detail:
       "You tell us what your AI agent does, who it serves, and what decisions it makes. We design a test plan tailored to your agent's domain, risk profile, and deployment context.",
-    duration: 'Day 1',
+    duration: 'Phase 1',
   },
   {
     number: '02',
     title: 'Test',
     detail:
       "Our team runs hundreds of scenarios against your agent: adversarial attacks, edge cases, ambiguous inputs, multi-language interactions. We document every failure with evidence.",
-    duration: 'Days 2-4',
+    duration: 'Phase 2',
   },
   {
     number: '03',
     title: 'Report',
     detail:
       'You receive a structured risk report: every failure found, its severity, the business consequence, and a specific fix recommendation. Actionable for your engineering team and legible for your leadership.',
-    duration: 'Day 5',
+    duration: 'Phase 3',
   },
 ]
 
@@ -36,7 +36,7 @@ export function HowItWorks() {
             One engagement. One report. Every failure documented.
           </h2>
           <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground">
-            A typical engagement runs 3-5 days. No integration required.
+            Engagements typically run 1-2 weeks. No integration required.
             No SDK to install. You give us access, we stress-test, you get the report.
           </p>
         </MotionReveal>

@@ -42,9 +42,9 @@ export function AboutSection() {
             <MotionReveal delay={0.08}>
               <p className="text-body-lg text-pretty text-muted-foreground">
                 Oreset is an AI agent risk assessment service. Companies hand us access to
-                their AI agent, and we spend 3-5 days stress-testing it: can it be
-                manipulated, does it make wrong decisions on its own, and what is the
-                business consequence when it fails.
+                their AI agent, and we stress-test it: can it be manipulated, does it
+                make wrong decisions on its own, and what is the business consequence
+                when it fails.
               </p>
               <p className="text-body mt-5 text-pretty text-muted-foreground">
                 We exist because security testing stops at "can it be hacked" and monitoring

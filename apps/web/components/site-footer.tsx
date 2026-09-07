@@ -6,37 +6,28 @@ import { motion, useReducedMotion } from 'framer-motion'
 
 const columns = [
   {
-    title: 'Verification',
+    title: 'Service',
     links: [
-      { label: 'How it works', href: '#engine' },
-      { label: 'Reviewer network', href: '#operators' },
-      { label: 'Verify a decision', href: '#contact' },
-    ],
-  },
-  {
-    title: 'Field data',
-    links: [
-      { label: 'When we originate data', href: '#origin' },
-      { label: 'Discuss a need', href: '#contact' },
+      { label: 'What we test', href: '#what-we-test' },
+      { label: 'How it works', href: '#how-it-works' },
+      { label: 'Methodology', href: '#methodology' },
+      { label: 'Request early access', href: '#contact' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'How it works', href: '#trust' },
       { label: 'About', href: '#about' },
+      { label: 'Why now', href: '#why-now' },
       { label: 'FAQ', href: '#faq' },
-      { label: 'Get involved', href: '#contact' },
     ],
   },
   {
-    title: 'Sign in',
+    title: 'Portals',
     links: [
-      { label: 'Contributor', href: '/capture' },
+      { label: 'Client', href: '/buyer' },
       { label: 'Reviewer', href: '/operator' },
-      { label: 'Buyer', href: '/buyer' },
-      { label: 'QA (staff)', href: '/qa' },
-      { label: 'Admin (staff)', href: '/admin' },
+      { label: 'Admin', href: '/admin' },
     ],
   },
 ]
@@ -55,11 +46,11 @@ export function SiteFooter() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="max-w-3xl font-display text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl md:text-5xl">
-            Verified decisions for African&nbsp;AI.
+            The penetration test for AI&nbsp;decisions.
           </p>
           <p className="mt-4 max-w-xl text-body text-ink-muted">
-            Real language, certified review, and a decision that&apos;s actually correct —
-            under one Shared Trust Ledger.
+            We stress-test your AI agent for security failures and wrong decisions —
+            before your users find them first.
           </p>
         </motion.div>
 

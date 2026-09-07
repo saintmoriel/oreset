@@ -13,7 +13,7 @@ const HERO_IMAGE = '/background hero1.jpeg'
 
 const proof = [
   {
-    value: '3-5 days',
+    value: '1-2 weeks',
     label: 'per engagement',
     detail: 'scoped, tested, reported',
   },
@@ -23,14 +23,14 @@ const proof = [
     detail: 'can it be hacked AND does it decide wrong',
   },
   {
-    value: '$3.5-10K',
-    label: 'per assessment',
-    detail: 'enterprise price range, validated',
-  },
-  {
     value: '1 report',
     label: 'every failure documented',
     detail: 'severity, impact, fix recommendation',
+  },
+  {
+    value: '0 SDKs',
+    label: 'no integration required',
+    detail: 'give us access, we do the rest',
   },
 ] as const
 
@@ -177,7 +177,7 @@ export function Hero() {
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </button>
               <a
-                href="#origin"
+                href="#how-it-works"
                 className="inline-flex h-12 w-full items-center justify-center rounded-md border border-white/25 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur-sm transition-[background-color,border-color] duration-200 hover:border-white/45 hover:bg-white/12 sm:w-auto"
               >
                 How It Works

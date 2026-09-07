@@ -20,17 +20,12 @@ const faqs = [
   {
     audience: 'Clients',
     q: 'How long does an engagement take?',
-    a: "A typical engagement runs 3-5 days. Day one is scoping, days two through four are testing, and day five is the report. No SDK to install. No integration required. You give us access, we stress-test, you get the report.",
+    a: "Engagements typically run 1-2 weeks depending on the agent's complexity and scope. No SDK to install. No integration required. You give us access, we stress-test, you get the report.",
   },
   {
     audience: 'Clients',
     q: 'What do I get at the end?',
     a: "A structured risk report: every failure found, its severity, the business consequence, and a specific fix recommendation. Actionable for your engineering team and legible for your leadership.",
-  },
-  {
-    audience: 'Clients',
-    q: 'How much does it cost?',
-    a: "$3,500 to $10,000 per engagement, depending on the agent's complexity and scope. This is in line with what enterprises already pay for security pen tests.",
   },
   {
     audience: 'Clients',
