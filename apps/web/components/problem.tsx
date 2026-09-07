@@ -4,8 +4,22 @@ import { MotionReveal } from './motion-reveal'
 import { ScrollWords } from './scroll-words'
 import { SiteImage } from './site-image'
 
-const PROBLEM_IMAGE =
-  '/pipeline-oreset.jpeg'
+const PROBLEM_IMAGE = '/pipeline-oreset.jpeg'
+
+const INCIDENTS = [
+  {
+    name: 'Air Canada chatbot',
+    detail: 'Promised a refund policy that did not exist. Company lost a tribunal ruling.',
+  },
+  {
+    name: 'NYC city chatbot',
+    detail: 'Gave illegal business advice to residents. Front-page story.',
+  },
+  {
+    name: 'GPT-5.6',
+    detail: 'Deleted user files during a routine task. Trust collapsed overnight.',
+  },
+]
 
 export function Problem() {
   return (
@@ -23,15 +37,15 @@ export function Problem() {
 
             <MotionReveal delay={0.08}>
               <h2 className="text-h1 mt-4 text-balance text-foreground sm:mt-5">
-                Fluency gets tested. Consequence &nbsp;doesn't.
+                AI agents ship fast. Nobody tests whether they decide&nbsp;right.
               </h2>
             </MotionReveal>
 
             <MotionReveal delay={0.14}>
               <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground sm:mt-6">
-                Real benchmarks test whether an AI is fluent in a language. Almost none test
-                whether a language failure changed the decision that followed: a claim, a loan,
-                a transaction.
+                Security firms test if your AI can be hacked. Monitoring tools watch it
+                after launch. But nobody tests the gap in between: does your AI agent make
+                wrong decisions on its own, before a single user touches it?
               </p>
             </MotionReveal>
 
@@ -43,10 +57,11 @@ export function Problem() {
                     className="mb-5 h-0.5 w-12 origin-left bg-accent"
                     aria-hidden="true"
                   />
-                  <p className="text-h4 text-foreground">The Consequence Gap</p>
+                  <p className="text-h4 text-foreground">Security testing stops too early</p>
                   <p className="text-body-sm mt-2 text-muted-foreground">
-                    A model can sound fluent in Yoruba, Hausa, or Pidgin and still get the
-                    decision wrong. Nothing in standard evaluation checks for that difference.
+                    Pen testers check if the agent can be jailbroken or tricked into leaking
+                    data. They don't check if it gives wrong advice, takes irreversible
+                    actions, or falls apart on edge cases.
                   </p>
                 </div>
                 <div className="border-t border-border pt-5">
@@ -55,11 +70,11 @@ export function Problem() {
                     className="mb-5 h-0.5 w-12 origin-left bg-accent"
                     aria-hidden="true"
                   />
-                  <p className="text-h4 text-foreground">Unverified Talent QA</p>
+                  <p className="text-h4 text-foreground">Monitoring starts too late</p>
                   <p className="text-body-sm mt-2 text-muted-foreground">
-                    Without certification and scorecards, 
-                    buyers cannot trust that a language-driven decision was actually correct
-                    and experts get treated as disposable gig labor, not professionals.
+                    Production monitoring tells you something went wrong after a user was
+                    affected. By then, the damage is done: a bad decision, a headline, a
+                    lawsuit.
                   </p>
                 </div>
               </div>
@@ -67,21 +82,19 @@ export function Problem() {
           </div>
 
           <MotionReveal delay={0.12} className="lg:col-span-5 lg:pt-6">
-            <figure className="card-surface overflow-hidden">
-              <div className="photo-brand relative aspect-[4/3] overflow-hidden sm:aspect-square lg:aspect-[4/5]">
-                <SiteImage
-                  data-scroll-media
-                  src={PROBLEM_IMAGE}
-                  alt="Abstract view of Earth from orbit, illustrating the gap between global systems and underrepresented languages"
-                  fill
-                  className="will-change-transform"
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                />
+            <div className="card-surface overflow-hidden">
+              <div className="border-b border-border/60 px-5 py-3">
+                <p className="text-eyebrow text-destructive">Real incidents</p>
               </div>
-              <figcaption className="border-t border-border/60 px-4 py-3 text-caption text-muted-foreground">
-                Representation is a pipeline problem, not a prompt problem.
-              </figcaption>
-            </figure>
+              <div className="divide-y divide-border/60">
+                {INCIDENTS.map((inc) => (
+                  <div key={inc.name} className="px-5 py-4">
+                    <p className="text-h4 text-foreground">{inc.name}</p>
+                    <p className="text-body-sm mt-1 text-muted-foreground">{inc.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </MotionReveal>
         </div>
 
@@ -93,7 +106,7 @@ export function Problem() {
           />
           <ScrollWords
             className="pl-5 font-display text-xl font-semibold leading-snug tracking-tight text-foreground sm:pl-6 sm:text-2xl md:pl-8 md:text-[2rem] md:leading-[1.25]"
-            text="Fluency is not the same as correct. Oreset verifies the difference, before it costs someone something."
+            text="Every AI agent makes decisions. Oreset tests whether those decisions are right, before they cost you something."
           />
           <p className="mt-4 pl-5 text-body-sm text-muted-foreground sm:pl-6 md:pl-8">
             Oreset operating thesis

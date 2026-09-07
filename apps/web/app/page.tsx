@@ -1,11 +1,9 @@
 import { SiteNav } from '@/components/site-nav'
 import { Hero } from '@/components/hero'
 import { Problem } from '@/components/problem'
-import { TwoArmsOverview } from '@/components/two-arms-overview'
-import { OriginDeepDive } from '@/components/origin-deep-dive'
-import { OperatorsDeepDive } from '@/components/operators-deep-dive'
+import { WhatWeTest } from '@/components/what-we-test'
+import { HowItWorks } from '@/components/how-it-works'
 import { QualityMethodology } from '@/components/quality-methodology'
-import { TrustLedger } from '@/components/trust-ledger'
 import { WhyNow } from '@/components/why-now'
 import { AboutSection } from '@/components/about-section'
 import { FAQ } from '@/components/faq'
@@ -14,7 +12,6 @@ import { SiteFooter } from '@/components/site-footer'
 import { ScrollOrchestrator } from '@/components/scroll-orchestrator'
 import { SmoothScroll } from '@/components/smooth-scroll'
 import { PilotScopingModal } from '@/components/pilot-scoping-modal'
-import { ThreePaths } from '@/components/three-paths'
 
 export default function Page() {
   return (
@@ -26,12 +23,9 @@ export default function Page() {
       <main>
         <Hero />
         <Problem />
-        <ThreePaths />
-        <TwoArmsOverview />
-        <OriginDeepDive />
-        <OperatorsDeepDive />
+        <WhatWeTest />
+        <HowItWorks />
         <QualityMethodology />
-        <TrustLedger />
         <WhyNow />
         <AboutSection />
         <FAQ />

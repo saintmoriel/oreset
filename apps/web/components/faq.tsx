@@ -8,49 +8,44 @@ import { MotionReveal } from './motion-reveal'
 
 const faqs = [
   {
-    audience: 'Everyone',
+    audience: 'General',
+    q: 'What exactly does Oreset test?',
+    a: "Two things: can your AI agent be manipulated into doing something wrong (security), and does it make wrong decisions on its own without being attacked (judgment). Most security firms only cover the first half. We cover both, in one engagement.",
+  },
+  {
+    audience: 'General',
     q: 'Is Oreset live yet?',
-    a: 'Oreset is pre-revenue and building through real cases, not a self-serve product with instant signup. If you have a decision you need checked, talk to us directly.',
+    a: "We're onboarding early partners now. If you're shipping an AI agent and want it stress-tested before launch, talk to us directly.",
   },
   {
-    audience: 'Buyers',
-    q: 'How does verification actually work?',
-    a: "We check two things separately, not one blended score: did the AI correctly understand what the user meant, and separately, was the decision that followed actually correct. A model can pass one and fail the other. That's the gap most evaluation misses.",
+    audience: 'Clients',
+    q: 'How long does an engagement take?',
+    a: "A typical engagement runs 3-5 days. Day one is scoping, days two through four are testing, and day five is the report. No SDK to install. No integration required. You give us access, we stress-test, you get the report.",
   },
   {
-    audience: 'Buyers',
-    q: 'How are reviewers certified?',
-    a: 'Reviewers move through Sourcing, Training, and Certification before joining the Bench. Training covers dialect baselines, error taxonomy, calibration scoring, and timed evaluation. Higher-stakes cases require earned reliability scorecards, matched by language and domain, not language alone.',
+    audience: 'Clients',
+    q: 'What do I get at the end?',
+    a: "A structured risk report: every failure found, its severity, the business consequence, and a specific fix recommendation. Actionable for your engineering team and legible for your leadership.",
   },
   {
-    audience: 'Contributors',
-    q: 'How do collectors and reviewers get paid?',
-    a: 'Compensation is designed around explicit rates and a wage floor, not opaque piece rates. Exact terms are set per case or account arrangement.',
+    audience: 'Clients',
+    q: 'How much does it cost?',
+    a: "$3,500 to $10,000 per engagement, depending on the agent's complexity and scope. This is in line with what enterprises already pay for security pen tests.",
   },
   {
-    audience: 'Buyers',
-    q: 'Which languages and decision types do you cover?',
-    a: 'Coverage is scoped per case: we start from the language and decision type you bring us, whether that\'s claims, lending, government services, or another decision-driven AI product. We do not publish inflated "N languages live" counts. We verify against real examples, not assumed coverage.',
+    audience: 'Clients',
+    q: 'Do you only test before launch?',
+    a: "No. We test pre-launch, post-update, post-incident, and on a recurring basis. Any time your AI agent changes or you need confidence that it still works correctly.",
   },
   {
-    audience: 'Everyone',
-    q: 'How is data consent handled, if you need fresh data for a case?',
-    a: 'Digital consent is required before a collector can submit a capture. Licensing and provenance travel with the data via the Shared Trust Ledger, not as paperwork after the fact.',
+    audience: 'Clients',
+    q: 'Can you test AI agents that handle African languages?',
+    a: "Yes. We have particular depth in African languages including Pidgin, Hausa, Yoruba, Swahili, and Sheng. No other risk assessment firm covers these. But our testing is not limited to any language or market.",
   },
   {
-    audience: 'Contributors',
-    q: 'Do I need special equipment to contribute?',
-    a: "No. The Oreset Capture app runs on standard Android smartphones. Tasks are designed for on-device recording with built-in quality gates, so you don't need studio hardware or professional training.",
-  },
-  {
-    audience: 'Buyers',
-    q: 'What happens if a delivery fails quality checks?',
-    a: 'Every batch passes automated gatechecks and reviewer sign-off before handoff. If a delivery falls below the agreed quality threshold, we re-collect or replace at no additional cost. The Trust Ledger audit trail shows exactly where any issue occurred.',
-  },
-  {
-    audience: 'Everyone',
+    audience: 'General',
     q: 'Where is Oreset based?',
-    a: 'Oreset Africa Hub is based in Abuja, Nigeria. The reviewer network is designed for distributed placement across African language communities.',
+    a: 'Headquartered in Abuja, Nigeria. We test AI agents for companies anywhere.',
   },
 ]
 
@@ -68,7 +63,7 @@ export function FAQ() {
               Straight answers.
             </h2>
             <p className="text-body mt-4 text-muted-foreground">
-              Honest to stage, for buyers, reviewers, and field collectors.
+              For teams considering an engagement.
             </p>
           </MotionReveal>
 

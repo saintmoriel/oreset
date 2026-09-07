@@ -16,7 +16,7 @@ export function WhyNow() {
             <MotionReveal>
               <p className="text-eyebrow text-accent">Why now</p>
               <h2 className="text-h1 mt-4 text-balance text-foreground">
-                Why Africa. Why this model.
+                AI agents are shipping faster than anyone can test them.
               </h2>
             </MotionReveal>
           </div>
@@ -25,19 +25,20 @@ export function WhyNow() {
             <MotionReveal delay={0.08}>
               <div className="space-y-8">
                 <p className="text-body-lg text-pretty text-muted-foreground">
-                  Real benchmarks exist for African-language accuracy,
-                  but none of them measure whether a language failure changed the actual decision it produced:
-                  a claim, a loan, a transaction. Fluency gets tested. Consequence doesn't.
+                  Every week, another company launches an AI agent that handles customer
+                  support, processes claims, approves loans, or triages patients.
+                  Every one of them is shipping scared, because one wrong decision
+                  is a headline, a lawsuit, or a lost customer.
                 </p>
                 <p className="text-body text-pretty text-muted-foreground">
-                  At the same time, enterprises shipping AI products into African markets
-                  need proof that language-driven decisions (a claim, a loan, a transaction)
-                  are actually correct, not just fluent-sounding.
+                  The EU AI Act hits in December 2027. Enterprises will need third-party
+                  testing to prove their AI agents are safe. The companies that start
+                  testing now build the track record. The ones that wait scramble later.
                 </p>
                 <div className="border-l-2 border-accent pl-5">
                   <ScrollWords
                     className="font-display text-xl font-semibold leading-snug tracking-tight text-foreground sm:text-2xl"
-                    text="Ore: raw material. Reset: what African AI needs before its decisions can be trusted."
+                    text="The penetration test for AI decisions. We break your AI agent before your users do."
                   />
                 </div>
               </div>

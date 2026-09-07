@@ -6,21 +6,21 @@ import { MapPin, Target, Shield } from 'lucide-react'
 const pillars = [
   {
     icon: Target,
-    title: 'Decision-level verification',
+    title: 'Decision-level testing',
     detail:
-      "We don’t just check fluency. We check whether a language failure changed the outcome: a denied claim, a misjudged loan, a flagged transaction.",
+      "We don't just test if your AI can be broken. We test whether its decisions are correct, safe, and defensible under real-world conditions.",
   },
   {
     icon: Shield,
-    title: 'Certified native reviewers',
+    title: 'Security and judgment in one engagement',
     detail:
-      'Every case is routed to a domain-matched, language-certified professional who passed calibration, not a crowdsourced annotator.',
+      "Adversarial attacks, edge cases, multi-language inputs, and domain-specific scenarios. One team, one report, both dimensions covered.",
   },
   {
     icon: MapPin,
-    title: 'Built in Africa, for Africa',
+    title: 'Built in Abuja, testing globally',
     detail:
-      'Headquartered in Abuja, Nigeria. Our reviewer network spans West, East, and North Africa, the regions where these decisions happen.',
+      "Headquartered in Nigeria. We test AI agents for companies anywhere, with particular depth in African languages and markets that no competitor covers.",
   },
 ]
 
@@ -33,7 +33,7 @@ export function AboutSection() {
             <MotionReveal>
               <p className="text-eyebrow text-accent">About Oreset</p>
               <h2 className="text-h1 mt-4 text-balance text-foreground">
-                Verification infrastructure for AI decisions in African languages.
+                The penetration test for AI decisions.
               </h2>
             </MotionReveal>
           </div>
@@ -41,17 +41,15 @@ export function AboutSection() {
           <div className="lg:col-span-7">
             <MotionReveal delay={0.08}>
               <p className="text-body-lg text-pretty text-muted-foreground">
-                Oreset is a verification layer that sits between AI systems and the high-stakes
-                decisions they make in African languages. When an AI denies a claim, scores a loan,
-                or triages a patient, and that decision flowed through Pidgin, Hausa, Yoruba,
-                or Swahili, we verify whether the language was understood correctly and whether
-                the outcome it produced is defensible.
+                Oreset is an AI agent risk assessment service. Companies hand us access to
+                their AI agent, and we spend 3-5 days stress-testing it: can it be
+                manipulated, does it make wrong decisions on its own, and what is the
+                business consequence when it fails.
               </p>
               <p className="text-body mt-5 text-pretty text-muted-foreground">
-                We exist because fluency benchmarks don’t catch decision failures. A model can
-                score well on translation and still deny a valid insurance claim because it
-                misread a colloquial phrase. Oreset catches that gap, case by case,
-                with evidence.
+                We exist because security testing stops at "can it be hacked" and monitoring
+                starts after someone gets hurt. The gap between those two is where wrong
+                decisions live. That gap is what Oreset closes.
               </p>
             </MotionReveal>
 

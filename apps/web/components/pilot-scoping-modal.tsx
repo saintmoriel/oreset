@@ -32,7 +32,7 @@ const initial: FormState = {
   caseDescription: '',
 }
 
-const domains = ['Claims & payouts', 'Lending & credit', 'Government & public services', 'Other decision-driven AI']
+const domains = ['Customer support agent', 'Claims & underwriting', 'Lending & credit', 'Other AI agent']
 
 export function openPilotModal() {
   window.dispatchEvent(new CustomEvent('oreset:open-pilot'))
@@ -93,10 +93,10 @@ export function PilotScopingModal() {
       next.email = 'Enter a valid work email.'
     }
     if (!values.org.trim()) next.org = 'Organization helps us route the review.'
-    if (!values.domain) next.domain = 'Select the decision type.'
-    if (!values.language.trim()) next.language = 'Which language or dialect is involved?'
+    if (!values.domain) next.domain = 'Select your agent type.'
+    if (!values.language.trim()) next.language = 'Which languages does your agent handle?'
     if (!values.caseDescription.trim() || values.caseDescription.trim().length < 20) {
-      next.caseDescription = 'Describe the real decision or exchange. A few sentences is enough.'
+      next.caseDescription = 'Tell us about your AI agent. A few sentences is enough.'
     }
     setErrors(next)
     if (Object.keys(next).length) return
@@ -137,9 +137,9 @@ export function PilotScopingModal() {
           >
             <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
               <div>
-                <p className="text-eyebrow text-accent">Verification request</p>
+                <p className="text-eyebrow text-accent">Early access</p>
                 <h2 id={titleId} className="mt-1 font-display text-xl font-semibold tracking-tight">
-                  Verify a Decision
+                  Request an Engagement
                 </h2>
               </div>
               <button
@@ -158,10 +158,10 @@ export function PilotScopingModal() {
                   <span className="flex size-11 items-center justify-center rounded-xl bg-success/10">
                     <CheckCircle2 className="size-5 text-success" />
                   </span>
-                  <h3 className="text-h4 text-foreground">Case received.</h3>
+                  <h3 className="text-h4 text-foreground">Request received.</h3>
                   <p className="text-body-sm text-muted-foreground">
-                    Our reviewers will look at what you've sent and follow up within a few business
-                    days with what we found.
+                    We'll review your submission and follow up within a few business days
+                    to scope the engagement.
                   </p>
                   <button
                     type="button"
@@ -208,7 +208,7 @@ export function PilotScopingModal() {
 
                   <fieldset>
                     <legend className="text-body-sm font-medium text-foreground">
-                      Decision type
+                      Agent type
                     </legend>
                     <div className="mt-2 grid grid-cols-2 gap-2">
                       {domains.map((d) => (
@@ -239,21 +239,21 @@ export function PilotScopingModal() {
                     )}
                   </fieldset>
 
-                  <Field label="Language or dialect" error={errors.language}>
+                  <Field label="Languages your agent handles" error={errors.language}>
                     <input
                       value={values.language}
                       onChange={(e) => update('language', e.target.value)}
                       className={fieldClass(Boolean(errors.language))}
-                      placeholder="e.g. Yorùbá, Hausa, Pidgin"
+                      placeholder="e.g. English, Pidgin, Hausa, multilingual"
                     />
                   </Field>
 
-                  <Field label="Describe the decision" error={errors.caseDescription}>
+                  <Field label="Tell us about your AI agent" error={errors.caseDescription}>
                     <textarea
                       value={values.caseDescription}
                       onChange={(e) => update('caseDescription', e.target.value)}
                       className={cn(fieldClass(Boolean(errors.caseDescription)), 'min-h-[6rem] resize-y')}
-                      placeholder="What happened, and what decision did your AI make? A real example, in a few sentences."
+                      placeholder="What does it do, who uses it, and what decisions does it make?"
                     />
                   </Field>
 
@@ -262,7 +262,7 @@ export function PilotScopingModal() {
                     disabled={status === 'submitting'}
                     className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground transition-[background-color,opacity] hover:bg-copper-600 disabled:opacity-60"
                   >
-                    {status === 'submitting' ? 'Sending…' : 'Submit pilot request'}
+                    {status === 'submitting' ? 'Sending…' : 'Request early access'}
                     {status !== 'submitting' && <ArrowRight className="size-4" />}
                   </button>
                 </form>

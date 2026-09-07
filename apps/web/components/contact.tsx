@@ -26,18 +26,18 @@ const initial: FormState = {
 const audiences: { value: Exclude<Audience, ''>; label: string; hint: string }[] = [
   {
     value: 'operators-buyer',
-    label: 'Verify a decision',
-    hint: 'Send us a real case to check',
+    label: 'Test my AI agent',
+    hint: 'Get a risk assessment before launch',
   },
   {
     value: 'origin-buyer',
-    label: 'Discuss field data',
-    hint: 'When a case needs fresh data first',
+    label: 'Recurring testing',
+    hint: 'Ongoing assessments post-deployment',
   },
   {
     value: 'contributor',
-    label: 'Apply as a reviewer',
-    hint: 'Native-language expert or field collector',
+    label: 'Join the team',
+    hint: 'Apply as a tester or analyst',
   },
 ]
 
@@ -134,8 +134,8 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             >
-              We're onboarding a select group of early partners in fintech and insurance.
-              Tell us what you're building and we&apos;ll follow up personally.
+              We're onboarding early partners shipping AI agents in fintech, insurance, and enterprise.
+              Tell us what your agent does and we&apos;ll follow up personally.
             </motion.p>
             <p className="mt-8 text-body-sm text-muted-foreground">
               Or email{' '}
@@ -258,7 +258,7 @@ export function Contact() {
 
                 <Field
                   id="message"
-                  label="Tell us about the pilot"
+                  label="Tell us about your AI agent"
                   error={touched.message ? errors.message : undefined}
                 >
                   <textarea
@@ -273,7 +273,7 @@ export function Contact() {
                       fieldClass(Boolean(touched.message && errors.message)),
                       'min-h-[7rem] resize-y',
                     )}
-                    placeholder="What decision, what language, and what you're trying to verify…"
+                    placeholder="What does your agent do, who uses it, and what decisions does it make?"
                   />
                 </Field>
 

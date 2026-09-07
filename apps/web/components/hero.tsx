@@ -13,24 +13,24 @@ const HERO_IMAGE = '/background hero1.jpeg'
 
 const proof = [
   {
-    value: '2,144',
-    label: 'languages spoken in Africa',
-    detail: 'just 20 served by a regional LLM',
+    value: '3-5 days',
+    label: 'per engagement',
+    detail: 'scoped, tested, reported',
   },
   {
-    value: '0',
-    label: 'frameworks that check this',
-    detail: "fluency gets tested, consequence doesn't",
+    value: '2 angles',
+    label: 'security + judgment',
+    detail: 'can it be hacked AND does it decide wrong',
   },
   {
-    value: '2-check',
-    label: 'verification, not 1',
-    detail: 'understanding and outcome, scored separately',
+    value: '$3.5-10K',
+    label: 'per assessment',
+    detail: 'enterprise price range, validated',
   },
   {
-    value: '100%',
-    label: 'opt-in consent',
-    detail: 'zero IP / regulatory liability',
+    value: '1 report',
+    label: 'every failure documented',
+    detail: 'severity, impact, fix recommendation',
   },
 ] as const
 
@@ -143,7 +143,7 @@ export function Hero() {
             >
               <ShieldCheck className="size-3.5 shrink-0 text-accent" aria-hidden="true" />
               <span className="text-balance">
-                Consented Ground Truth &amp; Certified Native Reviewer Infrastructure
+                AI Agent Risk Assessment &amp; Pre-Launch Testing
               </span>
             </p>
 
@@ -151,17 +151,17 @@ export function Hero() {
               data-hero-item
               className="mt-5 text-balance font-display text-[clamp(1.85rem,5.2vw,3.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-white sm:mt-6"
             >
-              A language error shouldn't decide who gets &nbsp; paid.
+              We break your AI agent before your users&nbsp;do.
             </h1>
 
             <p
               data-hero-item
               className="mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/70 sm:mt-5 sm:text-base md:text-lg"
             >
-              A claim gets denied. A loan gets misjudged. 
-              A transaction gets flagged, not because the logic was wrong,
-              but because the AI misread the Pidgin, Yoruba, or Hausa behind it. 
-              Oreset verifies that AI-driven decisions across African languages are actually correct.
+              Your AI agent makes decisions that affect real people.
+              Oreset stress-tests whether it can be manipulated, whether it
+              makes wrong decisions on its own, and what the business
+              consequence is when it fails.
             </p>
 
             <div
@@ -180,7 +180,7 @@ export function Hero() {
                 href="#origin"
                 className="inline-flex h-12 w-full items-center justify-center rounded-md border border-white/25 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur-sm transition-[background-color,border-color] duration-200 hover:border-white/45 hover:bg-white/12 sm:w-auto"
               >
-                How Verification Works
+                How It Works
               </a>
             </div>
 
@@ -189,9 +189,9 @@ export function Hero() {
               className="mt-5 flex flex-wrap items-center gap-x-1 gap-y-1 text-[13px] text-white/50 sm:mt-6"
               aria-label="Quick links"
             >
-              <a href="/capture" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Contribute</a>
+              <a href="#what-we-test" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">What we test</a>
               <span aria-hidden="true">·</span>
-              <a href="/operators/join" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Get certified</a>
+              <a href="#how-it-works" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">How it works</a>
               <span aria-hidden="true">·</span>
               <a href="#contact" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Request early access</a>
             </nav>

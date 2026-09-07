@@ -21,66 +21,12 @@ type NavItem =
 
 const navItems: NavItem[] = [
   {
-    label: 'Solutions',
-    href: '#engine',
-    children: [
-      {
-        label: 'Claims & payouts',
-        href: '/solutions/claims',
-        hint: 'Catching language-driven claim errors',
-      },
-      {
-        label: 'Lending & credit decisions',
-        href: '/solutions/lending',
-        hint: 'Verifying loan decisions across languages',
-      },
-      {
-        label: 'Government & public services',
-        href: '/solutions/government',
-        hint: 'Verified access for every language spoken',
-      },
-      {
-        label: 'Healthcare',
-        href: '/solutions/healthcare',
-        hint: 'Correct diagnoses across local languages',
-      },
-      {
-        label: 'Verify a decision',
-        href: '#contact',
-        hint: 'Send us a real example',
-        action: 'pilot',
-      },
-    ],
+    label: 'What we test',
+    href: '#what-we-test',
   },
   {
-    label: 'Platform',
-    href: '#engine',
-    children: [
-      {
-        label: 'The verification engine',
-        href: '#engine',
-        hint: 'Understanding vs. outcome, checked separately',
-      },
-      {
-        label: 'Shared Trust Ledger',
-        href: '#trust',
-        hint: 'Consent, scorecards, wage floor',
-      },
-      {
-        label: 'Certified reviewer network',
-        href: '#operators',
-        hint: 'Domain-matched, not just fluent',
-      },
-      {
-        label: 'Evidence & delivery',
-        href: '#trust',
-        hint: 'Reproducible traces, not vague reports',
-      },
-    ],
-  },
-  {
-    label: 'Reviewers',
-    href: '#operators',
+    label: 'How it works',
+    href: '#how-it-works',
   },
   {
     label: 'Company',
@@ -89,7 +35,7 @@ const navItems: NavItem[] = [
       {
         label: 'About Oreset',
         href: '#about',
-        hint: 'What we do and where we operate',
+        hint: 'AI agent risk assessment',
       },
       {
         label: 'Why now',
@@ -99,17 +45,12 @@ const navItems: NavItem[] = [
       {
         label: 'FAQ',
         href: '#faq',
-        hint: 'Straight answers for buyers',
-      },
-      {
-        label: 'Reviewer applications',
-        href: '/operators/join',
-        hint: 'African cohorts',
+        hint: 'Straight answers',
       },
       {
         label: 'Contact',
         href: '#contact',
-        hint: 'Partnership inquiries',
+        hint: 'Request early access',
       },
     ],
   },
@@ -328,7 +269,7 @@ export function SiteNav() {
                   : 'bg-primary text-primary-foreground hover:bg-navy-700',
               )}
             >
-              Scope a Pilot
+              Request early access
             </button>
 
             <button

@@ -6,21 +6,21 @@ import { MotionReveal, MotionStagger, MotionStaggerItem } from '@/components/mot
 const PILLARS = [
   {
     icon: GraduationCap,
-    title: 'Calibration before production',
+    title: 'Calibrated testers',
     detail:
-      "Every reviewer passes scored practice cases with known correct answers before touching live data. Pass rates and scores are tracked continuously, not just at onboarding.",
+      "Every tester passes scored practice scenarios with known correct outcomes before running a live engagement. Accuracy is tracked continuously.",
   },
   {
     icon: GitCompare,
-    title: 'Dual-solve consensus',
+    title: 'Dual-review consensus',
     detail:
-      'High-stakes cases are independently reviewed by two certified reviewers. Agreement is measured automatically. Disagreements go to a senior adjudicator, not a coin flip.',
+      'Critical findings are independently verified by a second tester. Agreement is measured automatically. Disagreements go to a senior analyst, not a coin flip.',
   },
   {
     icon: Tags,
-    title: 'Structured error taxonomy',
+    title: 'Structured severity taxonomy',
     detail:
-      'Every correction is tagged with a specific error type and severity level. Clients get structured data on what went wrong and how badly, not just a pass/fail.',
+      'Every failure is tagged with a specific error type, severity level, and business impact. You get structured data, not a vague summary.',
   },
 ]
 
