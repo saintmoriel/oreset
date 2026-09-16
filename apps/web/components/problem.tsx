@@ -9,15 +9,15 @@ const PROBLEM_IMAGE = '/pipeline-oreset.jpeg'
 const INCIDENTS = [
   {
     name: 'Air Canada chatbot',
-    detail: 'Promised a refund policy that did not exist. Company lost a tribunal ruling.',
+    detail: 'Invented a bereavement refund policy. A tribunal held the airline to it.',
   },
   {
-    name: 'NYC city chatbot',
-    detail: 'Gave illegal business advice to residents. Front-page story.',
+    name: 'NYC MyCity chatbot',
+    detail: 'Told business owners they could break the law. Front-page story.',
   },
   {
-    name: 'GPT-5.6',
-    detail: 'Deleted user files during a routine task. Trust collapsed overnight.',
+    name: 'Chevrolet dealer chatbot',
+    detail: 'Agreed to sell a new car for one dollar. Screenshots went viral within hours.',
   },
 ]
 

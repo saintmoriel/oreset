@@ -2,6 +2,7 @@ import { SiteNav } from '@/components/site-nav'
 import { Hero } from '@/components/hero'
 import { Problem } from '@/components/problem'
 import { WhatWeTest } from '@/components/what-we-test'
+import { FindingShowcase } from '@/components/finding-showcase'
 import { HowItWorks } from '@/components/how-it-works'
 import { QualityMethodology } from '@/components/quality-methodology'
 import { WhyNow } from '@/components/why-now'
@@ -24,6 +25,7 @@ export default function Page() {
         <Hero />
         <Problem />
         <WhatWeTest />
+        <FindingShowcase />
         <HowItWorks />
         <QualityMethodology />
         <WhyNow />

@@ -1,6 +1,6 @@
 'use client'
 
-import { GraduationCap, GitCompare, Tags } from 'lucide-react'
+import { GraduationCap, GitCompare, ShieldCheck, Tags } from 'lucide-react'
 import { MotionReveal, MotionStagger, MotionStaggerItem } from '@/components/motion-reveal'
 
 const PILLARS = [
@@ -14,13 +14,19 @@ const PILLARS = [
     icon: GitCompare,
     title: 'Dual-review consensus',
     detail:
-      'Critical findings are independently verified by a second tester. Agreement is measured automatically. Disagreements go to a senior analyst, not a coin flip.',
+      'High-stakes scenarios are assessed independently by two testers. Agreement is measured statistically, not assumed. Disagreements go to adjudication, not a coin flip.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Lead auditor verification',
+    detail:
+      'Every critical or high finding is reproduced by a lead auditor before you see it. They confirm it, correct the severity, or throw it out. False positives never reach your dashboard.',
   },
   {
     icon: Tags,
-    title: 'Structured severity taxonomy',
+    title: 'Structured taxonomy',
     detail:
-      'Every failure is tagged with a specific error type, severity level, and business impact. You get structured data, not a vague summary.',
+      'Every finding carries an OWASP-aligned vulnerability class, a P0 to P3 severity, reproduction steps, and a business impact. Structured data you can act on and export, not a summary.',
   },
 ]
 
@@ -31,15 +37,16 @@ export function QualityMethodology() {
         <MotionReveal>
           <p className="text-eyebrow text-accent">Testing methodology</p>
           <h2 className="text-h1 mt-4 max-w-2xl text-balance text-foreground">
-            Rigorous by design, not by claim.
+            Every finding is checked twice before you see it.
           </h2>
           <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground">
-            Every engagement follows a structured process built for
-            auditability. This is how we ensure the assessment itself is trustworthy.
+            A red team is only as good as its false positive rate. Ours is built to be
+            measured: calibrated testers, independent double review, and a lead auditor
+            who has to reproduce a finding before it counts.
           </p>
         </MotionReveal>
 
-        <MotionStagger className="mt-12 grid gap-8 sm:grid-cols-3" stagger={0.1}>
+        <MotionStagger className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4" stagger={0.1}>
           {PILLARS.map((p) => (
             <MotionStaggerItem key={p.title}>
               <div className="border-t border-border pt-6">

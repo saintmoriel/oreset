@@ -9,10 +9,10 @@ const DIMENSIONS = [
     title: 'Security',
     subtitle: 'Can your AI be manipulated?',
     tests: [
-      'Prompt injection and jailbreaking',
-      'Data extraction and leakage',
-      'Role manipulation and privilege escalation',
-      'Adversarial inputs designed to bypass guardrails',
+      'Direct and indirect prompt injection, including through documents and tool results',
+      'Sensitive data disclosure: system prompts, other users, internal records',
+      'Excessive agency: tool calls the agent was never authorised to make',
+      'Guardrail bypass through role-play, encoding, and multi-turn escalation',
     ],
   },
   {
@@ -20,10 +20,10 @@ const DIMENSIONS = [
     title: 'Judgment',
     subtitle: 'Does your AI make wrong decisions on its own?',
     tests: [
-      'Edge cases that expose faulty reasoning',
-      'Ambiguous inputs that reveal unstable behavior',
-      'Domain-specific scenarios with known correct answers',
-      'Multi-language inputs including African languages',
+      'Irreversible actions taken on a plausible request with no verification',
+      'Decisions that shift under pressure, urgency, or threats to churn',
+      'Ambiguous, incomplete, or multilingual inputs, including low-resource languages',
+      'Hallucinated business actions: promises, policies, and refunds that do not exist',
     ],
   },
   {
@@ -52,6 +52,15 @@ export function WhatWeTest() {
             Every engagement covers three dimensions. Findings show what
             breaks, how badly, and what to fix first, then we verify the fix.
           </p>
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="text-body-sm text-muted-foreground">Findings classified against</span>
+            <span className="rounded-md border border-border bg-card px-2.5 py-1 font-mono text-xs font-semibold text-foreground">
+              OWASP Top 10 for LLM Applications
+            </span>
+            <span className="rounded-md border border-border bg-card px-2.5 py-1 font-mono text-xs font-semibold text-foreground">
+              P0 to P3 severity
+            </span>
+          </div>
         </MotionReveal>
 
         <MotionStagger className="mt-12 grid gap-8 lg:grid-cols-3" stagger={0.1}>

@@ -56,6 +56,11 @@ const navItems: NavItem[] = [
     href: '#faq',
     children: [
       {
+        label: 'Cases',
+        href: '/cases',
+        hint: 'Public AI agent failures and what testing would have caught',
+      },
+      {
         label: 'FAQ',
         href: '#faq',
         hint: 'Straight answers about our service',
@@ -102,12 +107,11 @@ const navItems: NavItem[] = [
 
 const signInItems = [
   { label: 'Client', href: '/buyer', hint: 'Live findings and retest status' },
-  { label: 'Reviewer', href: '/operator', hint: 'Testing & analysis' },
+  { label: 'Red Team', href: '/operator', hint: 'Tester workspace' },
 ] as const
 
 const staffItems = [
-  { label: 'QA', href: '/qa', hint: 'Quality assurance' },
-  { label: 'Admin', href: '/admin', hint: 'Platform administration' },
+  { label: 'Admin', href: '/admin', hint: 'Findings, escalations, and platform administration' },
 ] as const
 
 export function SiteNav() {
