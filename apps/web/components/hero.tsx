@@ -9,8 +9,8 @@ import { openPilotModal } from './pilot-scoping-modal'
 
 registerGsap()
 
-// 3168x1344. Empty navy on the left for the copy, copper node at ~72%
-// across (the mobile crop centre), figure far right.
+// 3168x1344 (2.36:1). Empty navy on the left for the copy, copper node at
+// ~72% across, figure far right. Rendered right-anchored and unscaled.
 const HERO_IMAGE = '/hero-redteam.jpg'
 
 const proof = [
@@ -58,10 +58,11 @@ export function Hero() {
       const mm = gsap.matchMedia()
 
       mm.add('(min-width: 768px)', () => {
-        gsap.set(image, { scale: 1.12 })
+        // No scale on the image: the artwork is composed to be seen whole.
+        gsap.set(image, { autoAlpha: 0 })
         const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
         intro
-          .to(image, { scale: 1.03, duration: 1.8 }, 0)
+          .to(image, { autoAlpha: 1, duration: 1.2 }, 0)
           .from(
             content.querySelectorAll('[data-hero-item]'),
             { y: 32, autoAlpha: 0, duration: 0.8, stagger: 0.07 },
@@ -69,8 +70,7 @@ export function Hero() {
           )
 
         gsap.to(image, {
-          yPercent: 14,
-          scale: 1.08,
+          yPercent: 8,
           ease: 'none',
           force3D: true,
           scrollTrigger: {
@@ -117,14 +117,17 @@ export function Hero() {
       className="relative flex min-h-[100svh] flex-col overflow-hidden"
     >
       <div className="absolute inset-0" aria-hidden="true">
-        <div ref={imageRef} className="relative h-[115%] w-full will-change-transform md:h-[120%]">
+        <div ref={imageRef} className="relative h-[108%] w-full will-change-transform">
+          {/* Anchored right: when the viewport is narrower than the 2.36:1
+              artwork, the empty navy on the left is what gets cropped, and
+              the node and the figure stay in frame. */}
           <Image
             src={HERO_IMAGE}
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[72%_center] sm:object-center"
+            className="object-cover object-right"
           />
         </div>
         {/* Lighter than before: the image already carries the navy field, so the
