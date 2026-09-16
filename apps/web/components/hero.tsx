@@ -9,8 +9,8 @@ import { openPilotModal } from './pilot-scoping-modal'
 
 registerGsap()
 
-// 3168x1344 (2.36:1). Empty navy on the left for the copy, copper node at
-// ~72% across, figure far right. Rendered right-anchored and unscaled.
+// 2.36:1 artwork. Empty navy on the left for the copy, copper node near the
+// centre, figure just right of it. Rendered left-anchored and unscaled.
 const HERO_IMAGE = '/hero-redteam.jpg'
 
 const proof = [
@@ -118,16 +118,18 @@ export function Hero() {
     >
       <div className="absolute inset-0" aria-hidden="true">
         <div ref={imageRef} className="relative h-[108%] w-full will-change-transform">
-          {/* Anchored right: when the viewport is narrower than the 2.36:1
-              artwork, the empty navy on the left is what gets cropped, and
-              the node and the figure stay in frame. */}
+          {/* Artwork is 2.36:1 with the node at ~50% and the figure at ~63%.
+              On desktop a 16:9 viewport shows the left 75%, so anchoring left
+              puts the node about two-thirds across the screen, clear of the
+              copy, and trims only the empty right edge. On phones the slice
+              is a fifth of the image, so centre on the node instead. */}
           <Image
             src={HERO_IMAGE}
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover object-right"
+            className="object-cover object-center md:object-left"
           />
         </div>
         {/* Lighter than before: the image already carries the navy field, so the
