@@ -9,7 +9,9 @@ import { openPilotModal } from './pilot-scoping-modal'
 
 registerGsap()
 
-const HERO_IMAGE = '/background hero1.jpeg'
+// 3168x1344. Empty navy on the left for the copy, copper node at ~72%
+// across (the mobile crop centre), figure far right.
+const HERO_IMAGE = '/hero-redteam.jpg'
 
 const proof = [
   {
@@ -125,8 +127,10 @@ export function Hero() {
             className="object-cover object-[72%_center] sm:object-center"
           />
         </div>
-        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,24,41,0.95)_0%,rgba(15,24,41,0.82)_42%,rgba(18,32,58,0.5)_70%,rgba(197,106,50,0.2)_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(15,24,41,0.75)_0%,transparent_45%)]" />
+        {/* Lighter than before: the image already carries the navy field, so the
+            overlay only guarantees copy contrast on the left and clears the right. */}
+        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,24,41,0.88)_0%,rgba(15,24,41,0.7)_40%,rgba(18,32,58,0.25)_68%,rgba(18,32,58,0)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(15,24,41,0.7)_0%,transparent_40%)]" />
         <div ref={overlayRef} className="absolute inset-0 bg-ink opacity-0" />
       </div>
 
