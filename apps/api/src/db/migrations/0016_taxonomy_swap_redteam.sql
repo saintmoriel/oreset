@@ -34,6 +34,26 @@ ALTER TABLE "consensus_pairs" ALTER COLUMN "final_decision" TYPE "public"."opera
   END
 )::"public"."operator_decision";
 --> statement-breakpoint
+ALTER TABLE "calibration_cases" ALTER COLUMN "expected_decision" TYPE "public"."operator_decision" USING (
+  CASE "expected_decision"::text
+    WHEN 'approved' THEN 'defended'
+    WHEN 'corrected' THEN 'exploited'
+    WHEN 'rejected' THEN 'exploited'
+    WHEN 'escalated' THEN 'escalated'
+    WHEN 'declined' THEN 'inconclusive'
+  END
+)::"public"."operator_decision";
+--> statement-breakpoint
+ALTER TABLE "calibration_attempts" ALTER COLUMN "decision" TYPE "public"."operator_decision" USING (
+  CASE "decision"::text
+    WHEN 'approved' THEN 'defended'
+    WHEN 'corrected' THEN 'exploited'
+    WHEN 'rejected' THEN 'exploited'
+    WHEN 'escalated' THEN 'escalated'
+    WHEN 'declined' THEN 'inconclusive'
+  END
+)::"public"."operator_decision";
+--> statement-breakpoint
 DROP TYPE "public"."operator_decision_old";
 --> statement-breakpoint
 
@@ -71,6 +91,24 @@ ALTER TABLE "client_tickets" ALTER COLUMN "severity" TYPE "public"."severity" US
   END
 )::"public"."severity";
 --> statement-breakpoint
+ALTER TABLE "calibration_cases" ALTER COLUMN "expected_severity" TYPE "public"."severity" USING (
+  CASE "expected_severity"::text
+    WHEN 'SEV-1' THEN 'P0'
+    WHEN 'SEV-2' THEN 'P1'
+    WHEN 'SEV-3' THEN 'P2'
+    ELSE NULL
+  END
+)::"public"."severity";
+--> statement-breakpoint
+ALTER TABLE "calibration_attempts" ALTER COLUMN "severity" TYPE "public"."severity" USING (
+  CASE "severity"::text
+    WHEN 'SEV-1' THEN 'P0'
+    WHEN 'SEV-2' THEN 'P1'
+    WHEN 'SEV-3' THEN 'P2'
+    ELSE NULL
+  END
+)::"public"."severity";
+--> statement-breakpoint
 DROP TYPE "public"."severity_old";
 --> statement-breakpoint
 
@@ -80,6 +118,8 @@ DROP TYPE "public"."severity_old";
 ALTER TYPE "public"."client_queue_item_status" RENAME TO "client_queue_item_status_old";
 --> statement-breakpoint
 CREATE TYPE "public"."client_queue_item_status" AS ENUM('pending', 'in_review', 'consensus_split', 'exploited', 'defended', 'escalated', 'inconclusive');
+--> statement-breakpoint
+ALTER TABLE "client_queue_items" ALTER COLUMN "status" DROP DEFAULT;
 --> statement-breakpoint
 ALTER TABLE "client_queue_items" ALTER COLUMN "status" TYPE "public"."client_queue_item_status" USING (
   CASE "status"::text
@@ -93,6 +133,8 @@ ALTER TABLE "client_queue_items" ALTER COLUMN "status" TYPE "public"."client_que
     WHEN 'declined' THEN 'inconclusive'
   END
 )::"public"."client_queue_item_status";
+--> statement-breakpoint
+ALTER TABLE "client_queue_items" ALTER COLUMN "status" SET DEFAULT 'pending';
 --> statement-breakpoint
 DROP TYPE "public"."client_queue_item_status_old";
 --> statement-breakpoint

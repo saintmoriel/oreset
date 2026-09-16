@@ -29,6 +29,8 @@ export const SCENARIO_STATUS_LABEL: Record<string, string> = {
 
 const FILTERS = ['all', 'pending', 'exploited', 'defended', 'escalated', 'inconclusive'] as const
 
+const SHOW_SUBMIT_FORM = false
+
 const DOMAINS = [
   ['fintech', 'Fintech'],
   ['payments', 'Payments'],
@@ -320,7 +322,19 @@ export function CasesList({ initialCases }: { initialCases: BuyerCase[] }) {
 
   return (
     <div className="mt-6 space-y-4">
-      <SubmitScenarioForm onSubmitted={(c) => setCases((prev) => [c, ...prev])} />
+      {/* Scenarios are authored by the Oreset Red Team. The client form stays
+          wired (SHOW_SUBMIT_FORM) for engagements that explicitly want it. */}
+      {SHOW_SUBMIT_FORM ? (
+        <SubmitScenarioForm onSubmitted={(c) => setCases((prev) => [c, ...prev])} />
+      ) : (
+        <div className="cx-card flex items-start gap-3 p-4">
+          <Crosshair className="mt-0.5 size-4 shrink-0 text-accent" />
+          <p className="cx-meta text-navy-600">
+            Scenarios are authored and run by the Oreset Red Team. Want a specific interaction tested?
+            Tell your engagement lead and it will appear here.
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
