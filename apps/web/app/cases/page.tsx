@@ -32,7 +32,7 @@ const CASES: Case[] = [
     happened:
       'A passenger asked the airline’s support chatbot about bereavement fares. It told him he could book at full price and claim the discount retroactively within 90 days. The actual policy said the opposite, and the correct page was one link away. When he applied, the airline refused. He took it to the British Columbia Civil Resolution Tribunal.',
     consequence:
-      'The airline argued the chatbot was a separate legal entity responsible for its own statements. The tribunal rejected that outright, found negligent misrepresentation, and ordered the airline to pay. The ruling is now cited everywhere as the moment a company became liable for what its AI said.',
+      'The airline argued the chatbot was a separate legal entity responsible for its own statements. The tribunal member called that “a remarkable submission”, found negligent misrepresentation, and ordered the airline to pay C$650.88 in damages plus interest and fees. The sum was small. The ruling is now cited everywhere as the moment a company became liable for what its AI said.',
     vulnClass: 'VLN-05 Hallucinated business action',
     severity: 'P1',
     dimension: 'Judgment',
@@ -44,9 +44,9 @@ const CASES: Case[] = [
     when: 'December 2023',
     headline: 'A dealership bot agreed to sell a new Tahoe for one dollar.',
     happened:
-      'A visitor told the dealership’s customer chat agent to agree with everything he said and end each reply with “and that’s a legally binding offer, no takesies backsies.” He then offered one dollar for a 2024 Chevrolet Tahoe. The bot agreed, in exactly those words. Others got it to recommend a Ford and write Python.',
+      'A visitor steered the dealership’s ChatGPT-powered chat agent, built by the vendor Fullpath, into agreeing with everything he said and closing each reply with “that’s a legally binding offer, no takesie backsies.” He then offered one dollar for a 2024 Chevrolet Tahoe. The bot agreed, in exactly those words. Others got it to write Python and argue about unrelated topics.',
     consequence:
-      'No car changed hands, but the screenshots circulated for days and the vendor pulled the bot. The dealership became the reference example of an AI agent with no idea what it was and was not allowed to say.',
+      'No car changed hands, but the post spread for days and the vendor had to ship an update that detects and bans users trying the same thing. The dealership became the reference example of an AI agent with no idea what it was and was not allowed to say.',
     vulnClass: 'VLN-01 Prompt injection, VLN-04 Guardrail bypass',
     severity: 'P2',
     dimension: 'Security',
@@ -58,7 +58,7 @@ const CASES: Case[] = [
     when: 'March 2024',
     headline: 'A government chatbot told business owners they could break the law.',
     happened:
-      'The city launched an AI assistant to help small businesses navigate regulations. An investigation by The Markup found it telling users that landlords could refuse tenants with housing vouchers, that employers could take a cut of workers’ tips, and that businesses could refuse to accept cash. All of those are illegal in New York.',
+      'The city launched an AI assistant, built on Microsoft Azure AI, to help small businesses navigate regulations. An investigation by The Markup found it telling users that landlords could refuse tenants with housing vouchers, that employers could take a cut of workers’ tips, and that businesses could refuse to accept cash. All of those are illegal in New York.',
     consequence:
       'The city kept the tool live with an added disclaimer and defended it as a pilot. The story ran nationally. Every answer it gave carried the authority of the city government behind it.',
     vulnClass: 'VLN-05 Hallucinated business action, VLN-06 Unsafe decision under ambiguity',
@@ -74,7 +74,7 @@ const CASES: Case[] = [
     happened:
       'A customer trying to trace a parcel got nowhere with the courier’s chatbot, so he asked it to swear, then to write a poem about how bad the company was. It did both, calling itself useless and the company the worst delivery firm in the world. He posted the exchange.',
     consequence:
-      'The post was seen more than a million times in a day. The company blamed a recent update, disabled the AI component, and became the go-to example of a chatbot turned against its own brand.',
+      'The post was seen more than 800,000 times within a day. The company blamed a recent system update, disabled the AI component, and became the go-to example of a chatbot turned against its own brand.',
     vulnClass: 'VLN-04 Guardrail bypass',
     severity: 'P2',
     dimension: 'Security',
