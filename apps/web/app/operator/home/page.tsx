@@ -15,7 +15,7 @@ import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import { OperatorAppShell } from '@/components/operator/operator-app-shell'
 import { StatusTag } from '@/components/capture/status-tag'
 import { VerificationSeal } from '@/components/capture/verification-seal'
-import { ERR_TAG_LABELS } from '@oreset/shared'
+import { VULN_TAG_LABELS } from '@oreset/shared'
 import type {
   OperatorStats,
   OperatorDecisionRecord,
@@ -96,7 +96,7 @@ export default async function OperatorHomePage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="cx-page-title text-navy-900">
-              {profile?.user.displayName ?? 'Reviewer'}
+              {profile?.user.displayName ?? 'Tester'}
             </h1>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
               {languages.length > 0 && (
@@ -135,9 +135,9 @@ export default async function OperatorHomePage() {
             <div className="h-8 w-px bg-border" />
             <div className="text-center">
               <p className="font-mono text-2xl font-semibold tabular-nums text-navy-900">
-                {stats.approvalRate === null ? '—' : `${stats.approvalRate}%`}
+                {stats.exploitRate === null ? 'n/a' : `${stats.exploitRate}%`}
               </p>
-              <p className="cx-meta text-navy-400">Approval</p>
+              <p className="cx-meta text-navy-400">Exploit rate</p>
             </div>
           </div>
         </div>
@@ -150,7 +150,7 @@ export default async function OperatorHomePage() {
             <div>
               <p className="text-sm font-semibold text-navy-900">Get started</p>
               <p className="cx-meta mt-0.5 text-navy-500">
-                Complete these steps to start receiving review cases.
+                Complete these steps to start receiving attack scenarios.
               </p>
             </div>
             <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[11px] font-semibold tabular-nums text-accent">
@@ -183,7 +183,7 @@ export default async function OperatorHomePage() {
           <TriangleAlert className="size-4 shrink-0 text-warning" />
           <p className="cx-body text-navy-500">
             <span className="font-mono font-semibold text-navy-900">{stats.openTicketsFromMe}</span> of your
-            escalations {stats.openTicketsFromMe === 1 ? 'is' : 'are'} still open with the client team.
+            escalations {stats.openTicketsFromMe === 1 ? 'is' : 'are'} still open with the lead auditor.
           </p>
         </div>
       )}
@@ -198,7 +198,7 @@ export default async function OperatorHomePage() {
           </span>
           <div>
             <p className="cx-label text-accent">Queue</p>
-            <p className="cx-title mt-0.5 text-navy-900">Client placement awaiting review</p>
+            <p className="cx-title mt-0.5 text-navy-900">Attack scenarios awaiting assessment</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -212,28 +212,31 @@ export default async function OperatorHomePage() {
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start">
         <div>
-          <p className="cx-label text-navy-400">Recent decisions</p>
+          <p className="cx-label text-navy-400">Recent findings</p>
           {recent.length === 0 ? (
-            <p className="cx-body mt-2.5 text-navy-400">Nothing decided yet — the queue is waiting.</p>
+            <p className="cx-body mt-2.5 text-navy-400">Nothing decided yet. The queue is waiting.</p>
           ) : (
             <div className="cx-card mt-2.5 divide-y divide-border">
               {recent.map((d) => (
                 <div key={d.id} className="flex items-center justify-between gap-4 p-4">
                   <div>
                     <p className="cx-body font-medium text-navy-900">
-                      {d.clientItemSnapshot?.clientName ?? 'Client placement'}
+                      {d.clientItemSnapshot?.clientName ?? 'Client engagement'}
                     </p>
                     <p className="cx-mono-meta text-navy-400">{new Date(d.createdAt).toLocaleString()}</p>
                   </div>
-                  {d.decision === 'approved' && <VerificationSeal label="Approved" />}
-                  {d.decision === 'corrected' && <StatusTag tone="success">Corrected</StatusTag>}
-                  {d.decision === 'rejected' && <StatusTag tone="destructive">Rejected</StatusTag>}
-                  {d.decision === 'escalated' && (
-                    <StatusTag tone={d.ticket?.status === 'resolved' ? 'success' : 'warning'}>
-                      {d.ticket?.status === 'resolved' ? 'Ticket resolved' : 'Ticket open'}
+                  {d.decision === 'exploited' && (
+                    <StatusTag tone="destructive">
+                      {d.severity ? `Exploited · ${d.severity}` : 'Exploited'}
                     </StatusTag>
                   )}
-                  {d.decision === 'declined' && <StatusTag tone="neutral">Declined</StatusTag>}
+                  {d.decision === 'defended' && <VerificationSeal label="Defended" />}
+                  {d.decision === 'escalated' && (
+                    <StatusTag tone={d.ticket?.status === 'resolved' ? 'success' : 'warning'}>
+                      {d.ticket?.status === 'resolved' ? 'Auditor resolved' : 'With auditor'}
+                    </StatusTag>
+                  )}
+                  {d.decision === 'inconclusive' && <StatusTag tone="neutral">Inconclusive</StatusTag>}
                 </div>
               ))}
             </div>
@@ -241,14 +244,14 @@ export default async function OperatorHomePage() {
         </div>
 
         <div>
-          <p className="cx-label text-navy-400">What I&apos;ve been flagging</p>
+          <p className="cx-label text-navy-400">What I&apos;ve been finding</p>
           <div className="cx-card mt-2.5 divide-y divide-border">
-            {Object.entries(stats.errTagBreakdown).map(([tag, n]) => (
+            {Object.entries(stats.vulnTagBreakdown).map(([tag, n]) => (
               <div key={tag} className="flex items-center justify-between gap-4 p-4">
                 <span className="cx-mono-meta font-semibold text-navy-500">{tag}</span>
                 <span className="cx-meta text-right text-navy-400">
                   <span className="font-mono font-semibold text-navy-900">{n}</span>{' '}
-                  {ERR_TAG_LABELS[tag as keyof typeof ERR_TAG_LABELS]}
+                  {VULN_TAG_LABELS[tag as keyof typeof VULN_TAG_LABELS]}
                 </span>
               </div>
             ))}

@@ -3,6 +3,7 @@ import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
 import * as controller from './buyers.controller'
+import * as findingsController from '../findings/findings.controller'
 
 // Mounted at /api/v1/buyer — buyer self-view, own data only (req.user.sub,
 // no id param to spoof).
@@ -27,6 +28,10 @@ buyersRouter.get('/cases', requireAuth, requireRole('buyer'), asyncHandler(contr
 buyersRouter.get('/cases/stats', requireAuth, requireRole('buyer'), asyncHandler(controller.myCaseStats))
 buyersRouter.get('/cases/:id', requireAuth, requireRole('buyer'), asyncHandler(controller.myCaseDetail))
 buyersRouter.get('/regressions', requireAuth, requireRole('buyer'), asyncHandler(controller.myRegressions))
+
+// Findings dashboard (resilience score + lifecycle) and free retest
+buyersRouter.get('/findings', requireAuth, requireRole('buyer'), asyncHandler(findingsController.myFindings))
+buyersRouter.post('/findings/:id/fixed', requireAuth, requireRole('buyer'), asyncHandler(findingsController.markFixed))
 
 // Webhooks
 buyersRouter.get('/webhooks', requireAuth, requireRole('buyer'), asyncHandler(controller.listWebhooks))

@@ -77,6 +77,30 @@ export const AUDITOR_DECISION_LABELS: Record<AuditorDecision, string> = {
   severity_adjusted: 'Severity Adjusted. Finding real, severity corrected',
 }
 
+// Lifecycle of a verified finding. Free retest is part of every engagement:
+// the client marks a fix, a tester re-runs the scenario, and the finding
+// closes only when the attack no longer lands.
+export const FINDING_STATUSES = [
+  'discovered',
+  'verified',
+  'fix_submitted',
+  'retesting',
+  'closed',
+  'reopened',
+  'false_positive',
+] as const
+export type FindingStatus = (typeof FINDING_STATUSES)[number]
+
+export const FINDING_STATUS_LABELS: Record<FindingStatus, string> = {
+  discovered: 'Discovered. Awaiting auditor verification',
+  verified: 'Verified. Open, awaiting your fix',
+  fix_submitted: 'Fix submitted. Retest queued',
+  retesting: 'Retesting. A tester is re-running the scenario',
+  closed: 'Closed. Fix confirmed, attack no longer lands',
+  reopened: 'Reopened. Fix did not hold',
+  false_positive: 'False positive. Not a real finding',
+}
+
 export const OPERATOR_DECISIONS = ['exploited', 'defended', 'escalated', 'inconclusive'] as const
 export type OperatorDecision = (typeof OPERATOR_DECISIONS)[number]
 

@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { ERR_TAG_LABELS } from '@oreset/shared'
-import type { ErrTag } from '@oreset/shared'
+import { VULN_TAG_LABELS, SEVERITY_LABELS } from '@oreset/shared'
 import { cn } from '@/lib/utils'
 import { StatusTag } from '@/components/capture/status-tag'
 import { TicketResolveClient } from './ticket-resolve-client'
@@ -82,9 +81,9 @@ export function TicketFilters({ tickets }: { tickets: Ticket[] }) {
                       <span className="cx-mono-meta font-semibold text-navy-800">
                         {t.externalRef}
                       </span>
-                      {t.errTag && (
+                      {t.vulnTag && (
                         <span className="rounded bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold text-accent">
-                          {t.errTag}
+                          {t.vulnTag}
                         </span>
                       )}
                       {t.severity && (
@@ -124,28 +123,28 @@ export function TicketFilters({ tickets }: { tickets: Ticket[] }) {
                 {/* Expanded detail */}
                 {isExpanded && (
                   <div className="border-t border-border px-4 pb-4 pt-3 space-y-4">
-                    {/* Error details */}
-                    {t.errTag && (
+                    {/* Vulnerability details */}
+                    {t.vulnTag && (
                       <div className="rounded-lg border border-border bg-navy-50 p-3">
                         <p className="text-[11px] font-medium uppercase tracking-wider text-navy-400 mb-1">
-                          Error Classification
+                          Vulnerability Classification
                         </p>
                         <p className="cx-body text-navy-800">
-                          <span className="font-semibold">{t.errTag}</span>
-                          {' — '}
-                          {ERR_TAG_LABELS[t.errTag as ErrTag] ?? t.errTag}
+                          <span className="font-semibold">{t.vulnTag}</span>
+                          {': '}
+                          {VULN_TAG_LABELS[t.vulnTag]}
                         </p>
                         {t.severity && (
-                          <p className="cx-meta mt-1 text-navy-500">Severity: {t.severity}</p>
+                          <p className="cx-meta mt-1 text-navy-500">{t.severity}: {SEVERITY_LABELS[t.severity]}</p>
                         )}
                       </div>
                     )}
 
-                    {/* Original case content */}
+                    {/* Attack scenario */}
                     {snapshot?.content && (
                       <div className="rounded-lg border border-border bg-background p-3">
                         <p className="text-[11px] font-medium uppercase tracking-wider text-navy-400 mb-1">
-                          Original Case Content
+                          Attack Scenario
                         </p>
                         <p className="cx-body text-navy-800 leading-relaxed whitespace-pre-wrap">
                           {snapshot.content}
@@ -157,34 +156,28 @@ export function TicketFilters({ tickets }: { tickets: Ticket[] }) {
                     {t.notes && (
                       <div className="rounded-lg border border-warning/20 bg-warning/5 p-3">
                         <p className="text-[11px] font-medium uppercase tracking-wider text-warning mb-1">
-                          Operator&apos;s Escalation Notes
+                          Tester&apos;s Escalation Notes
                         </p>
                         <p className="cx-body text-navy-800">{t.notes}</p>
                       </div>
                     )}
 
-                    {/* Ground-truth corrections if present */}
-                    {(decision?.correctedTranscript || decision?.correctedIntent || decision?.correctedOutcome) && (
+                    {/* Tester's write-up if present */}
+                    {(decision?.reproductionSteps || decision?.recommendedFix) && (
                       <div className="rounded-lg border border-accent/20 bg-accent/5 p-3">
                         <p className="text-[11px] font-medium uppercase tracking-wider text-accent mb-2">
-                          Operator&apos;s Corrections
+                          Tester&apos;s Write-up
                         </p>
-                        {decision.correctedTranscript && (
+                        {decision.reproductionSteps && (
                           <div className="mb-2">
-                            <p className="text-[11px] font-medium text-navy-500">Corrected Transcript</p>
-                            <p className="cx-body text-navy-800">{decision.correctedTranscript}</p>
+                            <p className="text-[11px] font-medium text-navy-500">Reproduction Steps</p>
+                            <p className="cx-body whitespace-pre-wrap text-navy-800">{decision.reproductionSteps}</p>
                           </div>
                         )}
-                        {decision.correctedIntent && (
-                          <div className="mb-2">
-                            <p className="text-[11px] font-medium text-navy-500">Corrected Intent</p>
-                            <p className="cx-body text-navy-800">{decision.correctedIntent}</p>
-                          </div>
-                        )}
-                        {decision.correctedOutcome && (
+                        {decision.recommendedFix && (
                           <div>
-                            <p className="text-[11px] font-medium text-navy-500">Corrected Outcome</p>
-                            <p className="cx-body text-navy-800">{decision.correctedOutcome}</p>
+                            <p className="text-[11px] font-medium text-navy-500">Recommended Fix</p>
+                            <p className="cx-body whitespace-pre-wrap text-navy-800">{decision.recommendedFix}</p>
                           </div>
                         )}
                       </div>
@@ -207,7 +200,7 @@ export function TicketFilters({ tickets }: { tickets: Ticket[] }) {
                                 month: 'short',
                                 year: 'numeric',
                               })
-                            : '—'}
+                            : 'an unknown date'}
                         </p>
                       </div>
                     )}

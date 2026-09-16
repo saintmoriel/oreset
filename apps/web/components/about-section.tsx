@@ -14,7 +14,7 @@ const pillars = [
     icon: Shield,
     title: 'Security and judgment in one engagement',
     detail:
-      "Adversarial attacks, edge cases, multi-language inputs, and domain-specific scenarios. One team, one report, both dimensions covered.",
+      "Adversarial attacks, edge cases, multi-language inputs, and domain-specific scenarios. One team, one dashboard, both dimensions covered.",
   },
   {
     icon: MapPin,

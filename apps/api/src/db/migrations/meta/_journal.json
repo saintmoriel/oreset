@@ -120,6 +120,13 @@
       "when": 1788480000000,
       "tag": "0016_taxonomy_swap_redteam",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1789200000000,
+      "tag": "0017_finding_lifecycle",
+      "breakpoints": true
     }
   ]
 }

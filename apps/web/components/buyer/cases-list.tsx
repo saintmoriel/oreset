@@ -2,77 +2,106 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, ChevronUp, Plus, Upload, Clock, Eye } from 'lucide-react'
-import { ERR_TAG_LABELS, SEVERITY_LABELS } from '@oreset/shared'
+import { ChevronDown, ChevronUp, Plus, Crosshair, Eye, RotateCcw } from 'lucide-react'
 import type { BuyerCase } from '@/lib/api/endpoints/buyer-cases'
 import { submitBuyerCase, getMyBuyerCases } from '@/lib/api/endpoints/buyer-cases'
 import { cn } from '@/lib/utils'
 
-const STATUS_COLORS: Record<string, string> = {
+export const SCENARIO_STATUS_TONE: Record<string, string> = {
   pending: 'bg-warning/10 text-warning',
   in_review: 'bg-accent/10 text-accent',
-  approved: 'bg-success/10 text-success',
-  corrected: 'bg-accent/10 text-accent',
-  rejected: 'bg-destructive/10 text-destructive',
-  escalated: 'bg-warning/10 text-warning',
-  declined: 'bg-navy-100 text-navy-500',
   consensus_split: 'bg-navy-100 text-navy-600',
+  exploited: 'bg-destructive/10 text-destructive',
+  defended: 'bg-success/10 text-success',
+  escalated: 'bg-warning/10 text-warning',
+  inconclusive: 'bg-navy-100 text-navy-500',
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pending review',
-  in_review: 'In review (dual-solve)',
-  approved: 'Approved',
-  corrected: 'Corrected & passed',
-  rejected: 'Rejected',
-  escalated: 'Escalated',
-  declined: 'Declined',
+export const SCENARIO_STATUS_LABEL: Record<string, string> = {
+  pending: 'Queued',
+  in_review: 'In progress (dual-solve)',
   consensus_split: 'Awaiting adjudication',
+  exploited: 'Exploited',
+  defended: 'Defended',
+  escalated: 'With lead auditor',
+  inconclusive: 'Inconclusive',
 }
 
-const FILTERS = ['all', 'pending', 'in_review', 'approved', 'corrected', 'rejected', 'escalated'] as const
+const FILTERS = ['all', 'pending', 'exploited', 'defended', 'escalated', 'inconclusive'] as const
 
-function SubmitCaseForm({ onSubmitted }: { onSubmitted: (c: BuyerCase) => void }) {
+const DOMAINS = [
+  ['fintech', 'Fintech'],
+  ['payments', 'Payments'],
+  ['lending', 'Lending and credit'],
+  ['claims', 'Claims and payouts'],
+  ['healthcare', 'Healthcare'],
+  ['government', 'Government and public services'],
+  ['other', 'Other'],
+] as const
+
+const inputClass =
+  'w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800 placeholder:text-navy-300 focus:border-accent/50 focus:outline-none'
+
+function SubmitScenarioForm({ onSubmitted }: { onSubmitted: (c: BuyerCase) => void }) {
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [clientName, setClientName] = useState('')
   const [externalRef, setExternalRef] = useState('')
   const [content, setContent] = useState('')
-  const [language, setLanguage] = useState('')
+  const [targetEndpoint, setTargetEndpoint] = useState('')
+  const [attackType, setAttackType] = useState('')
+  const [modelId, setModelId] = useState('')
   const [domain, setDomain] = useState('')
+  const [language, setLanguage] = useState('')
   const [aiDecision, setAiDecision] = useState('')
   const [aiOutcome, setAiOutcome] = useState('')
+  const [toolCallsJson, setToolCallsJson] = useState('')
   const [dualSolve, setDualSolve] = useState(false)
+
+  function reset() {
+    setClientName(''); setExternalRef(''); setContent(''); setTargetEndpoint(''); setAttackType('')
+    setModelId(''); setDomain(''); setLanguage(''); setAiDecision(''); setAiOutcome(''); setToolCallsJson('')
+    setDualSolve(false); setError(null)
+  }
 
   const handleSubmit = async () => {
     if (!clientName || !externalRef || !content) return
+    setError(null)
+
+    const traceData: Record<string, unknown> = { input: content }
+    if (targetEndpoint) traceData.targetEndpoint = targetEndpoint
+    if (attackType) traceData.attackType = attackType
+    if (modelId) traceData.modelId = modelId
+    if (domain) traceData.domain = domain
+    if (language) traceData.language = language
+    if (aiDecision) traceData.aiDecision = aiDecision
+    if (aiOutcome) traceData.aiOutcome = aiOutcome
+    if (toolCallsJson.trim()) {
+      try {
+        const parsed = JSON.parse(toolCallsJson)
+        if (!Array.isArray(parsed)) throw new Error('not an array')
+        traceData.toolCalls = parsed
+      } catch {
+        setError('Tool calls must be a JSON array, for example [{"function":"transfer_funds","args":{"amount":500},"authorized":false}].')
+        return
+      }
+    }
+
     setSubmitting(true)
     try {
-      const traceData: Record<string, unknown> = {}
-      if (language) traceData.language = language
-      if (domain) traceData.domain = domain
-      if (aiDecision) traceData.aiDecision = aiDecision
-      if (aiOutcome) traceData.aiOutcome = aiOutcome
-
       const result = await submitBuyerCase({
         clientName,
         externalRef,
         content,
-        traceData: Object.keys(traceData).length > 0 ? traceData : undefined,
+        traceData,
         requiresDualSolve: dualSolve || undefined,
       })
       onSubmitted(result.item)
-      setClientName('')
-      setExternalRef('')
-      setContent('')
-      setLanguage('')
-      setDomain('')
-      setAiDecision('')
-      setAiOutcome('')
-      setDualSolve(false)
+      reset()
       setOpen(false)
     } catch {
-      // handled by apiFetch
+      setError('Could not submit the scenario.')
     }
     setSubmitting(false)
   }
@@ -84,108 +113,104 @@ function SubmitCaseForm({ onSubmitted }: { onSubmitted: (c: BuyerCase) => void }
         className="cx-card flex w-full items-center justify-center gap-2 p-4 text-accent hover:bg-accent/5 cx-fade"
       >
         <Plus className="size-4" />
-        <span className="cx-body font-semibold">Submit a new case</span>
+        <span className="cx-body font-semibold">Submit an attack scenario</span>
       </button>
     )
   }
 
   return (
-    <div className="cx-card p-5 space-y-4">
+    <div className="cx-card space-y-4 p-5">
       <div className="flex items-center justify-between">
-        <h3 className="cx-title text-navy-900">Submit Verification Case</h3>
-        <button onClick={() => setOpen(false)} className="cx-meta text-navy-400 hover:text-navy-600">
+        <div>
+          <h3 className="cx-title text-navy-900">Submit attack scenario</h3>
+          <p className="cx-meta mt-0.5 text-navy-500">
+            Most scenarios are authored by the Oreset Red Team. Use this to hand us a specific interaction you want assessed.
+          </p>
+        </div>
+        <button onClick={() => { setOpen(false); reset() }} className="cx-meta text-navy-400 hover:text-navy-600">
           Cancel
         </button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="cx-meta font-semibold text-navy-500 mb-1 block">Client / Product Name *</label>
-          <input
-            value={clientName}
-            onChange={(e) => setClientName(e.target.value)}
-            placeholder="e.g. SafariPay Credit Engine"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
-          />
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Agent or product name *</label>
+          <input value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. SafariPay support agent" className={inputClass} />
         </div>
         <div>
-          <label className="cx-meta font-semibold text-navy-500 mb-1 block">External Reference *</label>
-          <input
-            value={externalRef}
-            onChange={(e) => setExternalRef(e.target.value)}
-            placeholder="e.g. txn_5521a or case-2024-0891"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
-          />
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Scenario ID *</label>
+          <input value={externalRef} onChange={(e) => setExternalRef(e.target.value)} placeholder="e.g. scn-2026-0042" className={inputClass} />
         </div>
       </div>
 
       <div>
-        <label className="cx-meta font-semibold text-navy-500 mb-1 block">Input Content *</label>
+        <label className="cx-meta mb-1 block font-semibold text-navy-500">Attack prompt *</label>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="The original input in the customer's language (voice transcript, form text, chat message, etc.)"
+          placeholder="The exact input sent to the agent. Include the full conversation if the attack spans several turns."
           rows={4}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800 resize-none"
+          className={cn(inputClass, 'resize-none')}
         />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div>
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Target endpoint</label>
+          <input value={targetEndpoint} onChange={(e) => setTargetEndpoint(e.target.value)} placeholder="POST /v1/agent/chat" className={cn(inputClass, 'font-mono')} />
+        </div>
+        <div>
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Attack type</label>
+          <input value={attackType} onChange={(e) => setAttackType(e.target.value)} placeholder="e.g. Direct injection, role-play jailbreak" className={inputClass} />
+        </div>
+        <div>
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Model</label>
+          <input value={modelId} onChange={(e) => setModelId(e.target.value)} placeholder="e.g. gpt-4.1, claude-sonnet-5" className={cn(inputClass, 'font-mono')} />
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="cx-meta font-semibold text-navy-500 mb-1 block">Language</label>
-          <input
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            placeholder="e.g. Pidgin, Yoruba, Hausa, Swahili"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
-          />
-        </div>
-        <div>
-          <label className="cx-meta font-semibold text-navy-500 mb-1 block">Domain</label>
-          <select
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
-          >
-            <option value="">Select domain...</option>
-            <option value="claims">Claims & payouts</option>
-            <option value="lending">Lending & credit</option>
-            <option value="healthcare">Healthcare</option>
-            <option value="government">Government & public services</option>
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Domain</label>
+          <select value={domain} onChange={(e) => setDomain(e.target.value)} className={inputClass}>
+            <option value="">Select domain</option>
+            {DOMAINS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
         </div>
+        <div>
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Language of the attack</label>
+          <input value={language} onChange={(e) => setLanguage(e.target.value)} placeholder="e.g. English, Pidgin, Hausa, Swahili" className={inputClass} />
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="cx-meta font-semibold text-navy-500 mb-1 block">AI Decision</label>
-          <input
-            value={aiDecision}
-            onChange={(e) => setAiDecision(e.target.value)}
-            placeholder="What the AI decided (e.g. 'Claim denied')"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
-          />
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Model response</label>
+          <textarea value={aiDecision} onChange={(e) => setAiDecision(e.target.value)} placeholder="What the agent said or did" rows={3} className={cn(inputClass, 'resize-none')} />
         </div>
         <div>
-          <label className="cx-meta font-semibold text-navy-500 mb-1 block">AI Outcome</label>
-          <input
-            value={aiOutcome}
-            onChange={(e) => setAiOutcome(e.target.value)}
-            placeholder="The consequence (e.g. 'No payout issued')"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
-          />
+          <label className="cx-meta mb-1 block font-semibold text-navy-500">Agent reasoning (if available)</label>
+          <textarea value={aiOutcome} onChange={(e) => setAiOutcome(e.target.value)} placeholder="Chain of thought, plan, or internal notes the agent produced" rows={3} className={cn(inputClass, 'resize-none')} />
         </div>
       </div>
 
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={dualSolve}
-          onChange={(e) => setDualSolve(e.target.checked)}
-          className="rounded border-border"
+      <div>
+        <label className="cx-meta mb-1 block font-semibold text-navy-500">Tool calls executed (JSON array, optional)</label>
+        <textarea
+          value={toolCallsJson}
+          onChange={(e) => setToolCallsJson(e.target.value)}
+          placeholder='[{"function":"transfer_funds","args":{"amount":500,"to":"acct_9"},"authorized":false}]'
+          rows={3}
+          className={cn(inputClass, 'resize-none font-mono text-xs')}
         />
-        <span className="cx-body text-navy-700">Require dual-solve (two independent reviewers)</span>
+      </div>
+
+      <label className="flex cursor-pointer items-center gap-2">
+        <input type="checkbox" checked={dualSolve} onChange={(e) => setDualSolve(e.target.checked)} className="rounded border-border" />
+        <span className="cx-body text-navy-700">Require two independent testers (dual-solve)</span>
       </label>
+
+      {error && <p className="cx-body text-destructive">{error}</p>}
 
       <div className="flex justify-end">
         <button
@@ -193,16 +218,18 @@ function SubmitCaseForm({ onSubmitted }: { onSubmitted: (c: BuyerCase) => void }
           disabled={submitting || !clientName || !externalRef || !content}
           className="rounded-lg bg-accent px-5 py-2 cx-body font-semibold text-white hover:bg-accent/90 disabled:opacity-50 cx-fade"
         >
-          {submitting ? 'Submitting...' : 'Submit Case'}
+          {submitting ? 'Submitting...' : 'Submit scenario'}
         </button>
       </div>
     </div>
   )
 }
 
-function CaseCard({ c }: { c: BuyerCase }) {
+function ScenarioCard({ c }: { c: BuyerCase }) {
   const [expanded, setExpanded] = useState(false)
-  const traceData = c.traceData as Record<string, unknown> | null
+  const trace = (c.traceData ?? {}) as Record<string, unknown>
+  const isRetest = typeof trace.retestOf === 'string'
+  const toolCalls = Array.isArray(trace.toolCalls) ? (trace.toolCalls as unknown[]) : []
 
   return (
     <div className="cx-card overflow-hidden">
@@ -211,51 +238,52 @@ function CaseCard({ c }: { c: BuyerCase }) {
         className="flex w-full items-center gap-3 p-4 text-left hover:bg-navy-50/50 cx-fade"
       >
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="cx-body font-semibold text-navy-900">{c.clientName}</span>
             <span className="cx-mono-meta text-navy-400">{c.externalRef}</span>
-            <span className={cn('cx-meta inline-flex rounded-full px-2 py-0.5 font-semibold', STATUS_COLORS[c.status] ?? 'bg-navy-100 text-navy-500')}>
-              {STATUS_LABELS[c.status] ?? c.status}
+            {isRetest && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
+                <RotateCcw className="size-3" /> Retest
+              </span>
+            )}
+            <span className={cn('cx-meta inline-flex rounded-full px-2 py-0.5 font-semibold', SCENARIO_STATUS_TONE[c.status] ?? 'bg-navy-100 text-navy-500')}>
+              {SCENARIO_STATUS_LABEL[c.status] ?? c.status}
             </span>
           </div>
-          <div className="mt-1 flex items-center gap-3 flex-wrap">
-            {traceData?.language && (
-              <span className="cx-meta text-navy-400">{traceData.language as string}</span>
-            )}
-            {traceData?.domain && (
-              <span className="cx-meta text-navy-400">{traceData.domain as string}</span>
-            )}
+          <div className="mt-1 flex flex-wrap items-center gap-3">
+            {typeof trace.attackType === 'string' && <span className="cx-meta text-navy-500">{trace.attackType}</span>}
+            {typeof trace.targetEndpoint === 'string' && <span className="cx-mono-meta text-navy-400">{trace.targetEndpoint}</span>}
+            {typeof trace.domain === 'string' && <span className="cx-meta text-navy-400">{trace.domain}</span>}
+            {typeof trace.language === 'string' && <span className="cx-meta text-navy-400">{trace.language}</span>}
             <span className="cx-meta text-navy-400">{new Date(c.createdAt).toLocaleDateString()}</span>
             {c.requiresDualSolve && (
-              <span className="cx-meta rounded-full bg-accent/10 px-1.5 py-0.5 text-accent font-semibold">dual-solve</span>
+              <span className="cx-meta rounded-full bg-accent/10 px-1.5 py-0.5 font-semibold text-accent">dual-solve</span>
             )}
           </div>
         </div>
-        {expanded ? <ChevronUp className="size-4 text-navy-400 shrink-0" /> : <ChevronDown className="size-4 text-navy-400 shrink-0" />}
+        {expanded ? <ChevronUp className="size-4 shrink-0 text-navy-400" /> : <ChevronDown className="size-4 shrink-0 text-navy-400" />}
       </button>
 
       {expanded && (
-        <div className="border-t border-border p-4 space-y-3">
+        <div className="space-y-3 border-t border-border p-4">
           <div>
-            <p className="cx-meta font-semibold text-navy-500 mb-1">Input Content</p>
+            <p className="cx-meta mb-1 font-semibold text-navy-500">Attack prompt</p>
             <div className="rounded-lg bg-navy-50 p-3">
-              <p className="cx-body text-navy-800 text-sm whitespace-pre-wrap">{c.content}</p>
+              <p className="cx-body whitespace-pre-wrap text-sm text-navy-800">{c.content}</p>
             </div>
           </div>
 
-          {traceData?.aiDecision && (
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <p className="cx-meta font-semibold text-navy-500">AI Decision</p>
-                <p className="cx-body text-navy-700 mt-0.5">{traceData.aiDecision as string}</p>
-              </div>
-              {traceData?.aiOutcome && (
-                <div>
-                  <p className="cx-meta font-semibold text-navy-500">AI Outcome</p>
-                  <p className="cx-body text-navy-700 mt-0.5">{traceData.aiOutcome as string}</p>
-                </div>
-              )}
+          {typeof trace.aiDecision === 'string' && (
+            <div>
+              <p className="cx-meta font-semibold text-navy-500">Model response</p>
+              <p className="cx-body mt-0.5 whitespace-pre-wrap text-navy-700">{trace.aiDecision}</p>
             </div>
+          )}
+
+          {toolCalls.length > 0 && (
+            <p className="cx-meta text-navy-500">
+              {toolCalls.length} tool call{toolCalls.length === 1 ? '' : 's'} executed. Open the full details to inspect them.
+            </p>
           )}
 
           <div className="flex justify-end">
@@ -290,27 +318,21 @@ export function CasesList({ initialCases }: { initialCases: BuyerCase[] }) {
     setLoading(false)
   }
 
-  const handleSubmitted = (c: BuyerCase) => {
-    setCases((prev) => [c, ...prev])
-  }
-
   return (
     <div className="mt-6 space-y-4">
-      <SubmitCaseForm onSubmitted={handleSubmitted} />
+      <SubmitScenarioForm onSubmitted={(c) => setCases((prev) => [c, ...prev])} />
 
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => handleFilterChange(f)}
             className={cn(
               'cx-meta rounded-full px-3 py-1 font-semibold cx-fade',
-              filter === f
-                ? 'bg-accent text-white'
-                : 'bg-navy-100 text-navy-500 hover:bg-navy-200',
+              filter === f ? 'bg-accent text-white' : 'bg-navy-100 text-navy-500 hover:bg-navy-200',
             )}
           >
-            {f === 'all' ? 'All' : STATUS_LABELS[f] ?? f}
+            {f === 'all' ? 'All' : SCENARIO_STATUS_LABEL[f] ?? f}
           </button>
         ))}
       </div>
@@ -321,13 +343,13 @@ export function CasesList({ initialCases }: { initialCases: BuyerCase[] }) {
         </div>
       ) : cases.length === 0 ? (
         <div className="cx-card flex flex-col items-center gap-3 p-10 text-center">
-          <Upload className="size-8 text-navy-300" />
-          <p className="cx-body text-navy-500">No cases yet. Submit your first case above.</p>
+          <Crosshair className="size-8 text-navy-300" />
+          <p className="cx-body text-navy-500">No scenarios yet. They appear here as the red team starts your engagement.</p>
         </div>
       ) : (
         <div className="space-y-2">
           {cases.map((c) => (
-            <CaseCard key={c.id} c={c} />
+            <ScenarioCard key={c.id} c={c} />
           ))}
         </div>
       )}

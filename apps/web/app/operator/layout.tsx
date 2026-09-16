@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Client Queue | Oreset Reviewers',
-  description: 'Certified Reviewer prototype — reviewing a live enterprise client placement.',
+  title: 'Red Team | Oreset',
+  description: 'Oreset Red Team workspace for assessing attack scenarios against client AI agents.',
 }
 
 export default function OperatorLayout({ children }: { children: React.ReactNode }) {

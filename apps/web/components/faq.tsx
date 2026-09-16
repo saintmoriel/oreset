@@ -20,12 +20,12 @@ const faqs = [
   {
     audience: 'Clients',
     q: 'How long does an engagement take?',
-    a: "Engagements typically run 1-2 weeks depending on the agent's complexity and scope. No SDK to install. No integration required. You give us access, we stress-test, you get the report.",
+    a: "Engagements typically run 1-2 weeks depending on the agent's complexity and scope. No SDK to install. No integration required. You give us access, we stress-test, and findings appear in your dashboard as we confirm them.",
   },
   {
     audience: 'Clients',
-    q: 'What do I get at the end?',
-    a: "A structured risk report: every failure found, its severity, the business consequence, and a specific fix recommendation. Actionable for your engineering team and legible for your leadership.",
+    q: 'What do I get?',
+    a: "Access to a live findings dashboard, not a one-time PDF. Every failure is documented with severity, business consequence, reproduction steps, and a specific fix. Your engineers work from it directly, your leadership sees the resilience score and trend. After you patch, we retest at no extra cost and close the finding only when the fix holds. Findings also export as a regression suite you can run in your CI pipeline.",
   },
   {
     audience: 'Clients',

@@ -49,12 +49,12 @@ export function WhatWeTest() {
             Security tells you half the story. We tell you the rest.
           </h2>
           <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground">
-            Every engagement covers three dimensions. You get a single report
-            that shows what breaks, how badly, and what to fix first.
+            Every engagement covers three dimensions. Findings show what
+            breaks, how badly, and what to fix first, then we verify the fix.
           </p>
         </MotionReveal>
 
-        <MotionStagger className="mt-12 grid gap-8 lg:grid-cols-3" staggerDelay={0.1}>
+        <MotionStagger className="mt-12 grid gap-8 lg:grid-cols-3" stagger={0.1}>
           {DIMENSIONS.map((d) => (
             <MotionStaggerItem key={d.title}>
               <div className="card-surface flex h-full flex-col overflow-hidden">

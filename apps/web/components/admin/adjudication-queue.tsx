@@ -2,18 +2,25 @@
 
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Gavel, User, Clock } from 'lucide-react'
-import { OPERATOR_DECISIONS, ERR_TAGS, SEVERITY_LEVELS, OPERATOR_DECISION_LABELS, ERR_TAG_LABELS, SEVERITY_LABELS } from '@oreset/shared'
-import type { ConsensusPair } from '@/lib/api/endpoints/consensus'
+import {
+  OPERATOR_DECISIONS,
+  VULN_TAGS,
+  SEVERITY_LEVELS,
+  OPERATOR_DECISION_LABELS,
+  VULN_TAG_LABELS,
+  SEVERITY_LABELS,
+  EXPLOIT_STATUS_LABELS,
+} from '@oreset/shared'
+import type { ConsensusPair, ConsensusDecision } from '@/lib/api/endpoints/consensus'
 import { adjudicatePair, enableDualSolveBulk } from '@/lib/api/endpoints/consensus'
 import { cn } from '@/lib/utils'
 
 function DecisionBadge({ decision }: { decision: string }) {
   const colors: Record<string, string> = {
-    approved: 'bg-success/10 text-success',
-    corrected: 'bg-accent/10 text-accent',
-    rejected: 'bg-destructive/10 text-destructive',
+    exploited: 'bg-destructive/10 text-destructive',
+    defended: 'bg-success/10 text-success',
     escalated: 'bg-warning/10 text-warning',
-    declined: 'bg-navy-100 text-navy-500',
+    inconclusive: 'bg-navy-100 text-navy-500',
   }
   return (
     <span className={cn('cx-meta inline-flex items-center rounded-full px-2 py-0.5 font-semibold', colors[decision] ?? 'bg-navy-100 text-navy-500')}>
@@ -27,17 +34,7 @@ function ReviewerDecisionCard({
   decision,
 }: {
   label: string
-  decision: {
-    operatorId: string
-    decision: string
-    errTag: string | null
-    severity: string | null
-    notes: string | null
-    correctedTranscript: string | null
-    correctedIntent: string | null
-    correctedOutcome: string | null
-    reviewTimeMs: number | null
-  } | null | undefined
+  decision: ConsensusDecision | null | undefined
 }) {
   if (!decision) return null
 
@@ -53,10 +50,16 @@ function ReviewerDecisionCard({
           <span className="cx-meta text-navy-400 w-16 shrink-0">Decision</span>
           <DecisionBadge decision={decision.decision} />
         </div>
-        {decision.errTag && (
+        {decision.vulnTag && (
           <div className="flex items-center gap-2">
-            <span className="cx-meta text-navy-400 w-16 shrink-0">Error</span>
-            <span className="cx-meta text-navy-700">{decision.errTag} - {ERR_TAG_LABELS[decision.errTag as keyof typeof ERR_TAG_LABELS]}</span>
+            <span className="cx-meta text-navy-400 w-16 shrink-0">Vuln</span>
+            <span className="cx-meta text-navy-700">{decision.vulnTag}: {VULN_TAG_LABELS[decision.vulnTag]}</span>
+          </div>
+        )}
+        {decision.exploitStatus && (
+          <div className="flex items-center gap-2">
+            <span className="cx-meta text-navy-400 w-16 shrink-0">Exploit</span>
+            <span className="cx-meta text-navy-700">{EXPLOIT_STATUS_LABELS[decision.exploitStatus]}</span>
           </div>
         )}
         {decision.severity && (
@@ -71,10 +74,16 @@ function ReviewerDecisionCard({
             <p className="cx-body mt-0.5 text-navy-700 text-sm">{decision.notes}</p>
           </div>
         )}
-        {decision.correctedOutcome && (
+        {decision.reproductionSteps && (
           <div>
-            <span className="cx-meta text-navy-400">Corrected outcome</span>
-            <p className="cx-body mt-0.5 text-navy-700 text-sm">{decision.correctedOutcome}</p>
+            <span className="cx-meta text-navy-400">Reproduction steps</span>
+            <p className="cx-body mt-0.5 whitespace-pre-wrap text-navy-700 text-sm">{decision.reproductionSteps}</p>
+          </div>
+        )}
+        {decision.recommendedFix && (
+          <div>
+            <span className="cx-meta text-navy-400">Recommended fix</span>
+            <p className="cx-body mt-0.5 whitespace-pre-wrap text-navy-700 text-sm">{decision.recommendedFix}</p>
           </div>
         )}
         {decision.reviewTimeMs && (
@@ -91,8 +100,8 @@ function ReviewerDecisionCard({
 function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdjudicated: () => void }) {
   const [expanded, setExpanded] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [finalDecision, setFinalDecision] = useState(pair.decisionOne?.decision ?? 'approved')
-  const [finalErrTag, setFinalErrTag] = useState<string>('')
+  const [finalDecision, setFinalDecision] = useState(pair.decisionOne?.decision ?? 'exploited')
+  const [finalVulnTag, setFinalVulnTag] = useState<string>('')
   const [finalSeverity, setFinalSeverity] = useState<string>('')
   const [adjNotes, setAdjNotes] = useState('')
 
@@ -101,7 +110,7 @@ function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdju
     try {
       await adjudicatePair(pair.id, {
         finalDecision: finalDecision as typeof OPERATOR_DECISIONS[number],
-        ...(finalErrTag ? { finalErrTag: finalErrTag as typeof ERR_TAGS[number] } : {}),
+        ...(finalVulnTag ? { finalVulnTag: finalVulnTag as typeof VULN_TAGS[number] } : {}),
         ...(finalSeverity ? { finalSeverity: finalSeverity as typeof SEVERITY_LEVELS[number] } : {}),
         ...(adjNotes ? { notes: adjNotes } : {}),
       })
@@ -125,9 +134,9 @@ function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdju
             <span className="cx-mono-meta text-navy-400">{pair.clientItem?.externalRef}</span>
           </div>
           <div className="mt-1 flex items-center gap-3">
-            <span className="cx-meta text-navy-400">Reviewer 1:</span>
+            <span className="cx-meta text-navy-400">Tester 1:</span>
             <DecisionBadge decision={pair.decisionOne?.decision ?? '?'} />
-            <span className="cx-meta text-navy-400">Reviewer 2:</span>
+            <span className="cx-meta text-navy-400">Tester 2:</span>
             <DecisionBadge decision={pair.decisionTwo?.decision ?? '?'} />
             {pair.agreementScore != null && (
               <span className="cx-meta text-navy-400">Score: {Math.round(pair.agreementScore * 100)}%</span>
@@ -142,7 +151,7 @@ function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdju
           {/* Original content */}
           {pair.clientItem?.content && (
             <div>
-              <p className="cx-meta font-semibold text-navy-500 mb-1">Original Content</p>
+              <p className="cx-meta font-semibold text-navy-500 mb-1">Attack Scenario</p>
               <div className="rounded-lg bg-navy-50 p-3">
                 <p className="cx-body text-navy-800 text-sm whitespace-pre-wrap">{pair.clientItem.content}</p>
               </div>
@@ -151,8 +160,8 @@ function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdju
 
           {/* Side-by-side reviewer decisions */}
           <div className="grid gap-3 md:grid-cols-2">
-            <ReviewerDecisionCard label="Reviewer 1" decision={pair.decisionOne} />
-            <ReviewerDecisionCard label="Reviewer 2" decision={pair.decisionTwo} />
+            <ReviewerDecisionCard label="Tester 1" decision={pair.decisionOne} />
+            <ReviewerDecisionCard label="Tester 2" decision={pair.decisionTwo} />
           </div>
 
           {/* Adjudication form */}
@@ -167,7 +176,7 @@ function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdju
                 <label className="cx-meta font-semibold text-navy-500 mb-1 block">Final Decision</label>
                 <select
                   value={finalDecision}
-                  onChange={(e) => setFinalDecision(e.target.value)}
+                  onChange={(e) => setFinalDecision(e.target.value as typeof OPERATOR_DECISIONS[number])}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
                 >
                   {OPERATOR_DECISIONS.map((d) => (
@@ -176,15 +185,15 @@ function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdju
                 </select>
               </div>
               <div>
-                <label className="cx-meta font-semibold text-navy-500 mb-1 block">Error Tag</label>
+                <label className="cx-meta font-semibold text-navy-500 mb-1 block">Vulnerability</label>
                 <select
-                  value={finalErrTag}
-                  onChange={(e) => setFinalErrTag(e.target.value)}
+                  value={finalVulnTag}
+                  onChange={(e) => setFinalVulnTag(e.target.value)}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 cx-body text-navy-800"
                 >
                   <option value="">None</option>
-                  {ERR_TAGS.map((t) => (
-                    <option key={t} value={t}>{t} - {ERR_TAG_LABELS[t]}</option>
+                  {VULN_TAGS.map((t) => (
+                    <option key={t} value={t}>{t}: {VULN_TAG_LABELS[t]}</option>
                   ))}
                 </select>
               </div>
@@ -197,7 +206,7 @@ function AdjudicationCard({ pair, onAdjudicated }: { pair: ConsensusPair; onAdju
                 >
                   <option value="">None</option>
                   {SEVERITY_LEVELS.map((s) => (
-                    <option key={s} value={s}>{SEVERITY_LABELS[s]}</option>
+                    <option key={s} value={s}>{s}: {SEVERITY_LABELS[s]}</option>
                   ))}
                 </select>
               </div>

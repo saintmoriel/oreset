@@ -11,8 +11,16 @@ import {
   getMyCalibration,
 } from '@/lib/api/endpoints/calibration'
 import type { CalibrationCase, CalibrationFeedback, CalibrationAttempt } from '@/lib/api/endpoints/calibration'
-import { OPERATOR_DECISION_LABELS, ERR_TAG_LABELS, SEVERITY_LABELS } from '@oreset/shared'
-import type { OperatorDecision, ErrTag, Severity } from '@oreset/shared'
+import {
+  OPERATOR_DECISION_LABELS,
+  VULN_TAGS,
+  VULN_TAG_LABELS,
+  SEVERITY_LEVELS,
+  SEVERITY_LABELS,
+  EXPLOIT_STATUSES,
+  EXPLOIT_STATUS_LABELS,
+} from '@oreset/shared'
+import type { OperatorDecision, VulnTag, Severity, ExploitStatus } from '@oreset/shared'
 
 type Phase = 'loading' | 'ready' | 'reviewing' | 'feedback' | 'complete'
 
@@ -26,8 +34,10 @@ export default function CalibrationPage() {
 
   // Review form state
   const [decision, setDecision] = useState<OperatorDecision | null>(null)
-  const [errTag, setErrTag] = useState<ErrTag | null>(null)
+  const [vulnTag, setVulnTag] = useState<VulnTag | null>(null)
   const [severity, setSeverity] = useState<Severity | null>(null)
+  const [exploitStatus, setExploitStatus] = useState<ExploitStatus | null>(null)
+  const [reproductionSteps, setReproductionSteps] = useState('')
   const [notes, setNotes] = useState('')
   const [startTime] = useState(Date.now())
 
@@ -44,8 +54,10 @@ export default function CalibrationPage() {
         setCurrentCase(nextRes.calibrationCase)
         setPhase('reviewing')
         setDecision(null)
-        setErrTag(null)
+        setVulnTag(null)
         setSeverity(null)
+        setExploitStatus(null)
+        setReproductionSteps('')
         setNotes('')
         setFeedback(null)
       } else {
@@ -62,8 +74,10 @@ export default function CalibrationPage() {
       const res = await submitCalibrationAttempt({
         calibrationCaseId: currentCase.id,
         decision,
-        errTag: errTag ?? undefined,
+        vulnTag: vulnTag ?? undefined,
         severity: severity ?? undefined,
+        exploitStatus: exploitStatus ?? undefined,
+        reproductionSteps: reproductionSteps || undefined,
         notes: notes || undefined,
         reviewTimeMs: Date.now() - startTime,
       })
@@ -73,12 +87,13 @@ export default function CalibrationPage() {
   }
 
   const DECISIONS: { value: OperatorDecision; color: string }[] = [
-    { value: 'approved', color: 'border-success/50 bg-success/5' },
-    { value: 'corrected', color: 'border-accent/50 bg-accent/5' },
-    { value: 'rejected', color: 'border-destructive/50 bg-destructive/5' },
+    { value: 'exploited', color: 'border-destructive/50 bg-destructive/5' },
+    { value: 'defended', color: 'border-success/50 bg-success/5' },
     { value: 'escalated', color: 'border-warning/50 bg-warning/5' },
-    { value: 'declined', color: 'border-navy-200 bg-navy-50' },
+    { value: 'inconclusive', color: 'border-navy-200 bg-navy-50' },
   ]
+
+  const showFindingFields = decision !== null && decision !== 'inconclusive'
 
   return (
     <OperatorAppShell>
@@ -126,7 +141,7 @@ export default function CalibrationPage() {
           </span>
           <p className="cx-body font-semibold text-navy-900">All calibration cases completed</p>
           <p className="cx-meta max-w-sm text-navy-500">
-            You've reviewed all available gold-standard cases. New cases will appear here when added by the QA team.
+            You&apos;ve completed all available gold-standard scenarios. New ones will appear here when the lead auditors add them.
           </p>
         </div>
       )}
@@ -158,7 +173,7 @@ export default function CalibrationPage() {
           {/* Decision buttons */}
           <div className="mt-5">
             <p className="cx-meta font-medium text-navy-500 mb-2">Your Decision</p>
-            <div className="grid gap-2 sm:grid-cols-5">
+            <div className="grid gap-2 sm:grid-cols-4">
               {DECISIONS.map((d) => (
                 <button
                   key={d.value}
@@ -170,50 +185,84 @@ export default function CalibrationPage() {
                 >
                   <p className="cx-meta font-semibold text-navy-800 capitalize">{d.value}</p>
                   <p className="cx-mono-meta text-navy-400 mt-0.5 line-clamp-2">
-                    {OPERATOR_DECISION_LABELS[d.value].split(' — ')[1]}
+                    {OPERATOR_DECISION_LABELS[d.value].split('. ')[1]}
                   </p>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Error tag + severity */}
-          {decision && (decision === 'rejected' || decision === 'escalated') && (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {/* Vulnerability category, exploit status, severity */}
+          {showFindingFields && (
+            <div className="mt-4 space-y-3">
               <div>
-                <p className="cx-meta font-medium text-navy-500 mb-1.5">Error Tag</p>
+                <p className="cx-meta font-medium text-navy-500 mb-1.5">Vulnerability Category</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {(Object.entries(ERR_TAG_LABELS) as [ErrTag, string][]).map(([tag, label]) => (
+                  {VULN_TAGS.map((tag) => (
                     <button
                       key={tag}
-                      onClick={() => setErrTag(errTag === tag ? null : tag)}
+                      onClick={() => setVulnTag(vulnTag === tag ? null : tag)}
+                      title={VULN_TAG_LABELS[tag]}
                       className={cn(
                         'rounded-lg border px-3 py-1.5 cx-meta cx-fade',
-                        errTag === tag ? 'border-accent/50 bg-accent/10 text-accent' : 'border-border bg-card text-navy-600',
+                        vulnTag === tag ? 'border-accent/50 bg-accent/10 text-accent' : 'border-border bg-card text-navy-600',
                       )}
                     >
                       {tag}
                     </button>
                   ))}
                 </div>
+                {vulnTag && <p className="cx-meta mt-1 text-navy-500">{VULN_TAG_LABELS[vulnTag]}</p>}
               </div>
-              <div>
-                <p className="cx-meta font-medium text-navy-500 mb-1.5">Severity</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {(Object.entries(SEVERITY_LABELS) as [Severity, string][]).map(([sev, label]) => (
-                    <button
-                      key={sev}
-                      onClick={() => setSeverity(severity === sev ? null : sev)}
-                      className={cn(
-                        'rounded-lg border px-3 py-1.5 cx-meta cx-fade',
-                        severity === sev ? 'border-accent/50 bg-accent/10 text-accent' : 'border-border bg-card text-navy-600',
-                      )}
-                    >
-                      {sev}
-                    </button>
-                  ))}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="cx-meta font-medium text-navy-500 mb-1.5">Exploit Status</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {EXPLOIT_STATUSES.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setExploitStatus(exploitStatus === s ? null : s)}
+                        className={cn(
+                          'rounded-lg border px-3 py-1.5 cx-meta cx-fade',
+                          exploitStatus === s ? 'border-accent/50 bg-accent/10 text-accent' : 'border-border bg-card text-navy-600',
+                        )}
+                      >
+                        {EXPLOIT_STATUS_LABELS[s]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="cx-meta font-medium text-navy-500 mb-1.5">Severity</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {SEVERITY_LEVELS.map((sev) => (
+                      <button
+                        key={sev}
+                        onClick={() => setSeverity(severity === sev ? null : sev)}
+                        title={SEVERITY_LABELS[sev]}
+                        className={cn(
+                          'rounded-lg border px-3 py-1.5 cx-meta cx-fade',
+                          severity === sev ? 'border-accent/50 bg-accent/10 text-accent' : 'border-border bg-card text-navy-600',
+                        )}
+                      >
+                        {sev}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
+              {decision === 'exploited' && (
+                <div>
+                  <label className="cx-meta font-medium text-navy-500 mb-1.5 block">Reproduction steps</label>
+                  <textarea
+                    value={reproductionSteps}
+                    onChange={(e) => setReproductionSteps(e.target.value)}
+                    rows={3}
+                    className="cx-body w-full rounded-lg border border-border bg-card px-3 py-2 text-navy-800 placeholder:text-navy-300 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
+                    placeholder="How would you trigger this failure again?"
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -252,7 +301,7 @@ export default function CalibrationPage() {
                   <CheckCircle2 className="size-5 text-success" />
                 </span>
                 <div>
-                  <p className="cx-body font-semibold text-success">Correct — {feedback.score}%</p>
+                  <p className="cx-body font-semibold text-success">Correct, {feedback.score}%</p>
                   <p className="cx-meta text-navy-500">Your answer matched the gold standard</p>
                 </div>
               </>
@@ -262,7 +311,7 @@ export default function CalibrationPage() {
                   <XCircle className="size-5 text-destructive" />
                 </span>
                 <div>
-                  <p className="cx-body font-semibold text-destructive">Incorrect — {feedback.score}%</p>
+                  <p className="cx-body font-semibold text-destructive">Incorrect, {feedback.score}%</p>
                   <p className="cx-meta text-navy-500">Review the expected answer below</p>
                 </div>
               </>
@@ -273,8 +322,10 @@ export default function CalibrationPage() {
             <div className="rounded-lg border border-border bg-navy-50 p-3">
               <p className="text-[11px] font-medium uppercase tracking-wider text-navy-400 mb-1">Expected Decision</p>
               <p className="cx-body font-semibold text-navy-800 capitalize">{feedback.expectedDecision}</p>
-              {feedback.expectedErrTag && (
-                <p className="cx-meta text-navy-500 mt-1">Error: {feedback.expectedErrTag}</p>
+              {feedback.expectedVulnTag && (
+                <p className="cx-meta text-navy-500 mt-1">
+                  Vulnerability: {feedback.expectedVulnTag}, {VULN_TAG_LABELS[feedback.expectedVulnTag]}
+                </p>
               )}
               {feedback.expectedSeverity && (
                 <p className="cx-meta text-navy-500">Severity: {feedback.expectedSeverity}</p>

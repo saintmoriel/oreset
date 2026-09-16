@@ -63,7 +63,7 @@ export default function DataOriginationPage() {
             </p>
           </MotionReveal>
 
-          <MotionStagger className="mt-16 grid gap-8 sm:grid-cols-2" staggerDelay={0.1}>
+          <MotionStagger className="mt-16 grid gap-8 sm:grid-cols-2" stagger={0.1}>
             {capabilities.map((cap) => (
               <MotionStaggerItem key={cap.title}>
                 <div className="card-surface p-6">

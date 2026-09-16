@@ -1,4 +1,4 @@
-import type { ErrTag, Severity, TicketStatus } from '@oreset/shared'
+import type { VulnTag, ExploitStatus, Severity, TicketStatus } from '@oreset/shared'
 import { apiFetch } from '../client'
 
 export type TicketReviewDecision = {
@@ -11,12 +11,12 @@ export type TicketReviewDecision = {
     traceData?: Record<string, unknown>
   } | null
   decision: string
-  errTag: ErrTag | null
+  vulnTag: VulnTag | null
   severity: Severity | null
+  exploitStatus: ExploitStatus | null
   notes: string | null
-  correctedTranscript: string | null
-  correctedIntent: string | null
-  correctedOutcome: string | null
+  reproductionSteps: string | null
+  recommendedFix: string | null
   createdAt: string
 }
 
@@ -25,7 +25,7 @@ export type Ticket = {
   operatorReviewDecisionId: string
   clientName: string
   externalRef: string
-  errTag: ErrTag | null
+  vulnTag: VulnTag | null
   severity: Severity | null
   notes: string | null
   status: TicketStatus

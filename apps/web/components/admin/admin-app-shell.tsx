@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Megaphone, Package, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users } from 'lucide-react'
+import { LayoutDashboard, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users, ShieldAlert } from 'lucide-react'
 import { SignOutButton } from '@/components/shared/sign-out-button'
 import { Avatar } from '@/components/capture/avatar'
 import { getMe } from '@/lib/api/endpoints/auth'
@@ -20,14 +20,13 @@ const ROLE_LABELS: Record<StaffRole, string> = {
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/admin/home', icon: LayoutDashboard },
-  { label: 'Campaigns', href: '/admin/campaigns', icon: Megaphone },
-  { label: 'Datasets', href: '/admin/datasets', icon: Package },
-  { label: 'Tickets', href: '/admin/tickets', icon: TriangleAlert },
-  { label: 'Payouts', href: '/admin/payouts', icon: Wallet },
-  { label: 'Regressions', href: '/admin/regressions', icon: FlaskConical },
-  { label: 'Calibration', href: '/admin/calibration', icon: Target },
+  { label: 'Findings', href: '/admin/findings', icon: ShieldAlert },
+  { label: 'Escalations', href: '/admin/tickets', icon: TriangleAlert },
   { label: 'Consensus', href: '/admin/consensus', icon: GitCompare },
-  { label: 'Reviewers', href: '/admin/operators', icon: Users },
+  { label: 'Calibration', href: '/admin/calibration', icon: Target },
+  { label: 'Regressions', href: '/admin/regressions', icon: FlaskConical },
+  { label: 'Testers', href: '/admin/operators', icon: Users },
+  { label: 'Payouts', href: '/admin/payouts', icon: Wallet },
   { label: 'Audit Log', href: '/admin/audit-log', icon: ScrollText },
 ]
 

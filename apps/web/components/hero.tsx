@@ -15,7 +15,7 @@ const proof = [
   {
     value: '1-2 weeks',
     label: 'per engagement',
-    detail: 'scoped, tested, reported',
+    detail: 'scoped, tested, findings delivered live',
   },
   {
     value: '2 angles',
@@ -23,9 +23,9 @@ const proof = [
     detail: 'can it be hacked AND does it decide wrong',
   },
   {
-    value: '1 report',
-    label: 'every failure documented',
-    detail: 'severity, impact, fix recommendation',
+    value: 'Free retest',
+    label: 'every fix verified',
+    detail: 'patch it, we confirm it holds',
   },
   {
     value: '0 SDKs',

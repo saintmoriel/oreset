@@ -3,16 +3,15 @@
 import { useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { StatusTag } from '@/components/capture/status-tag'
-import { VerificationSeal } from '@/components/capture/verification-seal'
+import { VULN_TAG_LABELS } from '@oreset/shared'
 import type { OperatorDecisionRecord } from '@/lib/api/endpoints/operator'
 
 const STATUS_FILTERS = [
   { key: 'all', label: 'All' },
-  { key: 'approved', label: 'Approved' },
-  { key: 'corrected', label: 'Corrected' },
-  { key: 'rejected', label: 'Rejected' },
+  { key: 'exploited', label: 'Exploited' },
+  { key: 'defended', label: 'Defended' },
   { key: 'escalated', label: 'Escalated' },
-  { key: 'declined', label: 'Declined' },
+  { key: 'inconclusive', label: 'Inconclusive' },
 ] as const
 
 export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisionRecord[] }) {
@@ -20,8 +19,8 @@ export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisi
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
 
-  const approved = decisions.filter((d) => d.decision === 'approved').length
-  const approvalRate = decisions.length ? `${Math.round((approved / decisions.length) * 100)}%` : '—'
+  const exploited = decisions.filter((d) => d.decision === 'exploited').length
+  const exploitRate = decisions.length ? `${Math.round((exploited / decisions.length) * 100)}%` : 'n/a'
 
   const filtered = useMemo(
     () =>
@@ -39,12 +38,12 @@ export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisi
     <div>
       <div className="cx-card flex divide-x divide-border">
         <div className="flex-1 p-5">
-          <p className="cx-meta text-navy-400">Total decisions</p>
+          <p className="cx-meta text-navy-400">Total findings</p>
           <p className="cx-stat mt-1 text-navy-900">{decisions.length}</p>
         </div>
         <div className="flex-1 p-5">
-          <p className="cx-meta text-navy-400">Approval rate</p>
-          <p className="cx-stat mt-1 text-navy-900">{approvalRate}</p>
+          <p className="cx-meta text-navy-400">Exploit rate</p>
+          <p className="cx-stat mt-1 text-navy-900">{exploitRate}</p>
         </div>
       </div>
 
@@ -86,9 +85,9 @@ export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisi
       )}
 
       {decisions.length === 0 ? (
-        <p className="cx-body mt-6 text-navy-400">No decisions yet — the queue is waiting.</p>
+        <p className="cx-body mt-6 text-navy-400">No findings yet. The queue is waiting.</p>
       ) : filtered.length === 0 ? (
-        <p className="cx-body mt-6 text-navy-400">No decisions match these filters.</p>
+        <p className="cx-body mt-6 text-navy-400">No findings match these filters.</p>
       ) : (
         <div className="cx-card mt-3 divide-y divide-border">
           {filtered.map((d) => (
@@ -96,27 +95,27 @@ export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisi
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="cx-body font-medium text-navy-900">
-                    {d.clientItemSnapshot?.clientName ?? 'Client placement'}
+                    {d.clientItemSnapshot?.clientName ?? 'Client engagement'}
                   </p>
                   <p className="cx-mono-meta text-navy-400">{new Date(d.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {d.decision === 'approved' && <VerificationSeal label="Approved" />}
-                  {d.decision === 'corrected' && <StatusTag tone="success">Corrected</StatusTag>}
-                  {d.decision === 'rejected' && <StatusTag tone="destructive">Rejected</StatusTag>}
-                  {d.decision === 'escalated' && (
-                    <>
-                      <span className="cx-mono-meta text-navy-400">
-                        {d.errTag} / {d.severity}
-                      </span>
-                      <StatusTag tone={d.ticket?.status === 'resolved' ? 'success' : 'warning'}>
-                        {d.ticket?.status === 'resolved' ? 'Ticket resolved' : 'Ticket open'}
-                      </StatusTag>
-                    </>
+                  {(d.vulnTag || d.severity) && (
+                    <span className="cx-mono-meta text-navy-400">
+                      {[d.vulnTag, d.severity].filter(Boolean).join(' / ')}
+                    </span>
                   )}
-                  {d.decision === 'declined' && <StatusTag tone="neutral">Declined</StatusTag>}
+                  {d.decision === 'exploited' && <StatusTag tone="destructive">Exploited</StatusTag>}
+                  {d.decision === 'defended' && <StatusTag tone="success">Defended</StatusTag>}
+                  {d.decision === 'escalated' && (
+                    <StatusTag tone={d.ticket?.status === 'resolved' ? 'success' : 'warning'}>
+                      {d.ticket?.status === 'resolved' ? 'Auditor resolved' : 'With auditor'}
+                    </StatusTag>
+                  )}
+                  {d.decision === 'inconclusive' && <StatusTag tone="neutral">Inconclusive</StatusTag>}
                 </div>
               </div>
+              {d.vulnTag && <p className="cx-meta text-navy-500">{VULN_TAG_LABELS[d.vulnTag]}</p>}
               {d.notes && <p className="cx-meta text-navy-400">{d.notes}</p>}
             </div>
           ))}

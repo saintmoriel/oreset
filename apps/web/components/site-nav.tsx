@@ -42,7 +42,7 @@ const navItems: NavItem[] = [
       {
         label: 'How it works',
         href: '#how-it-works',
-        hint: 'Scope, test, report',
+        hint: 'Scope, test, fix, retest',
       },
       {
         label: 'Methodology',
@@ -101,7 +101,7 @@ const navItems: NavItem[] = [
 ]
 
 const signInItems = [
-  { label: 'Client', href: '/buyer', hint: 'Engagement reports & findings' },
+  { label: 'Client', href: '/buyer', hint: 'Live findings and retest status' },
   { label: 'Reviewer', href: '/operator', hint: 'Testing & analysis' },
 ] as const
 

@@ -66,7 +66,7 @@ export default async function AdminCalibrationPage() {
               </span>
               <div>
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
-                  {stats?.overallPassRate != null ? `${stats.overallPassRate}%` : '—'}
+                  {stats?.overallPassRate != null ? `${stats.overallPassRate}%` : 'n/a'}
                 </p>
                 <p className="cx-meta text-navy-400">Pass Rate</p>
               </div>
@@ -77,7 +77,7 @@ export default async function AdminCalibrationPage() {
               </span>
               <div>
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
-                  {stats?.avgScore != null ? `${stats.avgScore}%` : '—'}
+                  {stats?.avgScore != null ? `${stats.avgScore}%` : 'n/a'}
                 </p>
                 <p className="cx-meta text-navy-400">Avg Score</p>
               </div>

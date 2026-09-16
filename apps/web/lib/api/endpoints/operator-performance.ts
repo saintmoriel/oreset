@@ -1,4 +1,4 @@
-import type { ErrTag } from '@oreset/shared'
+import type { VulnTag } from '@oreset/shared'
 import { apiFetch } from '../client'
 
 export type OperatorPerformanceEntry = {
@@ -14,14 +14,13 @@ export type OperatorPerformanceEntry = {
   reviews7d: number
   reviews30d: number
   decisionBreakdown: {
-    approved: number
-    corrected: number
-    rejected: number
+    exploited: number
+    defended: number
     escalated: number
-    declined: number
+    inconclusive: number
   }
-  approvalRate: number | null
-  errTagBreakdown: Record<ErrTag, number>
+  exploitRate: number | null
+  vulnTagBreakdown: Record<VulnTag, number>
   avgReviewTimeMs: number | null
   medianReviewTimeMs: number | null
   calibrationAttempts: number

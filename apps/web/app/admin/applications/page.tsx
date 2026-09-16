@@ -26,7 +26,7 @@ export default async function OperatorApplicationsPage() {
       <p className="cx-label mt-6 text-navy-400">Operators · Applicants</p>
       <h1 className="cx-page-title mt-1.5 text-navy-900">Applications</h1>
       <p className="cx-body mt-2 max-w-lg text-navy-500">
-        Certification itself stays self-service (the Foundry quiz) — this is real visibility into
+        Certification itself stays self-service through calibration. This is real visibility into
         who has applied and their current status.
       </p>
 

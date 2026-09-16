@@ -39,7 +39,7 @@ export function QualityMethodology() {
           </p>
         </MotionReveal>
 
-        <MotionStagger className="mt-12 grid gap-8 sm:grid-cols-3" staggerDelay={0.1}>
+        <MotionStagger className="mt-12 grid gap-8 sm:grid-cols-3" stagger={0.1}>
           {PILLARS.map((p) => (
             <MotionStaggerItem key={p.title}>
               <div className="border-t border-border pt-6">

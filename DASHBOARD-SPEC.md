@@ -212,14 +212,18 @@ Already created in Step 1 migration.
 
 | Method | Path | Auth | Purpose |
 |--------|------|------|---------|
-| GET | `/api/v1/qa/findings` | staff:qa_reviewer, staff:admin | Findings pending verification |
-| GET | `/api/v1/qa/findings/:id` | same | Single finding detail |
-| POST | `/api/v1/qa/findings/:id/verify` | same | Verify, reject, or adjust a finding |
-| GET | `/api/v1/qa/findings/stats` | same | Verification stats |
+| GET | `/api/v1/findings/queue` | staff:admin, staff:reviewer_lead | Findings pending verification (P0/P1 exploits + escalations) |
+| GET | `/api/v1/findings/:decisionId` | same | Single finding detail |
+| POST | `/api/v1/findings/:decisionId/verify` | same | Verify, reject, or adjust a finding |
+| GET | `/api/v1/findings/stats` | same | Verification stats |
+| GET | `/api/v1/buyer/findings` | buyer | Client findings + resilience score + breakdowns |
+| POST | `/api/v1/buyer/findings/:id/fixed` | buyer | Mark fixed, queues a free retest scenario |
+
+Built as `apps/api/src/modules/findings/`. Retest outcomes are applied from `operator.service.decide` when the scenario carries `traceData.retestOf`.
 
 #### Frontend
 
-New page: `/qa/findings` (alongside existing `/qa/queue` which stays hidden for now).
+New page: `/admin/findings` inside the admin shell. Lead auditors already live in the admin portal via the `reviewer_lead` role, and the old QA portal stays hidden.
 
 Layout: Same dual-pane as operator workspace, but right pane shows:
 - Tester's original assessment (read-only summary)
@@ -318,6 +322,62 @@ Landing page and client onboarding should mention:
 
 ---
 
+## Step 5: Engagement Model Decisions (from Synack / Cobalt benchmark)
+
+These are product decisions, not just UI. They shape what the dashboards must support.
+
+### 5.1 The platform is the deliverable, not a report
+
+No single PDF handoff. The client dashboard is where findings live, and it must:
+
+- Stream findings as the lead auditor verifies them (not batched at the end)
+- Show a **resilience score** and its trend over the engagement, not a single snapshot
+- Let the client filter, export, and share individual findings with their engineering team
+- Generate the executive summary **from** platform data (a "Download summary" action), never written separately
+
+### 5.2 Finding lifecycle with free retest
+
+Every finding carries a state. Free retesting is included in every tier and is non-negotiable.
+
+```
+discovered → verified → fix_submitted → retesting → closed
+                    ↘ false_positive (terminal)
+                    ↘ reopened (retest failed, back to fix_submitted)
+```
+
+Schema impact:
+
+- New enum `FINDING_STATUSES = ['discovered', 'verified', 'fix_submitted', 'retesting', 'closed', 'reopened', 'false_positive']`
+- New columns on `verified_findings`: `status` (finding_status, default `verified`), `fixSubmittedAt`, `retestedAt`, `retestedBy` (FK users), `retestNotes`, `closedAt`
+- New client action: **"Mark as fixed"** on a finding. Sets `status = fix_submitted`, routes it back into the operator queue as a retest item (new `traceData.retestOf` pointing at the original finding id)
+- Operator retest decision: `defended` closes the finding, `exploited` reopens it with a note
+
+### 5.3 Multiple touchpoints per engagement
+
+Operational process, but the client dashboard should reflect engagement phase:
+
+| Phase | Client sees |
+|-------|-------------|
+| Kickoff | Scope summary, attack surface list, expected timeline |
+| Testing | Findings streaming in, resilience score updating |
+| Readout | Executive summary available, prioritized fix list |
+| Retest | Per-finding retest status, closure progress |
+
+Add `engagementPhase` to the client's engagement record (new lightweight `engagements` table or a field on the buyer's org record; decide with George).
+
+### 5.4 Developer hooks
+
+- **Webhooks** (already built): keep as the primary integration path. Landing page copy: "integrates with your existing tools via webhooks."
+- **CI/CD regression export** (already built): position as **AI agent regression testing**. Every confirmed exploit becomes a test case the client runs on every deploy. Add `verified`, `blastRadius`, and `status` to the export payload.
+- **Slack notifications**: Stage 2, when there are 5+ paying clients. One-way alerts on finding verified and finding closed.
+- **Jira / ServiceNow / Splunk**: not now. Build only when a signing client is blocked on it.
+
+### 5.5 Copy rule
+
+No em dashes or en dashes anywhere in user-facing text: labels, descriptions, enum labels, placeholders, empty states.
+
+---
+
 ## Implementation Order
 
 | Phase | What | Effort | Status |
@@ -330,7 +390,7 @@ Landing page and client onboarding should mention:
 | 2b | Update `/operator/item` to use new component | Medium | |
 | 2c | Update operator home/history pages | Small | |
 | 3a | Build auditor API endpoints | Medium | |
-| 3b | Build `/qa/findings` page | Large | |
+| 3b | Build `/admin/findings` page | Large | |
 | 4a | Add resilience score to buyer home | Medium | |
 | 4b | Update buyer cases list + detail | Medium | |
 | 4c | Add executive summary view | Medium | |
@@ -347,7 +407,7 @@ Everything else can happen in parallel after Step 2.
 George owns the backend. Step 1 is done for him. Remaining scope:
 
 1. **Run migration** `0016_taxonomy_swap_redteam.sql` against the database
-2. **New auditor API endpoints** (Step 3a): `/api/v1/qa/findings` CRUD for lead auditor verification
+2. **New auditor API endpoints** (Step 3a): `/api/v1/findings/*` for lead auditor verification, `/api/v1/buyer/findings` for the client dashboard
 3. **Export updates** (Step 4d): Add `blastRadius`, `verified`, `verifiedAt` from verified_findings to regression export
 
 ## What Favor Needs to Know
@@ -358,7 +418,7 @@ Favor owns the frontend. Their scope:
 2. **Update `MediaPanel`** add render blocks for `traceData.toolCalls`, `traceData.attackType`, `traceData.targetEndpoint`
 3. **Update `/operator/item/page.tsx`** wire the new component, map form state to new API payload shape
 4. **Update `/operator/home` and `/operator/history`** new decision labels, new severity badges
-5. **New page: `/qa/findings`** Lead auditor review page
+5. **New page: `/admin/findings`** Lead auditor review page
 6. **Update `/buyer/home`** Resilience score gauge, executive summary view
 7. **Update `/buyer/cases` and `/buyer/cases/[id]`** new vulnerability labels and badges
 

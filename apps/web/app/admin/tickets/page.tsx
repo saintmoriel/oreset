@@ -4,8 +4,7 @@ import { TicketResolveClient } from '@/components/admin/ticket-resolve-client'
 import { TicketFilters } from '@/components/admin/ticket-filters'
 import { StatusTag } from '@/components/capture/status-tag'
 import { serverApiFetch } from '@/lib/api/server'
-import { ERR_TAG_LABELS } from '@oreset/shared'
-import type { AuthUser, ErrTag } from '@oreset/shared'
+import type { AuthUser } from '@oreset/shared'
 import type { Ticket } from '@/lib/api/endpoints/tickets'
 
 export default async function TicketsPage() {
@@ -22,11 +21,11 @@ export default async function TicketsPage() {
 
   return (
     <AdminAppShell>
-      <p className="cx-label text-navy-400">Senior QA · Adjudication</p>
+      <p className="cx-label text-navy-400">Lead Auditor · Escalations</p>
       <h1 className="cx-page-title mt-1.5 text-navy-900">Escalation Queue</h1>
       <p className="cx-body mt-2 max-w-lg text-navy-500">
-        Cases escalated by operators for ambiguous context, novel slang, or unclear policy.
-        Review the original evidence and resolve or re-route.
+        Scenarios testers escalated because the result was ambiguous or outside the scope brief.
+        Review the exploit trace and resolve or re-route.
       </p>
 
       {!canView ? (

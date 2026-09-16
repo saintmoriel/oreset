@@ -13,6 +13,7 @@ import {
   EXPLOIT_STATUSES,
   QA_DECISIONS,
   AUDITOR_DECISIONS,
+  FINDING_STATUSES,
   OPERATOR_DECISIONS,
   CAMPAIGN_STATUSES,
   OTP_PURPOSES,
@@ -43,6 +44,7 @@ export const severityEnum = pgEnum('severity', SEVERITY_LEVELS)
 export const exploitStatusEnum = pgEnum('exploit_status', EXPLOIT_STATUSES)
 export const qaDecisionEnum = pgEnum('qa_decision', QA_DECISIONS)
 export const auditorDecisionEnum = pgEnum('auditor_decision', AUDITOR_DECISIONS)
+export const findingStatusEnum = pgEnum('finding_status', FINDING_STATUSES)
 export const operatorDecisionEnum = pgEnum('operator_decision', OPERATOR_DECISIONS)
 export const campaignStatusEnum = pgEnum('campaign_status', CAMPAIGN_STATUSES)
 export const otpPurposeEnum = pgEnum('otp_purpose', OTP_PURPOSES)

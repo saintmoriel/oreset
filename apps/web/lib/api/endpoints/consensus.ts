@@ -1,5 +1,19 @@
-import type { ErrTag, OperatorDecision, Severity } from '@oreset/shared'
+import type { VulnTag, ExploitStatus, OperatorDecision, Severity } from '@oreset/shared'
 import { apiFetch } from '../client'
+
+export type ConsensusDecision = {
+  id: string
+  operatorId: string
+  decision: OperatorDecision
+  vulnTag: VulnTag | null
+  severity: Severity | null
+  exploitStatus: ExploitStatus | null
+  notes: string | null
+  reproductionSteps: string | null
+  recommendedFix: string | null
+  reviewTimeMs: number | null
+  createdAt: string
+}
 
 export type ConsensusPair = {
   id: string
@@ -10,7 +24,7 @@ export type ConsensusPair = {
   decisionTwoId: string | null
   status: 'awaiting_reviews' | 'agreed' | 'disagreed' | 'adjudicated'
   finalDecision: OperatorDecision | null
-  finalErrTag: ErrTag | null
+  finalVulnTag: VulnTag | null
   finalSeverity: Severity | null
   agreementScore: number | null
   adjudicatorId: string | null
@@ -25,32 +39,8 @@ export type ConsensusPair = {
     traceData: Record<string, unknown> | null
     status: string
   }
-  decisionOne?: {
-    id: string
-    operatorId: string
-    decision: OperatorDecision
-    errTag: ErrTag | null
-    severity: Severity | null
-    notes: string | null
-    correctedTranscript: string | null
-    correctedIntent: string | null
-    correctedOutcome: string | null
-    reviewTimeMs: number | null
-    createdAt: string
-  } | null
-  decisionTwo?: {
-    id: string
-    operatorId: string
-    decision: OperatorDecision
-    errTag: ErrTag | null
-    severity: Severity | null
-    notes: string | null
-    correctedTranscript: string | null
-    correctedIntent: string | null
-    correctedOutcome: string | null
-    reviewTimeMs: number | null
-    createdAt: string
-  } | null
+  decisionOne?: ConsensusDecision | null
+  decisionTwo?: ConsensusDecision | null
 }
 
 export type ConsensusStats = {
@@ -82,7 +72,7 @@ export function adjudicatePair(
   pairId: string,
   data: {
     finalDecision: OperatorDecision
-    finalErrTag?: ErrTag
+    finalVulnTag?: VulnTag
     finalSeverity?: Severity
     notes?: string
   },

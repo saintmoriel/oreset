@@ -19,7 +19,7 @@ export default async function BuyerDatasetsPage() {
 
       {datasets.length === 0 ? (
         <p className="cx-body mt-6 text-navy-400">
-          Nothing delivered yet — datasets appear here once Oreset hands one off to your
+          Nothing delivered yet. Datasets appear here once Oreset hands one off to your
           organization.
         </p>
       ) : (

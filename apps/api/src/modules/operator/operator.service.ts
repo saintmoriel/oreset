@@ -6,6 +6,7 @@ import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operat
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 import { handleDualSolveDecision } from '../consensus/consensus.service'
+import { applyRetestOutcome } from '../findings/findings.service'
 import { fireWebhooksForItem } from '../../lib/webhooks'
 
 export async function getQueue(operatorId?: string) {
@@ -178,6 +179,17 @@ export async function decide(input: {
     .returning()
 
   await db.update(clientQueueItems).set({ status: input.decision }).where(eq(clientQueueItems.id, item.id))
+
+  // Retest of a previously verified finding: close it or reopen it.
+  const retestOf = (item.traceData as Record<string, unknown> | null)?.retestOf
+  if (typeof retestOf === 'string') {
+    await applyRetestOutcome({
+      findingId: retestOf,
+      decision: input.decision,
+      operatorId: input.operatorId,
+      notes: input.notes,
+    })
+  }
 
   if (input.decision === 'escalated') {
     await db.insert(clientTickets).values({

@@ -21,7 +21,7 @@ export default async function BuyerActivityPage() {
 
       {downloads.length === 0 ? (
         <p className="cx-body mt-6 text-navy-400">
-          Nothing downloaded yet — download links live on each dataset&apos;s detail page.
+          Nothing downloaded yet. Download links live on each dataset&apos;s detail page.
         </p>
       ) : (
         <div className="cx-card mt-6 divide-y divide-border">

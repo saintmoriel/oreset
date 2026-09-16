@@ -19,9 +19,9 @@ const STEPS = [
   },
   {
     number: '03',
-    title: 'Report',
+    title: 'Fix and retest',
     detail:
-      'You receive a structured risk report: every failure found, its severity, the business consequence, and a specific fix recommendation. Actionable for your engineering team and legible for your leadership.',
+      'Findings land in your dashboard as we confirm them, each with severity, business consequence, reproduction steps, and a specific fix. Your team patches, we retest for free, and the finding closes only when the fix holds.',
     duration: 'Phase 3',
   },
 ]
@@ -33,15 +33,16 @@ export function HowItWorks() {
         <MotionReveal>
           <p className="text-eyebrow text-accent">How it works</p>
           <h2 className="text-h1 mt-4 max-w-2xl text-balance text-foreground">
-            One engagement. One report. Every failure documented.
+            One engagement. Live findings. Every fix verified.
           </h2>
           <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground">
             Engagements typically run 1-2 weeks. No integration required.
-            No SDK to install. You give us access, we stress-test, you get the report.
+            No SDK to install. You give us access, we stress-test, and findings
+            stream into your dashboard as we confirm them. Not a PDF at the end.
           </p>
         </MotionReveal>
 
-        <MotionStagger className="mt-14 grid gap-8 lg:grid-cols-3" staggerDelay={0.12}>
+        <MotionStagger className="mt-14 grid gap-8 lg:grid-cols-3" stagger={0.12}>
           {STEPS.map((s) => (
             <MotionStaggerItem key={s.number}>
               <div className="border-t border-border pt-6">

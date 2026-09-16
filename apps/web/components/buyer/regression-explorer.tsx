@@ -2,10 +2,18 @@
 
 import { useState } from 'react'
 import { Download, RefreshCw, ChevronDown, ChevronUp, FlaskConical } from 'lucide-react'
-import { ERR_TAG_LABELS, SEVERITY_LABELS } from '@oreset/shared'
+import { VULN_TAG_LABELS, SEVERITY_LABELS, EXPLOIT_STATUS_LABELS } from '@oreset/shared'
+import type { Severity } from '@oreset/shared'
 import type { BuyerRegressionTestCase } from '@/lib/api/endpoints/buyer-cases'
 import { getMyBuyerRegressions } from '@/lib/api/endpoints/buyer-cases'
 import { cn } from '@/lib/utils'
+
+const SEVERITY_TONE: Record<Severity, string> = {
+  P0: 'bg-destructive text-white',
+  P1: 'bg-destructive/15 text-destructive',
+  P2: 'bg-warning/15 text-warning',
+  P3: 'bg-navy-100 text-navy-600',
+}
 
 function TestCaseCard({ tc }: { tc: BuyerRegressionTestCase }) {
   const [expanded, setExpanded] = useState(false)
@@ -17,76 +25,64 @@ function TestCaseCard({ tc }: { tc: BuyerRegressionTestCase }) {
         className="flex w-full items-center gap-3 p-4 text-left hover:bg-navy-50/50 cx-fade"
       >
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="cx-mono-meta text-navy-400">{tc.testCaseId}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="cx-mono-meta font-semibold text-navy-700">{tc.testCaseId}</span>
             <span className="cx-mono-meta text-navy-400">{tc.externalRef}</span>
-            <span className={cn(
-              'cx-meta inline-flex rounded-full px-2 py-0.5 font-semibold',
-              tc.decision === 'rejected' ? 'bg-destructive/10 text-destructive' : 'bg-accent/10 text-accent',
-            )}>
-              {tc.decision}
-            </span>
-            {tc.errTag && (
-              <span className="cx-meta rounded-full bg-navy-100 px-2 py-0.5 text-navy-600">{tc.errTag}</span>
+            {tc.severity && (
+              <span className={cn('rounded px-1.5 py-0.5 font-mono text-[11px] font-bold', SEVERITY_TONE[tc.severity])}>{tc.severity}</span>
+            )}
+            {tc.vulnTag && (
+              <span className="cx-meta rounded-full bg-accent/10 px-2 py-0.5 font-semibold text-accent">{tc.vulnTag}</span>
             )}
           </div>
-          <div className="mt-1 flex gap-3 flex-wrap">
+          <div className="mt-1 flex flex-wrap gap-3">
+            {tc.vulnTag && <span className="cx-meta text-navy-500">{VULN_TAG_LABELS[tc.vulnTag]}</span>}
             {tc.language && <span className="cx-meta text-navy-400">{tc.language}</span>}
             {tc.domain && <span className="cx-meta text-navy-400">{tc.domain}</span>}
             <span className="cx-meta text-navy-400">{new Date(tc.reviewedAt).toLocaleDateString()}</span>
           </div>
         </div>
-        {expanded ? <ChevronUp className="size-4 text-navy-400 shrink-0" /> : <ChevronDown className="size-4 text-navy-400 shrink-0" />}
+        {expanded ? <ChevronUp className="size-4 shrink-0 text-navy-400" /> : <ChevronDown className="size-4 shrink-0 text-navy-400" />}
       </button>
 
       {expanded && (
-        <div className="border-t border-border p-4 space-y-3">
-          {tc.sourceInput && (
+        <div className="space-y-3 border-t border-border p-4">
+          {tc.attackPrompt && (
             <div>
-              <p className="cx-meta font-semibold text-navy-500 mb-1">Source Input</p>
+              <p className="cx-meta mb-1 font-semibold text-navy-500">Attack prompt</p>
               <div className="rounded-lg bg-navy-50 p-3">
-                <p className="cx-body text-navy-800 text-sm whitespace-pre-wrap">{tc.sourceInput}</p>
+                <p className="cx-body whitespace-pre-wrap text-sm text-navy-800">{tc.attackPrompt}</p>
               </div>
             </div>
           )}
-          {tc.modelOutput && (
+          {tc.modelResponse && (
             <div>
-              <p className="cx-meta font-semibold text-navy-500 mb-1">Model Output</p>
-              <p className="cx-body text-navy-700 text-sm">{tc.modelOutput}</p>
+              <p className="cx-meta mb-1 font-semibold text-navy-500">Model response that failed</p>
+              <p className="cx-body whitespace-pre-wrap text-sm text-navy-700">{tc.modelResponse}</p>
             </div>
           )}
-          {tc.groundTruth && (
+          <div className="flex flex-wrap gap-4">
+            {tc.exploitStatus && (
+              <span className="cx-meta text-navy-600">{EXPLOIT_STATUS_LABELS[tc.exploitStatus]}</span>
+            )}
+            {tc.severity && <span className="cx-meta text-navy-600">{tc.severity}: {SEVERITY_LABELS[tc.severity]}</span>}
+          </div>
+          {tc.reproductionSteps && (
             <div>
-              <p className="cx-meta font-semibold text-accent mb-1">Ground Truth (Corrected)</p>
-              <p className="cx-body text-navy-700 text-sm">{tc.groundTruth}</p>
+              <p className="cx-meta mb-1 font-semibold text-navy-500">Reproduction steps</p>
+              <p className="cx-body whitespace-pre-wrap text-sm text-navy-700">{tc.reproductionSteps}</p>
             </div>
           )}
-          {tc.correctedTranscript && (
+          {tc.recommendedFix && (
             <div>
-              <p className="cx-meta font-semibold text-navy-500 mb-1">Corrected Transcript</p>
-              <p className="cx-body text-navy-700 text-sm">{tc.correctedTranscript}</p>
-            </div>
-          )}
-          {tc.correctedIntent && (
-            <div>
-              <p className="cx-meta font-semibold text-navy-500 mb-1">Corrected Intent</p>
-              <p className="cx-body text-navy-700 text-sm">{tc.correctedIntent}</p>
-            </div>
-          )}
-          {(tc.errTag || tc.severity) && (
-            <div className="flex gap-3">
-              {tc.errTag && (
-                <span className="cx-meta text-navy-600">{tc.errTag} - {ERR_TAG_LABELS[tc.errTag]}</span>
-              )}
-              {tc.severity && (
-                <span className="cx-meta text-navy-600">{SEVERITY_LABELS[tc.severity]}</span>
-              )}
+              <p className="cx-meta mb-1 font-semibold text-accent">Recommended fix</p>
+              <p className="cx-body whitespace-pre-wrap text-sm text-navy-700">{tc.recommendedFix}</p>
             </div>
           )}
           {tc.reviewerNotes && (
             <div>
-              <p className="cx-meta font-semibold text-navy-500 mb-1">Reviewer Notes</p>
-              <p className="cx-body text-navy-700 text-sm">{tc.reviewerNotes}</p>
+              <p className="cx-meta mb-1 font-semibold text-navy-500">Tester notes</p>
+              <p className="cx-body whitespace-pre-wrap text-sm text-navy-700">{tc.reviewerNotes}</p>
             </div>
           )}
         </div>
@@ -128,6 +124,16 @@ export function BuyerRegressionExplorer() {
 
   return (
     <div className="mt-6 space-y-4">
+      <div className="rounded-lg border border-accent/20 bg-accent/5 p-4">
+        <p className="cx-body font-semibold text-navy-900">Run our attacks on every deploy</p>
+        <p className="cx-meta mt-1 text-navy-600">
+          Every confirmed exploit becomes a test case. Pull this suite into your CI pipeline (GitHub Actions, GitLab CI, anything
+          that can read JSON or JSONL) and replay the exact prompts against your agent after each change. If a closed finding
+          starts landing again, you find out before your users do.
+        </p>
+        <p className="cx-mono-meta mt-2 text-navy-500">GET /api/v1/buyer/regressions?format=jsonl</p>
+      </div>
+
       <div className="flex flex-wrap items-center gap-3">
         <button
           onClick={handleLoad}
@@ -135,7 +141,7 @@ export function BuyerRegressionExplorer() {
           className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 cx-body font-semibold text-white hover:bg-accent/90 disabled:opacity-50 cx-fade"
         >
           <RefreshCw className={cn('size-4', loading && 'animate-spin')} />
-          {loaded ? 'Refresh' : 'Load Regression Suite'}
+          {loaded ? 'Refresh' : 'Load regression suite'}
         </button>
 
         {loaded && testCases.length > 0 && (
@@ -154,7 +160,7 @@ export function BuyerRegressionExplorer() {
               <Download className="size-3.5" />
               JSONL
             </button>
-            <span className="cx-meta text-navy-400">{testCases.length} test cases</span>
+            <span className="cx-meta text-navy-400">{testCases.length} test case{testCases.length === 1 ? '' : 's'}</span>
           </>
         )}
       </div>
@@ -163,7 +169,7 @@ export function BuyerRegressionExplorer() {
         <div className="cx-card flex flex-col items-center gap-3 p-10 text-center">
           <FlaskConical className="size-8 text-navy-300" />
           <p className="cx-body text-navy-500">
-            No regression test cases yet. Cases appear here after reviewers reject or correct your AI output.
+            No regression cases yet. Each exploit the red team confirms against your agent is added here automatically.
           </p>
         </div>
       )}

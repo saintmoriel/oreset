@@ -1,20 +1,32 @@
-import type { ErrTag, OperatorDecision, Severity, TicketStatus } from '@oreset/shared'
+import type { VulnTag, ExploitStatus, OperatorDecision, Severity, TicketStatus } from '@oreset/shared'
 import { apiFetch } from '../client'
 
+export type ToolCall = {
+  function: string
+  args?: Record<string, unknown>
+  authorized?: boolean
+  result?: string
+}
+
+// Attack scenario payload. `input` is the attack prompt (string for new
+// scenarios; legacy items may still carry the old structured object).
 export type TraceData = {
   domain?: string
   scope?: string
   language?: string
-  input?: {
-    type: 'audio' | 'text' | 'document' | 'conversation'
-    [key: string]: unknown
-  }
+  input?: string | { type?: string; [key: string]: unknown }
   aiDecision?: string
   aiOutcome?: string
   decisionCriteria?: string | null
   executionLogs?: Record<string, unknown>[]
   isDualSolve?: boolean
   isGoldStandard?: boolean
+  targetEndpoint?: string
+  attackType?: string
+  toolCalls?: ToolCall[]
+  systemPrompt?: string
+  modelId?: string
+  retestOf?: string
 }
 
 export type OperatorQueueItem = {
@@ -31,21 +43,23 @@ export type OperatorStats = {
   queueRemaining: number
   reviewedToday: number
   reviewedAllTime: number
-  approvedAllTime: number
-  correctedAllTime: number
+  exploitedAllTime: number
+  defendedAllTime: number
   escalatedAllTime: number
-  rejectedAllTime: number
-  declinedAllTime: number
-  approvalRate: number | null
-  errTagBreakdown: Record<ErrTag, number>
+  inconclusiveAllTime: number
+  exploitRate: number | null
+  vulnTagBreakdown: Record<VulnTag, number>
   openTicketsFromMe: number
 }
 
 export type OperatorDecisionRecord = {
   id: string
   decision: OperatorDecision
-  errTag: ErrTag | null
+  vulnTag: VulnTag | null
   severity: Severity | null
+  exploitStatus: ExploitStatus | null
+  reproductionSteps: string | null
+  recommendedFix: string | null
   notes: string | null
   createdAt: string
   clientItemId: string
@@ -59,12 +73,12 @@ export function getOperatorQueue() {
 
 export type DecisionInput = {
   decision: OperatorDecision
-  errTag?: ErrTag
+  vulnTag: VulnTag
+  exploitStatus: ExploitStatus
   severity?: Severity
   notes?: string
-  correctedTranscript?: string
-  correctedIntent?: string
-  correctedOutcome?: string
+  reproductionSteps?: string
+  recommendedFix?: string
   reviewTimeMs?: number
 }
 

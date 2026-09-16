@@ -63,12 +63,12 @@ export default function AfricanAiAssurancePage() {
             </h1>
             <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground">
               AI systems serving African markets make decisions based on languages they
-              barely understand. We verify that the AI got it right — in the language
+              barely understand. We verify that the AI got it right in the language
               the user actually spoke.
             </p>
           </MotionReveal>
 
-          <MotionStagger className="mt-16 grid gap-8 sm:grid-cols-2" staggerDelay={0.1}>
+          <MotionStagger className="mt-16 grid gap-8 sm:grid-cols-2" stagger={0.1}>
             {capabilities.map((cap) => (
               <MotionStaggerItem key={cap.title}>
                 <div className="card-surface p-6">
@@ -87,7 +87,7 @@ export default function AfricanAiAssurancePage() {
               <h2 className="text-h2 text-foreground">Languages we cover</h2>
               <p className="mt-3 text-body text-muted-foreground">
                 We test in the languages your African users actually speak. Coverage is
-                scoped per engagement — we start from what you bring us.
+                scoped per engagement. We start from what you bring us.
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 {languages.map((lang) => (

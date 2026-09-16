@@ -3,7 +3,14 @@ import { eq, and } from 'drizzle-orm'
 import { db } from '../db/client'
 import { webhookConfigs, clientQueueItems } from '../db/schema'
 
-export type WebhookEvent = 'case.completed' | 'case.escalated' | 'case.consensus_split' | 'case.adjudicated'
+export type WebhookEvent =
+  | 'case.completed'
+  | 'case.escalated'
+  | 'case.consensus_split'
+  | 'case.adjudicated'
+  | 'finding.verified'
+  | 'finding.closed'
+  | 'finding.reopened'
 
 function signPayload(payload: string, secret: string): string {
   return crypto.createHmac('sha256', secret).update(payload).digest('hex')

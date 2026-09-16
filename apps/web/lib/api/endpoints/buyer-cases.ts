@@ -1,4 +1,4 @@
-import type { ErrTag, OperatorDecision, Severity, ClientQueueItemStatus } from '@oreset/shared'
+import type { VulnTag, ExploitStatus, OperatorDecision, Severity, ClientQueueItemStatus } from '@oreset/shared'
 import { apiFetch } from '../client'
 
 export type BuyerCase = {
@@ -16,12 +16,12 @@ export type BuyerCaseDecision = {
   id: string
   operatorId: string
   decision: OperatorDecision
-  errTag: ErrTag | null
+  vulnTag: VulnTag | null
   severity: Severity | null
+  exploitStatus: ExploitStatus | null
   notes: string | null
-  correctedTranscript: string | null
-  correctedIntent: string | null
-  correctedOutcome: string | null
+  reproductionSteps: string | null
+  recommendedFix: string | null
   reviewTimeMs: number | null
   createdAt: string
 }
@@ -34,10 +34,10 @@ export type BuyerCaseDetail = {
 export type BuyerCaseStats = {
   total: number
   pending: number
-  approved: number
-  corrected: number
-  rejected: number
+  exploited: number
+  defended: number
   escalated: number
+  inconclusive: number
   consensusSplit: number
 }
 
@@ -46,14 +46,14 @@ export type BuyerRegressionTestCase = {
   externalRef: string
   domain: string | null
   language: string | null
-  sourceInput: string | null
-  modelOutput: string | null
-  groundTruth: string | null
-  correctedTranscript: string | null
-  correctedIntent: string | null
-  errTag: ErrTag | null
+  attackPrompt: string | null
+  modelResponse: string | null
+  vulnTag: VulnTag | null
   severity: Severity | null
+  exploitStatus: ExploitStatus | null
   decision: string
+  reproductionSteps: string | null
+  recommendedFix: string | null
   reviewerNotes: string | null
   reviewedAt: string
 }

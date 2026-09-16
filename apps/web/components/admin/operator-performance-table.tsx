@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, User, Clock, Target, GitCompare, Globe } from 'lucide-react'
-import { ERR_TAG_LABELS, SEVERITY_LABELS } from '@oreset/shared'
+import { ChevronDown, ChevronUp, User, Users, Clock, Target, GitCompare, Globe } from 'lucide-react'
+import { VULN_TAG_LABELS } from '@oreset/shared'
 import type { OperatorPerformanceEntry } from '@/lib/api/endpoints/operator-performance'
 import { cn } from '@/lib/utils'
 
-type SortField = 'totalReviews' | 'reviews7d' | 'approvalRate' | 'avgReviewTimeMs' | 'calibrationAvgScore' | 'consensusAgreementRate'
+type SortField = 'totalReviews' | 'reviews7d' | 'exploitRate' | 'avgReviewTimeMs' | 'calibrationAvgScore' | 'consensusAgreementRate'
 
 function formatMs(ms: number | null): string {
   if (ms == null) return '--'
@@ -29,11 +29,10 @@ function DecisionBar({ breakdown, total }: { breakdown: OperatorPerformanceEntry
   if (total === 0) return <span className="cx-meta text-navy-400">No reviews</span>
 
   const segments = [
-    { key: 'approved', count: breakdown.approved, color: 'bg-success' },
-    { key: 'corrected', count: breakdown.corrected, color: 'bg-accent' },
-    { key: 'rejected', count: breakdown.rejected, color: 'bg-destructive' },
+    { key: 'exploited', count: breakdown.exploited, color: 'bg-destructive' },
+    { key: 'defended', count: breakdown.defended, color: 'bg-success' },
     { key: 'escalated', count: breakdown.escalated, color: 'bg-warning' },
-    { key: 'declined', count: breakdown.declined, color: 'bg-navy-300' },
+    { key: 'inconclusive', count: breakdown.inconclusive, color: 'bg-navy-300' },
   ].filter((s) => s.count > 0)
 
   return (
@@ -60,16 +59,19 @@ function DecisionBar({ breakdown, total }: { breakdown: OperatorPerformanceEntry
   )
 }
 
-function ErrTagList({ breakdown }: { breakdown: Record<string, number> }) {
+function VulnTagList({ breakdown }: { breakdown: Record<string, number> }) {
   const tags = Object.entries(breakdown).filter(([, v]) => v > 0)
   if (tags.length === 0) return <span className="cx-meta text-navy-400">None</span>
   return (
     <div className="flex flex-wrap gap-1.5">
-      {tags.map(([tag, count]) => (
-        <span key={tag} className="cx-meta rounded-full bg-navy-100 px-2 py-0.5 text-navy-600">
-          {tag} ({count}) {ERR_TAG_LABELS[tag as keyof typeof ERR_TAG_LABELS] ? `- ${ERR_TAG_LABELS[tag as keyof typeof ERR_TAG_LABELS]}` : ''}
-        </span>
-      ))}
+      {tags.map(([tag, count]) => {
+        const label = VULN_TAG_LABELS[tag as keyof typeof VULN_TAG_LABELS]
+        return (
+          <span key={tag} className="cx-meta rounded-full bg-navy-100 px-2 py-0.5 text-navy-600">
+            {tag} ({count}){label ? `: ${label}` : ''}
+          </span>
+        )
+      })}
     </div>
   )
 }
@@ -99,8 +101,8 @@ function OperatorCard({ op }: { op: OperatorPerformanceEntry }) {
             {op.avgReviewTimeMs != null && (
               <span className="cx-meta text-navy-400">avg {formatMs(op.avgReviewTimeMs)}</span>
             )}
-            {op.approvalRate != null && (
-              <span className="cx-meta text-navy-400">{op.approvalRate}% approval</span>
+            {op.exploitRate != null && (
+              <span className="cx-meta text-navy-400">{op.exploitRate}% exploit rate</span>
             )}
             {op.calibrationAvgScore != null && (
               <span className="cx-meta text-accent">cal {op.calibrationAvgScore}%</span>
@@ -238,10 +240,10 @@ function OperatorCard({ op }: { op: OperatorPerformanceEntry }) {
             </div>
           )}
 
-          {/* Error tags */}
+          {/* Vulnerability categories */}
           <div>
-            <p className="cx-meta font-semibold text-navy-500 mb-2">Error Tags Flagged</p>
-            <ErrTagList breakdown={op.errTagBreakdown} />
+            <p className="cx-meta font-semibold text-navy-500 mb-2">Vulnerabilities Found</p>
+            <VulnTagList breakdown={op.vulnTagBreakdown} />
           </div>
         </div>
       )}
@@ -273,7 +275,7 @@ export function OperatorPerformanceTable({ operators }: { operators: OperatorPer
   return (
     <div className="mt-6">
       <div className="flex flex-wrap items-center gap-3 mb-3">
-        <h2 className="cx-title text-navy-900 flex-1">Operators ({operators.length})</h2>
+        <h2 className="cx-title text-navy-900 flex-1">Testers ({operators.length})</h2>
         <input
           type="text"
           placeholder="Search by name, code, language, location..."
@@ -288,7 +290,7 @@ export function OperatorPerformanceTable({ operators }: { operators: OperatorPer
         >
           <option value="totalReviews">Sort: Total Reviews</option>
           <option value="reviews7d">Sort: This Week</option>
-          <option value="approvalRate">Sort: Approval Rate</option>
+          <option value="exploitRate">Sort: Exploit Rate</option>
           <option value="avgReviewTimeMs">Sort: Avg Speed</option>
           <option value="calibrationAvgScore">Sort: Calibration Score</option>
           <option value="consensusAgreementRate">Sort: Consensus Agreement</option>
@@ -299,7 +301,7 @@ export function OperatorPerformanceTable({ operators }: { operators: OperatorPer
         <div className="cx-card flex flex-col items-center gap-3 p-10 text-center">
           <Users className="size-8 text-navy-300" />
           <p className="cx-body text-navy-500">
-            {search ? 'No operators match your search.' : 'No operators registered yet.'}
+            {search ? 'No testers match your search.' : 'No testers registered yet.'}
           </p>
         </div>
       ) : (

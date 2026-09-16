@@ -10,8 +10,8 @@ const fakeTicket: Ticket = {
   operatorReviewDecisionId: 'd1',
   clientName: 'Test Client',
   externalRef: 'txn_1',
-  errTag: 'ERR-02',
-  severity: 'SEV-1',
+  vulnTag: 'VLN-02',
+  severity: 'P0',
   notes: null,
   status: 'resolved',
   resolvedBy: 'admin1',
@@ -19,6 +19,7 @@ const fakeTicket: Ticket = {
   resolutionNotes: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   resolvedByUser: null,
+  operatorReviewDecision: null,
 }
 
 const refresh = vi.fn()
