@@ -20,6 +20,16 @@ const SCREENSHOTS: Partial<Record<TabKey, { src: string; alt: string; aspect: st
     alt: 'Oreset client dashboard showing an agent resilience score of 60, open findings by severity and by category',
     aspect: 'aspect-[1900/815]',
   },
+  tester: {
+    src: '/platform/red-team-workspace.png',
+    alt: 'Oreset red team workspace with the exploit trace on the left and the vulnerability assessment form on the right',
+    aspect: 'aspect-[1900/815]',
+  },
+  auditor: {
+    src: '/platform/auditor-console.png',
+    alt: 'Oreset lead auditor console with an escalated scenario expanded, showing the exploit trace and the auditor verdict form',
+    aspect: 'aspect-[1900/815]',
+  },
 }
 
 const TABS: { key: TabKey; label: string; icon: typeof LayoutDashboard; title: string; detail: string }[] = [
