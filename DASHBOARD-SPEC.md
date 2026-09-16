@@ -1,7 +1,56 @@
 # Dashboard Adaptation Spec: AI Agent Red-Teaming
 
-**Status:** Step 1 complete. Step 2 next.
-**Date:** 2026-09-07
+**Status:** Steps 1 to 5 built, migrated, seeded, and smoke-tested on the dev database. This document is now the record of what exists plus the remaining work.
+**Spec written:** 2026-09-07. **Last updated:** 2026-09-16.
+
+---
+
+## Where we are (read this first)
+
+### Done and on `main`
+
+| Area | What exists | Key files |
+|------|-------------|-----------|
+| Taxonomy | VLN-01 to VLN-06, P0 to P3, exploit statuses, auditor decisions, finding statuses. Single source of truth in shared enums. | `packages/shared/src/enums.ts` |
+| Database | Migration 0016 (taxonomy swap, all tables incl. calibration) and 0017 (finding lifecycle columns). Both apply cleanly from scratch. | `apps/api/src/db/migrations/0016_*.sql`, `0017_*.sql` |
+| Tester workspace | Single-pane exploit trace + finding form. Queue, home, history, calibration on the new taxonomy. Legacy two-step reviewer components deleted. | `apps/web/components/reviewer/vulnerability-review-workspace.tsx`, `exploit-trace-panel.tsx`, `apps/web/app/operator/*` |
+| Lead auditor | Verification queue (P0/P1 exploits + escalations), verify / adjust severity / false positive, stats. Verifying resolves the escalation ticket and sets the scenario's final status. | `apps/api/src/modules/findings/*`, `apps/web/app/admin/findings/page.tsx`, `apps/web/components/admin/findings-verification-queue.tsx` |
+| Client portal | Resilience score, breakdowns, findings list with lifecycle, "mark as fixed" queues a free retest, scenarios list and detail, regression explorer. Manual scenario form hidden behind `SHOW_SUBMIT_FORM`. | `apps/web/app/buyer/*`, `apps/web/components/buyer/*` |
+| Retest loop | Marking a finding fixed creates a retest scenario (`traceData.retestOf`). Tester decision on it closes or reopens the finding. | `findings.service.ts` (`markFindingFixed`, `applyRetestOutcome`), `operator.service.ts` (`decide`) |
+| Webhooks | New events `finding.verified`, `finding.closed`, `finding.reopened`. | `apps/api/src/lib/webhooks.ts` |
+| Admin | Tickets, adjudication queue, performance table on the new taxonomy. Data-collection nav links hidden (Campaigns, Datasets). | `apps/web/components/admin/*` |
+| Demo data | SafariPay engagement with every lifecycle state, three gold calibration cases. Smoke script asserts the dashboard numbers. | `apps/api/src/db/seed-redteam.ts`, `smoke-redteam.ts` |
+| Landing site | Eight-block page, finding showcase, platform section, `/cases`, `/pricing`, `/trust`, `/company`. | `apps/web/app/*`, `apps/web/components/*` |
+
+### Running it locally
+
+```bash
+pnpm install
+pnpm --filter @oreset/shared build          # drizzle and the web app read the built enums
+pnpm --filter @oreset/api db:migrate         # applies 0016 and 0017
+pnpm --filter @oreset/api db:seed:redteam    # SafariPay demo engagement, safe to re-run
+pnpm --filter @oreset/api exec tsx src/db/smoke-redteam.ts   # 19 checks, all should pass
+pnpm dev
+```
+
+Demo logins (all `dev-password`): `client@safaripay.demo` (client), `tester-1@oreset.dev` and `tester-2@oreset.dev` (red team), `lead-auditor@oreset.dev` (auditor, admin portal), `admin@oreset.dev`.
+
+Typecheck: `npx tsc --noEmit -p tsconfig.json` in `apps/api` and `apps/web`. The web check reports stale `.next/dev/types` errors for the deleted `/solutions/*` pages until the next `pnpm dev`; everything else is clean.
+
+### Not done, in priority order
+
+1. **Engagement phase** (Step 5.3). Client home should show Kickoff / Testing / Readout / Retest. Needs a decision: new `engagements` table (recommended, a client will have more than one engagement) or a field on the buyer user. **George decides.**
+2. **Executive summary export.** One button on the client home, generated from `getBuyerFindings` output. Score, open by severity, top three fixes, retest status. HTML or PDF, no separate authoring.
+3. **Retest queue priority.** Retest scenarios should sort ahead of fresh ones in `operator.service.getQueue`. Small change.
+4. **Real screenshots** for the landing page platform section, replacing the rendered panels in `platform-showcase.tsx`.
+5. **Resources page** with the founder's first post, and possibly one more public incident on `/cases`.
+6. **Slack notifications.** Not before five paying clients.
+
+### Known rough edges
+
+- `operator_review_decisions.client_item_id` stores the scenario's `externalRef` (text), not its uuid. `findings.service.ts` resolves it with a lookup. Worth a proper FK migration when there is time.
+- A shared dev database may contain older FirstBank test scenarios from `seed.ts`; they were migrated correctly and appear in the admin queues. Ignore or delete.
+- Client-facing copy rule: no em or en dashes anywhere. Enum labels use a full stop instead.
 
 ---
 
@@ -386,14 +435,17 @@ No em dashes or en dashes anywhere in user-facing text: labels, descriptions, en
 | 1b | Write DB migration | Small | DONE |
 | 1c | Update API Zod schemas + services | Medium | DONE |
 | 1d | Update calibration schema + services | Small | DONE |
-| 2a | Build `VulnerabilityReviewWorkspace` component | Large | NEXT |
-| 2b | Update `/operator/item` to use new component | Medium | |
-| 2c | Update operator home/history pages | Small | |
-| 3a | Build auditor API endpoints | Medium | |
-| 3b | Build `/admin/findings` page | Large | |
-| 4a | Add resilience score to buyer home | Medium | |
-| 4b | Update buyer cases list + detail | Medium | |
-| 4c | Add executive summary view | Medium | |
+| 2a | Build `VulnerabilityReviewWorkspace` component | Large | DONE |
+| 2b | Update `/operator/item` to use new component | Medium | DONE |
+| 2c | Update operator home/history/calibration pages | Small | DONE |
+| 3a | Build auditor API endpoints (`/api/v1/findings/*`) | Medium | DONE |
+| 3b | Build `/admin/findings` page | Large | DONE |
+| 4a | Add resilience score to buyer home | Medium | DONE |
+| 4b | Update buyer cases list + detail + regression explorer | Medium | DONE |
+| 4c | Add executive summary view | Medium | OPEN |
+| 5.2 | Finding lifecycle, mark as fixed, free retest (migration 0017) | Medium | DONE |
+| 5.3 | Engagement phase on client home | Small | OPEN, needs George's decision on `engagements` table |
+| 6 | Demo seed + smoke checks | Small | DONE |
 | 4d | Update export formats with auditor data | Small | |
 
 **Critical path:** 1 (done) then 2a then 2b (gets tester workspace working).
