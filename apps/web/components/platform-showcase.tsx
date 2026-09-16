@@ -1,14 +1,26 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { LayoutDashboard, Crosshair, ShieldCheck, CheckCircle2, Wrench, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { MotionReveal } from '@/components/motion-reveal'
 
-// The three portals, rendered with the same components and tokens the live
-// platform uses. Data is illustrative; the UI is not a mock.
+// Real screenshots of the live platform where we have them (public/platform).
+// Tabs without one fall back to a panel rendered from the same components
+// and tokens the portals use, so the section never shows an empty frame.
 
 type TabKey = 'client' | 'tester' | 'auditor'
+
+// Screenshots are full-window captures; the crop trims the browser scrollbar
+// on the right and the dev overlay at the bottom-left.
+const SCREENSHOTS: Partial<Record<TabKey, { src: string; alt: string; aspect: string }>> = {
+  client: {
+    src: '/platform/client-dashboard.png',
+    alt: 'Oreset client dashboard showing an agent resilience score of 60, open findings by severity and by category',
+    aspect: 'aspect-[1900/815]',
+  },
+}
 
 const TABS: { key: TabKey; label: string; icon: typeof LayoutDashboard; title: string; detail: string }[] = [
   {
@@ -37,6 +49,12 @@ const TABS: { key: TabKey; label: string; icon: typeof LayoutDashboard; title: s
   },
 ]
 
+const FRAME_TITLES: Record<TabKey, string> = {
+  client: 'app.oreset.africa/buyer/home',
+  tester: 'app.oreset.africa/operator/item',
+  auditor: 'app.oreset.africa/admin/findings',
+}
+
 function Frame({ children, title }: { children: React.ReactNode; title: string }) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_24px_60px_-30px_rgba(22,33,58,0.35)]">
@@ -48,6 +66,22 @@ function Frame({ children, title }: { children: React.ReactNode; title: string }
       </div>
       <div className="p-4 sm:p-5">{children}</div>
     </div>
+  )
+}
+
+function Screenshot({ shot, title }: { shot: NonNullable<(typeof SCREENSHOTS)[TabKey]>; title: string }) {
+  return (
+    <Frame title={title}>
+      <div className={cn('relative -m-4 overflow-hidden rounded-b-xl sm:-m-5', shot.aspect)}>
+        <Image
+          src={shot.src}
+          alt={shot.alt}
+          fill
+          sizes="(min-width: 1024px) 60vw, 100vw"
+          className="object-cover object-left-top"
+        />
+      </div>
+    </Frame>
   )
 }
 
@@ -231,11 +265,19 @@ export function PlatformShowcase() {
               <p className="text-body mt-3 text-pretty text-muted-foreground">{active.detail}</p>
             </div>
             <div className="lg:col-span-8">
-              {tab === 'client' && <ClientPanel />}
-              {tab === 'tester' && <TesterPanel />}
-              {tab === 'auditor' && <AuditorPanel />}
+              {SCREENSHOTS[tab] ? (
+                <Screenshot shot={SCREENSHOTS[tab]!} title={FRAME_TITLES[tab]} />
+              ) : (
+                <>
+                  {tab === 'client' && <ClientPanel />}
+                  {tab === 'tester' && <TesterPanel />}
+                  {tab === 'auditor' && <AuditorPanel />}
+                </>
+              )}
               <p className="mt-3 text-[11px] text-muted-foreground">
-                Live platform UI. Scenario data is illustrative, not a specific client.
+                {SCREENSHOTS[tab]
+                  ? 'Screenshot of the live platform on a demo engagement. Client and data are illustrative.'
+                  : 'Live platform UI. Scenario data is illustrative, not a specific client.'}
               </p>
             </div>
           </div>
