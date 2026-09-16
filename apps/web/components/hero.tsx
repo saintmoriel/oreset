@@ -9,8 +9,8 @@ import { openPilotModal } from './pilot-scoping-modal'
 
 registerGsap()
 
-// 3168x1344 (2.36:1). Empty navy on the left for the copy, copper node at
-// ~73% across, small figure at ~86%. Rendered right-anchored and unscaled.
+// 2912x1440 (2.02:1). Network mesh across the full width, figure at ~67%.
+// Rendered centred and unscaled; the overlay carries the left-side contrast.
 const HERO_IMAGE = '/hero-redteam.jpg'
 
 const proof = [
@@ -118,23 +118,21 @@ export function Hero() {
     >
       <div className="absolute inset-0" aria-hidden="true">
         <div ref={imageRef} className="relative h-[108%] w-full will-change-transform">
-          {/* Artwork is 2.36:1 with the node at ~73% and the figure at ~86%.
-              On desktop a 16:9 viewport shows 75% of the width, so anchoring
-              right keeps node and figure in frame and trims only the empty
-              navy on the left, under the copy. On phones the slice is a fifth
-              of the image, so centre it on the node. */}
+          {/* Artwork is 2.02:1, the same shape the hero renders at on most
+              laptops, so it shows almost uncropped. Figure sits at ~67%; on
+              phones centre the slice on it. */}
           <Image
             src={HERO_IMAGE}
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[80%_center] md:object-right"
+            className="object-cover object-[67%_center] md:object-center"
           />
         </div>
-        {/* Lighter than before: the image already carries the navy field, so the
-            overlay only guarantees copy contrast on the left and clears the right. */}
-        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,24,41,0.88)_0%,rgba(15,24,41,0.7)_40%,rgba(18,32,58,0.25)_68%,rgba(18,32,58,0)_100%)]" />
+        {/* The mesh runs under the headline, so the left half is darkened firmly
+            for copy contrast and the overlay clears toward the figure on the right. */}
+        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,24,41,0.94)_0%,rgba(15,24,41,0.82)_45%,rgba(18,32,58,0.3)_70%,rgba(18,32,58,0.05)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(15,24,41,0.7)_0%,transparent_40%)]" />
         <div ref={overlayRef} className="absolute inset-0 bg-ink opacity-0" />
       </div>
