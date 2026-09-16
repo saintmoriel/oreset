@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Pool } from 'pg'
 import { drizzle } from 'drizzle-orm/node-postgres'
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import argon2 from 'argon2'
 import * as schema from './schema'
 
@@ -87,11 +87,28 @@ async function main() {
     }
   }
 
+  // --reset wipes the demo client's scenarios, decisions, tickets, and
+  // findings so the engagement returns to its starting state. Users and
+  // calibration cases are kept.
+  if (process.argv.includes('--reset')) {
+    const refs = await db
+      .select({ ref: schema.clientQueueItems.externalRef })
+      .from(schema.clientQueueItems)
+      .where(eq(schema.clientQueueItems.submittedBy, buyer.id))
+    if (refs.length > 0) {
+      await db.delete(schema.operatorReviewDecisions).where(
+        inArray(schema.operatorReviewDecisions.clientItemId, refs.map((r) => r.ref)),
+      )
+      await db.delete(schema.clientQueueItems).where(eq(schema.clientQueueItems.submittedBy, buyer.id))
+      console.log(`Reset: removed ${refs.length} scenarios and their decisions, tickets, and findings.`)
+    }
+  }
+
   const already = await db.query.clientQueueItems.findFirst({
     where: eq(schema.clientQueueItems.submittedBy, buyer.id),
   })
   if (already) {
-    console.log('Client already has scenarios. Skipping scenario seed.')
+    console.log('Client already has scenarios. Skipping scenario seed. Pass --reset to start over.')
     await pool.end()
     return
   }
