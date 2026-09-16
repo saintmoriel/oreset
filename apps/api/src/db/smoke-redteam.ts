@@ -38,7 +38,7 @@ async function main() {
   // Lead auditor console: only the escalation is waiting (P2 exploit is below the bar)
   // Scope to the demo client: a shared dev database may hold other clients' escalations.
   const queue = (await findings.getVerificationQueue()).filter(
-    (e) => e.decision.clientItemSnapshot?.clientName === 'SafariPay support agent',
+    (e) => (e.decision.clientItemSnapshot as { clientName?: string } | null)?.clientName === 'SafariPay support agent',
   )
   check('auditor queue has 1 SafariPay entry', queue.length === 1, queue.length)
   check('auditor queue entry is the escalation', queue[0]?.decision.decision === 'escalated', queue[0]?.decision.decision)
@@ -55,6 +55,22 @@ async function main() {
   check('tester 1 has 4 decisions', testerStats.reviewedAllTime === 4, testerStats.reviewedAllTime)
   check('tester 1 exploit rate 50%', testerStats.exploitRate === 50, testerStats.exploitRate)
   check('tester 1 has 1 open escalation ticket', testerStats.openTicketsFromMe === 1, testerStats.openTicketsFromMe)
+
+  // Admin operations console
+  const admin = await import('../modules/admin/admin.service')
+  const overview = await admin.getOverview('admin')
+  if (overview.role === 'admin') {
+    check('admin overview: at least 1 finding awaiting verification', overview.findingsAwaitingVerification >= 1, overview.findingsAwaitingVerification)
+    check('admin overview: at least 1 active client', overview.activeClients >= 1, overview.activeClients)
+    check('admin overview: 1 finding in retest', overview.findingsInRetest === 1, overview.findingsInRetest)
+    check('admin overview: 1 finding closed', overview.findingsClosed === 1, overview.findingsClosed)
+    check('admin overview: retests queued is 1', overview.retestsQueued === 1, overview.retestsQueued)
+    check('admin overview: needsAttention counts everything', overview.needsAttention >= overview.findingsAwaitingVerification + overview.openEscalations, overview.needsAttention)
+  } else {
+    check('admin overview returns admin role', false, overview.role)
+  }
+  const lead = await admin.getOverview('reviewer_lead')
+  check('reviewer lead overview has verification count', lead.role === 'reviewer_lead' && lead.findingsAwaitingVerification >= 1, lead)
 
   console.log(failures.length === 0 ? '\nAll checks passed.' : `\n${failures.length} check(s) failed.`)
   process.exit(failures.length === 0 ? 0 : 1)
