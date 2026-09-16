@@ -4,17 +4,30 @@ import type { AuditLogEntry } from './audit'
 export type AdminOverview =
   | {
       role: 'admin'
-      campaignsLive: number
-      datasetsByStatus: { draft: number; sealed: number; delivered: number }
-      submissionsAwaitingQa: number
-      clientItemsAwaitingReview: number
-      openTickets: number
-      pendingOperatorApplications: number
-      submissionsAwaitingPayout: number
       needsAttention: number
+      findingsAwaitingVerification: number
+      openEscalations: number
+      consensusSplits: number
+      pendingTesterApplications: number
+      activeClients: number
+      scenariosQueued: number
+      retestsQueued: number
+      findingsOpen: number
+      findingsInRetest: number
+      findingsClosed: number
+      scenariosAssessed7d: number
+      exploited7d: number
+      exploitRate7d: number | null
+      totalVerified: number
+      falsePositiveRate: number | null
       recentAuditEntries: AuditLogEntry[]
     }
-  | { role: 'reviewer_lead'; openTickets: number }
+  | {
+      role: 'reviewer_lead'
+      findingsAwaitingVerification: number
+      openEscalations: number
+      consensusSplits: number
+    }
   | { role: 'compliance'; recentAuditEntries: AuditLogEntry[] }
 
 export function getAdminOverview() {

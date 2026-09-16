@@ -1,77 +1,155 @@
-import { and, avg, count, desc, eq, gte, isNull, sql } from 'drizzle-orm'
+import { and, avg, count, desc, eq, gte, isNull, sql, type SQL } from 'drizzle-orm'
+import type { PgTable } from 'drizzle-orm/pg-core'
 import type { StaffRole } from '@oreset/shared'
 import { VULN_TAGS, type VulnTag } from '@oreset/shared'
 import { db } from '../../db/client'
-import { campaigns, users, submissions, operatorReviewDecisions, calibrationAttempts, consensusPairs, operatorApplications } from '../../db/schema'
-import { getQueueCount as getQaQueueCount } from '../qa/qa.service'
+import {
+  users,
+  operatorReviewDecisions,
+  calibrationAttempts,
+  consensusPairs,
+  operatorApplications,
+  clientQueueItems,
+  verifiedFindings,
+  clientTickets,
+} from '../../db/schema'
 import { getQueueCount as getOperatorQueueCount } from '../operator/operator.service'
-import { listDatasets } from '../datasets/datasets.service'
-import { listTickets } from '../tickets/tickets.service'
+import { getVerificationQueue, getVerificationStats } from '../findings/findings.service'
 import { listAuditLog } from '../audit/audit.service'
 
-async function countCampaignsLive() {
-  const [row] = await db.select({ n: count() }).from(campaigns).where(eq(campaigns.status, 'live'))
-  return row.n
+// ---------------------------------------------------------------------------
+// Overview: the engagement operations console. Everything here is a number
+// someone has to act on today or a number that tells you whether the red
+// team is working. Old data-collection stats (campaigns, datasets, QA
+// backlog) are gone; those portals are hidden.
+// ---------------------------------------------------------------------------
+
+async function countWhere(table: PgTable, where: SQL) {
+  const [row] = await db.select({ n: sql<number>`count(*)::int` }).from(table).where(where)
+  return row?.n ?? 0
 }
 
-async function countPendingOperatorApplications() {
-  const [row] = await db
-    .select({ n: count() })
-    .from(users)
-    .where(and(eq(users.role, 'operator'), eq(users.status, 'pending')))
-  return row.n
+async function countPendingTesterApplications() {
+  return countWhere(users, sql`${users.role} = 'operator' AND ${users.status} = 'pending'`)
 }
 
-async function countSubmissionsAwaitingPayout() {
+async function countOpenEscalations() {
+  return countWhere(clientTickets, sql`${clientTickets.status} = 'open'`)
+}
+
+async function countConsensusSplits() {
+  return countWhere(consensusPairs, sql`${consensusPairs.status} = 'disagreed'`)
+}
+
+async function countRetestsQueued() {
+  return countWhere(
+    clientQueueItems,
+    sql`${clientQueueItems.status} IN ('pending', 'in_review') AND ${clientQueueItems.traceData}->>'retestOf' IS NOT NULL`,
+  )
+}
+
+async function countActiveClients() {
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   const [row] = await db
-    .select({ n: count() })
-    .from(submissions)
-    .where(and(eq(submissions.status, 'qa_approved'), isNull(submissions.payoutId)))
-  return row.n
+    .select({ n: sql<number>`count(distinct ${clientQueueItems.clientName})::int` })
+    .from(clientQueueItems)
+    .where(gte(clientQueueItems.createdAt, thirtyDaysAgo))
+  return row?.n ?? 0
+}
+
+async function getFindingLifecycleCounts() {
+  const rows = await db
+    .select({ status: verifiedFindings.status, n: sql<number>`count(*)::int` })
+    .from(verifiedFindings)
+    .groupBy(verifiedFindings.status)
+  const by = Object.fromEntries(rows.map((r) => [r.status, r.n])) as Partial<Record<string, number>>
+  return {
+    open: (by.verified ?? 0) + (by.reopened ?? 0),
+    inRetest: (by.fix_submitted ?? 0) + (by.retesting ?? 0),
+    closed: by.closed ?? 0,
+  }
+}
+
+async function getWeekActivity() {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  const rows = await db
+    .select({ decision: operatorReviewDecisions.decision, n: sql<number>`count(*)::int` })
+    .from(operatorReviewDecisions)
+    .where(gte(operatorReviewDecisions.createdAt, sevenDaysAgo))
+    .groupBy(operatorReviewDecisions.decision)
+  const by = Object.fromEntries(rows.map((r) => [r.decision, r.n])) as Partial<Record<string, number>>
+  const total = rows.reduce((s, r) => s + r.n, 0)
+  const exploited = by.exploited ?? 0
+  return {
+    scenariosAssessed7d: total,
+    exploited7d: exploited,
+    exploitRate7d: total > 0 ? Math.round((exploited / total) * 100) : null,
+  }
 }
 
 async function getAdminOverview() {
   const [
-    campaignsLive,
-    allDatasets,
-    submissionsAwaitingQa,
-    clientItemsAwaitingReview,
-    tickets,
-    pendingOperatorApplications,
-    submissionsAwaitingPayout,
+    verificationQueue,
+    verificationStats,
+    openEscalations,
+    consensusSplits,
+    pendingTesterApplications,
+    scenariosQueued,
+    retestsQueued,
+    activeClients,
+    findings,
+    week,
     recentAuditEntries,
   ] = await Promise.all([
-    countCampaignsLive(),
-    listDatasets(),
-    getQaQueueCount(),
+    getVerificationQueue(),
+    getVerificationStats(),
+    countOpenEscalations(),
+    countConsensusSplits(),
+    countPendingTesterApplications(),
     getOperatorQueueCount(),
-    listTickets(),
-    countPendingOperatorApplications(),
-    countSubmissionsAwaitingPayout(),
+    countRetestsQueued(),
+    countActiveClients(),
+    getFindingLifecycleCounts(),
+    getWeekActivity(),
     listAuditLog({ limit: 8 }),
   ])
 
-  const datasetsByStatus = { draft: 0, sealed: 0, delivered: 0 }
-  for (const d of allDatasets) datasetsByStatus[d.status]++
-  const openTickets = tickets.filter((t) => t.status === 'open').length
+  const findingsAwaitingVerification = verificationQueue.length
 
   return {
     role: 'admin' as const,
-    campaignsLive,
-    datasetsByStatus,
-    submissionsAwaitingQa,
-    clientItemsAwaitingReview,
-    openTickets,
-    pendingOperatorApplications,
-    submissionsAwaitingPayout,
-    needsAttention: openTickets + pendingOperatorApplications + submissionsAwaitingPayout,
+    needsAttention: findingsAwaitingVerification + openEscalations + consensusSplits + pendingTesterApplications,
+    findingsAwaitingVerification,
+    openEscalations,
+    consensusSplits,
+    pendingTesterApplications,
+    activeClients,
+    scenariosQueued,
+    retestsQueued,
+    findingsOpen: findings.open,
+    findingsInRetest: findings.inRetest,
+    findingsClosed: findings.closed,
+    scenariosAssessed7d: week.scenariosAssessed7d,
+    exploited7d: week.exploited7d,
+    exploitRate7d: week.exploitRate7d,
+    totalVerified: verificationStats.totalVerified,
+    falsePositiveRate: verificationStats.falsePositiveRate,
     recentAuditEntries,
   }
 }
 
 async function getReviewerLeadOverview() {
-  const tickets = await listTickets()
-  return { role: 'reviewer_lead' as const, openTickets: tickets.filter((t) => t.status === 'open').length }
+  const [verificationQueue, openEscalations, consensusSplits] = await Promise.all([
+    getVerificationQueue(),
+    countOpenEscalations(),
+    countConsensusSplits(),
+  ])
+  return {
+    role: 'reviewer_lead' as const,
+    findingsAwaitingVerification: verificationQueue.length,
+    openEscalations,
+    consensusSplits,
+  }
 }
 
 async function getComplianceOverview() {
