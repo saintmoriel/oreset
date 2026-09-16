@@ -18,7 +18,8 @@
 | Client portal | Resilience score, breakdowns, findings list with lifecycle, "mark as fixed" queues a free retest, scenarios list and detail, regression explorer. Manual scenario form hidden behind `SHOW_SUBMIT_FORM`. | `apps/web/app/buyer/*`, `apps/web/components/buyer/*` |
 | Retest loop | Marking a finding fixed creates a retest scenario (`traceData.retestOf`). Tester decision on it closes or reopens the finding. | `findings.service.ts` (`markFindingFixed`, `applyRetestOutcome`), `operator.service.ts` (`decide`) |
 | Webhooks | New events `finding.verified`, `finding.closed`, `finding.reopened`. | `apps/api/src/lib/webhooks.ts` |
-| Admin | Tickets, adjudication queue, performance table on the new taxonomy. Data-collection nav links hidden (Campaigns, Datasets). | `apps/web/components/admin/*` |
+| Admin, operations | Home is an engagement ops console: findings awaiting verification, escalations, split assessments, tester applications, queue and retest counts, weekly exploit rate, auditor false positive rate. Tickets, adjudication, performance table on the new taxonomy. Data-collection nav hidden. | `apps/api/src/modules/admin/admin.service.ts`, `apps/web/app/admin/home/page.tsx` |
+| Admin, owner's console | `/admin/people`: every account, role, status, last sign-in, what each role reaches; create staff, change role, suspend (kills sessions), reactivate, force password reset (temporary password shown once). `/admin/clients`: per-client scenarios, findings by lifecycle, resilience score, payments, provisioning. Business strip on home. Admin role only. Migration 0018 adds `users.last_login_at`; suspended accounts are refused at login. | `apps/api/src/modules/admin/people.*`, `apps/web/app/admin/{people,clients}/page.tsx`, `apps/web/components/admin/{people,clients}-directory.tsx` |
 | Demo data | SafariPay engagement with every lifecycle state, three gold calibration cases. Smoke script asserts the dashboard numbers. | `apps/api/src/db/seed-redteam.ts`, `smoke-redteam.ts` |
 | Landing site | Eight-block page, finding showcase, platform section, `/cases`, `/pricing`, `/trust`, `/company`. | `apps/web/app/*`, `apps/web/components/*` |
 
@@ -27,9 +28,9 @@
 ```bash
 pnpm install
 pnpm --filter @oreset/shared build          # drizzle and the web app read the built enums
-pnpm --filter @oreset/api db:migrate         # applies 0016 and 0017
-pnpm --filter @oreset/api db:seed:redteam    # SafariPay demo engagement, safe to re-run
-pnpm --filter @oreset/api exec tsx src/db/smoke-redteam.ts   # 19 checks, all should pass
+pnpm --filter @oreset/api db:migrate         # applies 0016, 0017, 0018
+pnpm --filter @oreset/api db:seed:redteam    # SafariPay demo engagement, skips if present; add --reset to start over
+pnpm --filter @oreset/api exec tsx src/db/smoke-redteam.ts   # 34 checks, all should pass on a fresh seed
 pnpm dev
 ```
 
