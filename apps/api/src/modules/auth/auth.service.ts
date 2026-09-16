@@ -118,13 +118,20 @@ export async function loginWithPassword(
     throw new HttpError(401, 'invalid_credentials', 'Invalid email or password.')
   }
 
+  if (user.status === 'suspended') {
+    throw new HttpError(403, 'account_suspended', 'This account has been suspended. Contact your administrator.')
+  }
+
   const tokens = await issueSession(user, context)
-  await writeAuditLog({
-    actorId: user.id,
-    actorLabel: user.email ?? user.id,
-    actorRole: user.role === 'staff' ? (user.staffRole ?? 'staff') : user.role,
-    action: 'auth.login',
-  })
+  await Promise.all([
+    db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id)),
+    writeAuditLog({
+      actorId: user.id,
+      actorLabel: user.email ?? user.id,
+      actorRole: user.role === 'staff' ? (user.staffRole ?? 'staff') : user.role,
+      action: 'auth.login',
+    }),
+  ])
 
   return { user: toAuthUser(user), ...tokens }
 }

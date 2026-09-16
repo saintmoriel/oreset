@@ -15,6 +15,7 @@ import {
 } from '../../db/schema'
 import { getQueueCount as getOperatorQueueCount } from '../operator/operator.service'
 import { getVerificationQueue, getVerificationStats } from '../findings/findings.service'
+import { getBusinessNumbers } from './people.service'
 import { listAuditLog } from '../audit/audit.service'
 
 // ---------------------------------------------------------------------------
@@ -99,6 +100,7 @@ async function getAdminOverview() {
     activeClients,
     findings,
     week,
+    business,
     recentAuditEntries,
   ] = await Promise.all([
     getVerificationQueue(),
@@ -111,6 +113,7 @@ async function getAdminOverview() {
     countActiveClients(),
     getFindingLifecycleCounts(),
     getWeekActivity(),
+    getBusinessNumbers(),
     listAuditLog({ limit: 8 }),
   ])
 
@@ -134,6 +137,7 @@ async function getAdminOverview() {
     exploitRate7d: week.exploitRate7d,
     totalVerified: verificationStats.totalVerified,
     falsePositiveRate: verificationStats.falsePositiveRate,
+    business,
     recentAuditEntries,
   }
 }

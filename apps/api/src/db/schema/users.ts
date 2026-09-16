@@ -22,6 +22,9 @@ export const users = pgTable(
     // required before a payout can be initiated for them.
     payoutDetails: jsonb('payout_details'),
     status: userStatusEnum('status').notNull().default('active'),
+    // Stamped on password login. Shown on the admin People page so an owner
+    // can see who actually uses their access.
+    lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

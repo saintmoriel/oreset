@@ -1,5 +1,6 @@
 import { apiFetch } from '../client'
 import type { AuditLogEntry } from './audit'
+import type { BusinessNumbers } from './people'
 
 export type AdminOverview =
   | {
@@ -20,6 +21,7 @@ export type AdminOverview =
       exploitRate7d: number | null
       totalVerified: number
       falsePositiveRate: number | null
+      business: BusinessNumbers
       recentAuditEntries: AuditLogEntry[]
     }
   | {

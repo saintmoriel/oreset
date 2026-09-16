@@ -3,6 +3,7 @@ import { ArrowRight, ShieldAlert, TriangleAlert, GitCompare, Users, Crosshair, R
 import { AdminAppShell } from '@/components/admin/admin-app-shell'
 import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import type { AdminOverview } from '@/lib/api/endpoints/admin'
+import { formatMoney } from '@/lib/api/endpoints/people'
 
 export default async function AdminHomePage() {
   let overview: AdminOverview
@@ -85,6 +86,20 @@ function AdminOverviewView({ overview: o }: { overview: Extract<AdminOverview, {
       </div>
 
       <div className="mt-8">
+        <p className="cx-label text-navy-400">The business</p>
+        <div className="cx-card mt-2.5 grid grid-cols-2 divide-y divide-border sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+          <Link href="/admin/clients" className="hover:bg-navy-50/60"><Stat label="Clients" value={o.business.clientsActive} hint={`${o.business.engagementsRunning} with an engagement running`} /></Link>
+          <Link href="/admin/people" className="hover:bg-navy-50/60"><Stat label="Red team testers" value={o.business.testersActive} hint="active accounts" /></Link>
+          <Stat
+            label="Collected, last 30 days"
+            value={o.business.revenue30d.length === 0 ? 'nothing yet' : o.business.revenue30d.map((r) => formatMoney(r.minorUnits, r.currency)).join(' + ')}
+            hint="paid invoices"
+          />
+          <Stat label="Verdicts recorded" value={o.totalVerified} hint={o.falsePositiveRate === null ? 'no false positive rate yet' : `${o.falsePositiveRate}% false positives`} />
+        </div>
+      </div>
+
+      <div className="mt-8">
         <p className="cx-label text-navy-400">Engagements</p>
         <div className="cx-card mt-2.5 grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           <Stat label="Active clients" value={o.activeClients} hint="scenarios in the last 30 days" />
@@ -93,25 +108,12 @@ function AdminOverviewView({ overview: o }: { overview: Extract<AdminOverview, {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-2">
-        <div>
-          <p className="cx-label text-navy-400">Findings across all clients</p>
-          <div className="cx-card mt-2.5 grid grid-cols-3 divide-x divide-border">
-            <Stat label="Open" value={o.findingsOpen} />
-            <Stat label="In retest" value={o.findingsInRetest} />
-            <Stat label="Closed" value={o.findingsClosed} />
-          </div>
-        </div>
-        <div>
-          <p className="cx-label text-navy-400">Auditor quality</p>
-          <div className="cx-card mt-2.5 grid grid-cols-2 divide-x divide-border">
-            <Stat label="Verdicts recorded" value={o.totalVerified} />
-            <Stat
-              label="False positive rate"
-              value={o.falsePositiveRate === null ? 'n/a' : `${o.falsePositiveRate}%`}
-              hint="tester findings the auditor threw out"
-            />
-          </div>
+      <div className="mt-8">
+        <p className="cx-label text-navy-400">Findings across all clients</p>
+        <div className="cx-card mt-2.5 grid grid-cols-3 divide-x divide-border">
+          <Stat label="Open" value={o.findingsOpen} />
+          <Stat label="In retest" value={o.findingsInRetest} />
+          <Stat label="Closed" value={o.findingsClosed} />
         </div>
       </div>
 

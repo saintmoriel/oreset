@@ -72,6 +72,21 @@ async function main() {
   const lead = await admin.getOverview('reviewer_lead')
   check('reviewer lead overview has verification count', lead.role === 'reviewer_lead' && lead.findingsAwaitingVerification >= 1, lead)
 
+  // Owner's console
+  const people = await import('../modules/admin/people.service')
+  const directory = await people.listPeople()
+  check('people directory lists the demo accounts', directory.filter((p) => p.email?.endsWith('@oreset.dev') || p.email === 'client@safaripay.demo').length >= 4, directory.length)
+  check('people directory labels the lead auditor', directory.some((p) => p.email === 'lead-auditor@oreset.dev' && p.accessLabel === 'Lead auditor'), null)
+  const clients = await people.listClients()
+  const safaripay = clients.find((c) => c.email === 'client@safaripay.demo')
+  check('clients list includes SafariPay', Boolean(safaripay), clients.map((c) => c.email))
+  check('SafariPay resilience score is 60', safaripay?.resilienceScore === 60, safaripay?.resilienceScore)
+  check('SafariPay has 10 scenarios', safaripay?.scenariosTotal === 10, safaripay?.scenariosTotal)
+  if (overview.role === 'admin') {
+    check('business numbers: at least 1 active client', overview.business.clientsActive >= 1, overview.business)
+    check('business numbers: 1 engagement running', overview.business.engagementsRunning >= 1, overview.business)
+  }
+
   console.log(failures.length === 0 ? '\nAll checks passed.' : `\n${failures.length} check(s) failed.`)
   process.exit(failures.length === 0 ? 0 : 1)
 }
