@@ -1,29 +1,30 @@
+import type { VulnTag, ExploitStatus, Severity } from '@oreset/shared'
 import { apiFetch } from '../client'
 
 export type RegressionStats = {
-  rejectedCount: number
-  correctedCount: number
+  exploitedCount: number
+  defendedCount: number
   totalTestCases: number
   clients: string[]
 }
 
+// Snake_case on purpose: this is the CI/CD export format clients consume.
 export type RegressionTestCase = {
   test_case_id: string
   external_ref: string
   client_name: string | null
   domain: string | null
   language: string | null
-  source_input: string | null
-  model_executed_output: string | null
-  ground_truth_correct_output: string | null
-  corrected_transcript: string | null
-  corrected_intent: string | null
-  error_taxonomy: string[]
-  severity: string | null
+  attack_prompt: string | null
+  model_response: string | null
+  vuln_tag: VulnTag | null
+  exploit_status: ExploitStatus | null
+  severity: Severity | null
+  reproduction_steps: string | null
+  recommended_fix: string | null
   decision: string
   reviewer_notes: string | null
   reviewed_at: string
-  status: 'FAILED_PRODUCTION_GATE' | 'CORRECTED_PASS'
 }
 
 export type RegressionSuiteResponse = {

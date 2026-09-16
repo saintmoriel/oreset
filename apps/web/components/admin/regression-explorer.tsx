@@ -4,6 +4,7 @@ import { useCallback, useState, useTransition } from 'react'
 import { ChevronDown, ChevronUp, Download, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { StatusTag } from '@/components/capture/status-tag'
+import { VULN_TAG_LABELS, SEVERITY_LABELS, EXPLOIT_STATUS_LABELS } from '@oreset/shared'
 import { getRegressionSuite } from '@/lib/api/endpoints/regressions'
 import type { RegressionTestCase } from '@/lib/api/endpoints/regressions'
 
@@ -95,7 +96,7 @@ export function RegressionExplorer({ clients }: { clients: string[] }) {
 
           {testCases.length === 0 ? (
             <p className="cx-body text-navy-400">
-              No regression test cases found. Cases are generated when operators reject or correct decisions.
+              No regression test cases found. Each exploit a tester confirms becomes a test case.
             </p>
           ) : (
             <div className="space-y-2">
@@ -116,10 +117,16 @@ export function RegressionExplorer({ clients }: { clients: string[] }) {
                           <span className="cx-mono-meta font-semibold text-navy-800">
                             {tc.test_case_id}
                           </span>
-                          {tc.status === 'FAILED_PRODUCTION_GATE' ? (
-                            <StatusTag tone="destructive">Rejected</StatusTag>
+                          {tc.severity && (
+                            <span className="rounded bg-destructive/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-destructive">
+                              {tc.severity}
+                            </span>
+                          )}
+                          {tc.vuln_tag && <StatusTag tone="warning">{tc.vuln_tag}</StatusTag>}
+                          {tc.exploit_status === 'partial_bypass' ? (
+                            <StatusTag tone="neutral">Partial bypass</StatusTag>
                           ) : (
-                            <StatusTag tone="success">Corrected</StatusTag>
+                            <StatusTag tone="destructive">Exploited</StatusTag>
                           )}
                           {tc.domain && (
                             <span className="rounded bg-navy-100 px-1.5 py-0.5 text-[10px] font-semibold text-navy-500 uppercase">
@@ -154,49 +161,40 @@ export function RegressionExplorer({ clients }: { clients: string[] }) {
 
                     {isExpanded && (
                       <div className="border-t border-border px-4 pb-4 pt-3 space-y-3">
-                        {tc.source_input && (
-                          <Field label="Source Input" value={tc.source_input} />
+                        {tc.attack_prompt && (
+                          <Field label="Attack Prompt" value={tc.attack_prompt} />
                         )}
-                        {tc.model_executed_output && (
-                          <Field label="Model Output" value={tc.model_executed_output} />
+                        {tc.model_response && (
+                          <Field label="Model Response" value={tc.model_response} />
                         )}
-                        {tc.ground_truth_correct_output && (
-                          <Field
-                            label="Ground Truth (Correct Output)"
-                            value={tc.ground_truth_correct_output}
-                            accent
-                          />
-                        )}
-                        {tc.corrected_transcript && (
-                          <Field label="Corrected Transcript" value={tc.corrected_transcript} accent />
-                        )}
-                        {tc.corrected_intent && (
-                          <Field label="Corrected Intent" value={tc.corrected_intent} accent />
-                        )}
-                        {tc.error_taxonomy.length > 0 && (
+                        {(tc.vuln_tag || tc.severity || tc.exploit_status) && (
                           <div className="rounded-lg border border-border bg-navy-50 p-3">
                             <p className="text-[11px] font-medium uppercase tracking-wider text-navy-400 mb-1">
-                              Error Taxonomy
+                              Classification
                             </p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {tc.error_taxonomy.map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="rounded bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
+                            <div className="space-y-1">
+                              {tc.vuln_tag && (
+                                <p className="cx-body text-navy-800">
+                                  <span className="font-semibold">{tc.vuln_tag}</span>: {VULN_TAG_LABELS[tc.vuln_tag]}
+                                </p>
+                              )}
                               {tc.severity && (
-                                <span className="rounded bg-navy-200 px-2 py-0.5 text-[11px] font-semibold text-navy-600">
-                                  {tc.severity}
-                                </span>
+                                <p className="cx-meta text-navy-600">{tc.severity}: {SEVERITY_LABELS[tc.severity]}</p>
+                              )}
+                              {tc.exploit_status && (
+                                <p className="cx-meta text-navy-600">{EXPLOIT_STATUS_LABELS[tc.exploit_status]}</p>
                               )}
                             </div>
                           </div>
                         )}
+                        {tc.reproduction_steps && (
+                          <Field label="Reproduction Steps" value={tc.reproduction_steps} />
+                        )}
+                        {tc.recommended_fix && (
+                          <Field label="Recommended Fix" value={tc.recommended_fix} accent />
+                        )}
                         {tc.reviewer_notes && (
-                          <Field label="Reviewer Notes" value={tc.reviewer_notes} />
+                          <Field label="Tester Notes" value={tc.reviewer_notes} />
                         )}
                       </div>
                     )}

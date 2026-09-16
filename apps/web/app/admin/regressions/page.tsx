@@ -54,9 +54,9 @@ export default async function RegressionsPage() {
               </span>
               <div>
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
-                  {stats?.rejectedCount ?? 0}
+                  {stats?.exploitedCount ?? 0}
                 </p>
-                <p className="cx-meta text-navy-400">Rejected</p>
+                <p className="cx-meta text-navy-400">Exploited</p>
               </div>
             </div>
             <div className="cx-card flex items-center gap-3 p-4">
@@ -65,9 +65,9 @@ export default async function RegressionsPage() {
               </span>
               <div>
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
-                  {stats?.correctedCount ?? 0}
+                  {stats?.defendedCount ?? 0}
                 </p>
-                <p className="cx-meta text-navy-400">Corrected</p>
+                <p className="cx-meta text-navy-400">Defended</p>
               </div>
             </div>
             <div className="cx-card flex items-center gap-3 p-4">
