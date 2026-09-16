@@ -125,7 +125,7 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
             >
-              Request early access to Oreset.
+              Someone will find out what your agent does under pressure. It should be you.
             </motion.h2>
             <motion.p
               className="text-body-lg mt-5 text-pretty text-muted-foreground"
@@ -134,8 +134,8 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             >
-              We're onboarding early partners shipping AI agents in fintech, insurance, and enterprise.
-              Tell us what your agent does and we&apos;ll follow up personally.
+              We&apos;re onboarding early partners shipping AI agents in fintech, payments, and lending.
+              Tell us what your agent does and what it can touch. A person replies, usually the same day.
             </motion.p>
             <p className="mt-8 text-body-sm text-muted-foreground">
               Or email{' '}

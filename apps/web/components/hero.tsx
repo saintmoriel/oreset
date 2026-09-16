@@ -143,7 +143,7 @@ export function Hero() {
             >
               <ShieldCheck className="size-3.5 shrink-0 text-accent" aria-hidden="true" />
               <span className="text-balance">
-                AI Agent Risk Assessment &amp; Pre-Launch Testing
+                Human red team for AI agents
               </span>
             </p>
 
@@ -151,17 +151,17 @@ export function Hero() {
               data-hero-item
               className="mt-5 text-balance font-display text-[clamp(1.85rem,5.2vw,3.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-white sm:mt-6"
             >
-              We break your AI agent before your users&nbsp;do.
+              Your AI agent will be attacked. It will also just decide&nbsp;wrong.
             </h1>
 
             <p
               data-hero-item
               className="mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/70 sm:mt-5 sm:text-base md:text-lg"
             >
-              Your AI agent makes decisions that affect real people.
-              Oreset stress-tests whether it can be manipulated, whether it
-              makes wrong decisions on its own, and what the business
-              consequence is when it fails.
+              Oreset red-teams both. The security failures a hacker would exploit,
+              and the judgement failures that need no hacker at all. Every finding
+              verified by a lead auditor, streamed to your dashboard as it lands,
+              and retested free once you fix it.
             </p>
 
             <div
@@ -177,10 +177,10 @@ export function Hero() {
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </button>
               <a
-                href="#how-it-works"
+                href="#finding"
                 className="inline-flex h-12 w-full items-center justify-center rounded-md border border-white/25 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur-sm transition-[background-color,border-color] duration-200 hover:border-white/45 hover:bg-white/12 sm:w-auto"
               >
-                How It Works
+                See a Finding
               </a>
             </div>
 
@@ -191,9 +191,11 @@ export function Hero() {
             >
               <a href="#what-we-test" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">What we test</a>
               <span aria-hidden="true">·</span>
-              <a href="#how-it-works" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">How it works</a>
+              <a href="#platform" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">The platform</a>
               <span aria-hidden="true">·</span>
-              <a href="#contact" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Request early access</a>
+              <a href="/pricing" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Pricing</a>
+              <span aria-hidden="true">·</span>
+              <a href="/cases" className="rounded-md px-2 py-1 font-medium text-white/70 transition-colors hover:text-white">Cases</a>
             </nav>
           </div>
         </div>

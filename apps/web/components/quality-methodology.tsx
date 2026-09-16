@@ -35,14 +35,16 @@ export function QualityMethodology() {
     <section id="methodology" className="border-t border-border/60 py-16 sm:py-24 md:py-32">
       <div className="container-wide">
         <MotionReveal>
-          <p className="text-eyebrow text-accent">Testing methodology</p>
+          <p className="text-eyebrow text-accent">The Oreset Red Team</p>
           <h2 className="text-h1 mt-4 max-w-2xl text-balance text-foreground">
             Every finding is checked twice before you see it.
           </h2>
           <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground">
             A red team is only as good as its false positive rate. Ours is built to be
-            measured: calibrated testers, independent double review, and a lead auditor
-            who has to reproduce a finding before it counts.
+            measured: vetted testers who pass calibration before touching a live engagement,
+            independent double review on high-stakes scenarios, and a lead auditor who has
+            to reproduce a finding before it counts. Testers work under NDA, a code of
+            conduct, and a data handling policy, all signed before they see a scenario.
           </p>
         </MotionReveal>
 

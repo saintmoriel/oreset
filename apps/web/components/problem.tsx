@@ -44,8 +44,10 @@ export function Problem() {
             <MotionReveal delay={0.14}>
               <p className="text-body-lg mt-5 max-w-2xl text-pretty text-muted-foreground sm:mt-6">
                 Security firms test if your AI can be hacked. Monitoring tools watch it
-                after launch. But nobody tests the gap in between: does your AI agent make
-                wrong decisions on its own, before a single user touches it?
+                after launch. Nobody tests the gap in between: does your AI agent make
+                wrong decisions on its own, before a single user touches it? And the gap is
+                widening. Agents are shipping weekly, and the EU AI Act starts requiring
+                third-party evidence of safety in 2027.
               </p>
             </MotionReveal>
 

@@ -11,8 +11,9 @@ const columns = [
       { label: 'AI Agent Risk Assessment', href: '#what-we-test' },
       { label: 'Data Origination', href: '/services/data-origination' },
       { label: 'African AI Assurance', href: '/services/african-ai-assurance' },
+      { label: 'The platform', href: '#platform' },
       { label: 'How it works', href: '#how-it-works' },
-      { label: 'Methodology', href: '#methodology' },
+      { label: 'Pricing', href: '/pricing' },
     ],
   },
   {
@@ -27,8 +28,10 @@ const columns = [
   {
     title: 'Company',
     links: [
-      { label: 'About', href: '#about' },
-      { label: 'Why now', href: '#why-now' },
+      { label: 'About', href: '/company' },
+      { label: 'The Red Team', href: '#methodology' },
+      { label: 'Trust', href: '/trust' },
+      { label: 'Join the Red Team', href: '/operators/join' },
       { label: 'Contact', href: '#contact' },
     ],
   },
@@ -36,7 +39,7 @@ const columns = [
     title: 'Portals',
     links: [
       { label: 'Client', href: '/buyer' },
-      { label: 'Reviewer', href: '/operator' },
+      { label: 'Red Team', href: '/operator' },
       { label: 'Admin', href: '/admin' },
     ],
   },

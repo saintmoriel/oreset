@@ -24,6 +24,11 @@ const faqs = [
   },
   {
     audience: 'Clients',
+    q: 'What does it cost?',
+    a: "Engagements start at $3,500 for a single agent and go from $6,500 for a full red team across multiple flows. Continuous testing runs from $1,500 a month. Every engagement is scoped first and the scope sets the final price. Retesting is included in all of them. Full details are on the pricing page.",
+  },
+  {
+    audience: 'Clients',
     q: 'What do I get?',
     a: "Access to a live findings dashboard, not a one-time PDF. Every failure is documented with severity, business consequence, reproduction steps, and a specific fix. Your engineers work from it directly, your leadership sees the resilience score and trend. After you patch, we retest at no extra cost and close the finding only when the fix holds. Findings also export as a regression suite you can run in your CI pipeline.",
   },

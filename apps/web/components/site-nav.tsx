@@ -45,9 +45,14 @@ const navItems: NavItem[] = [
         hint: 'Scope, test, fix, retest',
       },
       {
-        label: 'Methodology',
-        href: '#methodology',
-        hint: 'Calibrated testers and dual review',
+        label: 'The platform',
+        href: '#platform',
+        hint: 'Client dashboard, red team workspace, auditor console',
+      },
+      {
+        label: 'Pricing',
+        href: '/pricing',
+        hint: 'Engagements from $3,500, scoped first',
       },
     ],
   },
@@ -79,22 +84,27 @@ const navItems: NavItem[] = [
   },
   {
     label: 'Company',
-    href: '#about',
+    href: '/company',
     children: [
       {
         label: 'About Oreset',
-        href: '#about',
-        hint: 'AI agent risk assessment',
+        href: '/company',
+        hint: 'Who we are and why now',
       },
       {
-        label: 'Why now',
-        href: '#why-now',
-        hint: 'Thesis and timing',
+        label: 'The Red Team',
+        href: '#methodology',
+        hint: 'Vetting, calibration, double review, lead auditors',
       },
       {
-        label: 'Careers',
-        href: '#contact',
-        hint: 'Join the testing team',
+        label: 'Trust',
+        href: '/trust',
+        hint: 'Access, data handling, disclosure, in plain language',
+      },
+      {
+        label: 'Join the Red Team',
+        href: '/operators/join',
+        hint: 'Apply as a tester',
       },
       {
         label: 'Contact',
