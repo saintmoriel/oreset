@@ -3,7 +3,7 @@ import { ArrowRight, Crosshair, FlaskConical, ShieldAlert } from 'lucide-react'
 import { VULN_TAG_LABELS } from '@oreset/shared'
 import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import { BuyerAppShell } from '@/components/buyer/buyer-app-shell'
-import { ResilienceSummary } from '@/components/buyer/resilience-summary'
+import { ResilienceSummary, NotStartedSummary } from '@/components/buyer/resilience-summary'
 import type { ClientFindingsResponse } from '@/lib/api/endpoints/findings'
 import type { BuyerCaseStats } from '@/lib/api/endpoints/buyer-cases'
 
@@ -33,8 +33,13 @@ export default async function BuyerHomePage() {
         fixed, and we retest for free. The score moves as findings close.
       </p>
 
+      {/* No score until something has actually been assessed. */}
       <div className="mt-6">
-        <ResilienceSummary data={findings} />
+        {stats.total - stats.pending === 0 && findings.findings.length === 0 ? (
+          <NotStartedSummary scenariosQueued={stats.pending} />
+        ) : (
+          <ResilienceSummary data={findings} />
+        )}
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">

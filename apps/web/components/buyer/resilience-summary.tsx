@@ -57,6 +57,30 @@ function BarRow({ label, value, max, bar }: { label: string; value: number; max:
   )
 }
 
+// Before any scenario has been assessed there is no score to show. A default
+// of 100 would read as "your agent is fine", which is not something we know.
+export function NotStartedSummary({ scenariosQueued }: { scenariosQueued: number }) {
+  return (
+    <div className="cx-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:gap-8">
+      <div className="flex size-32 shrink-0 items-center justify-center rounded-full border-8 border-navy-100">
+        <span className="font-mono text-2xl font-semibold text-navy-300">?</span>
+      </div>
+      <div>
+        <p className="cx-label text-navy-400">Agent resilience score</p>
+        <p className="cx-title mt-1 text-navy-900">Not scored yet</p>
+        <p className="cx-meta mt-2 max-w-xl text-navy-500">
+          {scenariosQueued > 0
+            ? `${scenariosQueued} attack scenario${scenariosQueued === 1 ? ' is' : 's are'} queued for the red team. The score appears once a lead auditor has verified the first finding, or the first scenarios come back defended.`
+            : 'Your engagement has not started testing yet. Scenarios appear here as the red team begins, and the score follows the first verified result.'}
+        </p>
+        <p className="cx-meta mt-2 text-navy-400">
+          A score of 100 would mean every scenario was defended. We do not show one until we have earned it.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function ResilienceSummary({ data }: { data: ClientFindingsResponse }) {
   const tone = scoreTone(data.score)
   const sevMax = Math.max(0, ...SEVERITY_ROWS.map((r) => data.breakdown.bySeverity[r.key] ?? 0))

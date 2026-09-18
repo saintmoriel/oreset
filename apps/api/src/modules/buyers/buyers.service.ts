@@ -5,6 +5,8 @@ import { db } from '../../db/client'
 import { users, datasets, datasetDownloadEvents, clientQueueItems, operatorReviewDecisions, webhookConfigs, type User } from '../../db/schema'
 import { hashPassword } from '../../lib/password'
 import { writeAuditLog } from '../../lib/audit'
+import { sendMail } from '../../lib/mail'
+import { env } from '../../config/env'
 import { HttpError } from '../../middleware/error-handler'
 import { toAuthUser } from '../auth/auth.service'
 import { getDownloadUrl } from '../uploads/uploads.service'
@@ -49,6 +51,25 @@ export async function provisionBuyer(input: {
     action: 'buyer.provisioned',
     resourceType: 'user',
     resourceId: user.id,
+  })
+
+  // The temporary password travels by a channel the admin chooses, never by
+  // this email. This just tells them the account exists and where to go.
+  void sendMail({
+    to: input.email,
+    subject: 'Your Oreset client account is ready',
+    text: [
+      `Hi ${input.displayName},`,
+      '',
+      'Your Oreset client account has been created. Your engagement lead will share a temporary password with you separately.',
+      '',
+      `Sign in: ${env.WEB_PUBLIC_URL}/buyer`,
+      `Forgot the password later? ${env.WEB_PUBLIC_URL}/forgot-password?portal=buyer`,
+      '',
+      'Findings appear on your dashboard as the red team confirms them and a lead auditor verifies them.',
+      '',
+      'Oreset',
+    ].join('\n'),
   })
 
   return { user: toAuthUser(user) }

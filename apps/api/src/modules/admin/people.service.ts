@@ -13,6 +13,8 @@ import {
 } from '../../db/schema'
 import { hashPassword } from '../../lib/password'
 import { writeAuditLog } from '../../lib/audit'
+import { sendMail } from '../../lib/mail'
+import { env } from '../../config/env'
 import { HttpError } from '../../middleware/error-handler'
 import { getBuyerFindings } from '../findings/findings.service'
 
@@ -159,6 +161,22 @@ export async function createStaff(
     .returning()
 
   await audit(actor, 'people.staff_created', user.id, { email: input.email, staffRole: input.staffRole })
+
+  void sendMail({
+    to: input.email,
+    subject: 'Your Oreset staff account',
+    text: [
+      `Hi ${input.displayName.split(' ')[0]},`,
+      '',
+      `An Oreset staff account has been created for you with the role "${ROLE_ACCESS[`staff:${input.staffRole}`]?.label ?? input.staffRole}". The person who created it will give you a temporary password separately.`,
+      '',
+      `Sign in: ${env.WEB_PUBLIC_URL}/admin`,
+      `Change your password after first sign-in: ${env.WEB_PUBLIC_URL}/forgot-password?portal=admin`,
+      '',
+      'Oreset',
+    ].join('\n'),
+  })
+
   return { user: { id: user.id, email: user.email, displayName: user.displayName, staffRole: user.staffRole }, temporaryPassword }
 }
 

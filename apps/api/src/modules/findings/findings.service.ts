@@ -4,8 +4,16 @@ import { db } from '../../db/client'
 import { clientQueueItems, operatorReviewDecisions, verifiedFindings, clientTickets, users } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
 import { fireWebhooksForItem } from '../../lib/webhooks'
+import { sendMail } from '../../lib/mail'
+import { env } from '../../config/env'
 import { HttpError } from '../../middleware/error-handler'
 import { ingestSingle } from '../ingestion/ingestion.service'
+
+async function contactFor(userId: string | null | undefined) {
+  if (!userId) return null
+  const u = await db.query.users.findFirst({ where: eq(users.id, userId), columns: { email: true, displayName: true } })
+  return u?.email ? { email: u.email, firstName: u.displayName?.split(' ')[0] ?? 'there' } : null
+}
 
 // ---------------------------------------------------------------------------
 // Resilience scoring (see DASHBOARD-SPEC.md, Step 4)
@@ -188,6 +196,51 @@ export async function verifyFinding(input: {
     reproducible: input.reproducible,
     blastRadius: input.blastRadius ?? null,
   })
+
+  // Close the loop with both people who care: the client (a finding is now
+  // on their dashboard) and the tester (their call was confirmed or not).
+  const severity = input.adjustedSeverity ?? decision.severity
+  const [client, tester] = await Promise.all([contactFor(item.submittedBy), contactFor(decision.operatorId)])
+
+  if (client && !isFalsePositive) {
+    void sendMail({
+      to: client.email,
+      subject: `${severity ?? 'New'} finding verified on ${item.clientName}`,
+      text: [
+        `Hi ${client.firstName},`,
+        '',
+        `A lead auditor has verified a ${severity ?? ''} finding on ${item.clientName}${decision.vulnTag ? ` (${decision.vulnTag})` : ''}.`,
+        input.blastRadius ? `\nBusiness impact: ${input.blastRadius}\n` : '',
+        'Reproduction steps and a recommended fix are on your dashboard. When you have fixed it, mark it fixed there and we will retest at no extra cost.',
+        '',
+        `${env.WEB_PUBLIC_URL}/buyer/findings`,
+        '',
+        'Oreset',
+      ].join('\n'),
+    })
+  }
+
+  if (tester) {
+    const outcome =
+      input.verdict === 'verified' ? 'verified and sent to the client'
+      : input.verdict === 'severity_adjusted' ? `verified, with severity changed to ${input.adjustedSeverity}`
+      : 'ruled a false positive and will not reach the client'
+    void sendMail({
+      to: tester.email,
+      subject: `Your finding on ${item.externalRef} was ${input.verdict === 'false_positive' ? 'not accepted' : 'verified'}`,
+      text: [
+        `Hi ${tester.firstName},`,
+        '',
+        `The lead auditor reviewed your finding on ${item.externalRef} (${item.clientName}). It was ${outcome}.`,
+        input.auditorNotes ? `\nAuditor notes: ${input.auditorNotes}\n` : '',
+        `Reproduced by the auditor: ${input.reproducible ? 'yes' : 'no'}.`,
+        '',
+        `${env.WEB_PUBLIC_URL}/operator/history`,
+        '',
+        'Oreset Red Team',
+      ].join('\n'),
+    })
+  }
 
   return finding
 }
@@ -451,6 +504,31 @@ export async function applyRetestOutcome(input: {
       status,
       retestNotes: input.notes ?? null,
     })
+
+    const item = await db.query.clientQueueItems.findFirst({
+      where: eq(clientQueueItems.id, finding.clientItemId),
+      columns: { clientName: true, externalRef: true, submittedBy: true },
+    })
+    const client = await contactFor(item?.submittedBy)
+    if (client && item) {
+      void sendMail({
+        to: client.email,
+        subject: status === 'closed'
+          ? `Retest passed: finding on ${item.externalRef} is closed`
+          : `Retest failed: finding on ${item.externalRef} is open again`,
+        text: [
+          `Hi ${client.firstName},`,
+          '',
+          status === 'closed'
+            ? `We re-ran the attack on ${item.clientName} after your fix. It no longer lands. The finding is closed and your resilience score has moved up.`
+            : `We re-ran the attack on ${item.clientName} after your fix. It still lands. The finding has been reopened with the tester's notes.`,
+          input.notes ? `\nTester notes: ${input.notes}\n` : '',
+          `${env.WEB_PUBLIC_URL}/buyer/findings`,
+          '',
+          'Oreset',
+        ].join('\n'),
+      })
+    }
   }
 
   return updated

@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
 import * as operatorsService from './operators.service'
+import { sendMail } from '../../lib/mail'
+import { env } from '../../config/env'
 import { setSessionCookies, requestContext } from '../../lib/session-cookies'
 
 const languageRowSchema = z.object({ language: z.string().min(1), fluency: z.string().min(1) })
@@ -22,6 +24,23 @@ const applySchema = z.object({
 export async function apply(req: Request, res: Response) {
   const body = applySchema.parse(req.body)
   const { user } = await operatorsService.apply(body)
+
+  void sendMail({
+    to: body.email,
+    subject: 'We received your Oreset Red Team application',
+    text: [
+      `Hi ${body.name.split(' ')[0]},`,
+      '',
+      `Thanks for applying. Your tester code is ${user.operatorCode ?? 'in your profile'}.`,
+      '',
+      'A lead auditor reviews every application before anyone sees client scenarios. Most decisions take a few working days, and you will get an email either way.',
+      '',
+      `You can sign in to see your status at ${env.WEB_PUBLIC_URL}/operator`,
+      '',
+      'Oreset Red Team',
+    ].join('\n'),
+  })
+
   res.status(201).json({ user })
 }
 
