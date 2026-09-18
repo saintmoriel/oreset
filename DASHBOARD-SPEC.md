@@ -28,9 +28,9 @@
 ```bash
 pnpm install
 pnpm --filter @oreset/shared build          # drizzle and the web app read the built enums
-pnpm --filter @oreset/api db:migrate         # applies 0016, 0017, 0018
+pnpm --filter @oreset/api db:migrate         # applies 0016 through 0020 (taxonomy, lifecycle, last login, leads, password resets)
 pnpm --filter @oreset/api db:seed:redteam    # SafariPay demo engagement, skips if present; add --reset to start over
-pnpm --filter @oreset/api exec tsx src/db/smoke-redteam.ts   # 34 checks, all should pass on a fresh seed
+pnpm --filter @oreset/api exec tsx src/db/smoke-redteam.ts   # 37 checks, all should pass on a fresh seed
 pnpm dev
 ```
 

@@ -192,12 +192,14 @@ OK means it works and reads right. FLAW means it breaks, lies, or leads nowhere.
 
 ## Cross-cutting flaws (the ones behind many rows above)
 
+**Status as of 18 September 2026.** X1, X3, X4 fixed. X2 partly fixed: the mail helper exists and sends lead acknowledgements, approval and rejection notices, and password reset links; finding-lifecycle and verdict notifications still to do. X9 partly fixed (sign-in copy, site metadata). Feedback toasts now cover sign-in, application, submissions, verdicts, account actions. Everything else below is still open.
+
 | ID | Flaw | Hits | Severity |
 |----|------|------|----------|
-| X1 | **Both public forms fake their submit.** No lead is stored or sent. | Tunde, founder | **F0** |
-| X2 | **The system sends no email of any kind.** No confirmations, no password resets, no "your finding was verified", no "your retest closed", no "needs your decision". Every loop that should close by email is open. | Everyone | **F0** |
-| X3 | **Tester onboarding gate is the wrong test and has no human step.** Audio quiz certifies a security tester; NDA and calibration are optional. | Musa, founder, every client | **F0** |
-| X4 | **No forgot-password flow** on any of the three sign-in pages. | Everyone | **F1** |
+| X1 | ~~Both public forms fake their submit.~~ **Fixed:** leads table, admin Leads inbox, acknowledgement email, rate limit and honeypot. | Tunde, founder | ~~F0~~ done |
+| X2 | **The system sends no email of any kind.** **Partly fixed:** `lib/mail.ts` (Resend or console). Wired: lead received, lead acknowledgement, tester approved, tester rejected, password reset link, password changed. **Still open:** finding verified (client), retest closed or reopened (client), verdict recorded on your finding (tester), "needs your decision" (admin). | Everyone | **F1** (was F0) |
+| X3 | ~~Tester onboarding gate is the wrong test and has no human step.~~ **Fixed:** Foundry retired, admin or lead approves from Applications, agreements and two calibration passes required before the queue opens, pending status page. Application form questions still language-era (see X9). | Musa, founder, every client | ~~F0~~ done |
+| X4 | ~~No forgot-password flow.~~ **Fixed:** all three sign-ins, 30 minute single-use token by email, all sessions ended on reset. | Everyone | ~~F1~~ done |
 | X5 | **No engagement object.** No scope, tier, dates, price, or phase. Clients page and client home both want it. | Founder, Tunde, Amara | **F1** |
 | X6 | **One login per client organisation.** No teammates, no roles inside a client. | Tunde, Amara | **F1** |
 | X7 | **Feedback loops are missing between roles.** Auditor to tester (verdict and notes), tester to client (nothing), client to Oreset (no comments or disputes). | Adaeze, Favour, Amara | **F1** |
@@ -215,10 +217,10 @@ Ordered by how much damage each flaw does today, then by how small the fix is. S
 
 ### Stop the bleeding (this week)
 
-1. **Wire the two forms** to a real `leads` table and an admin **Leads** inbox, plus an email to the founder on each submission. Until email exists, the inbox alone stops the loss. (X1) **S to M**
-2. **Transactional email.** One provider (Resend or Postmark), one `sendMail` helper, then use it for: lead received, account created with sign-in link, password reset, tester application received, finding verified (to client), retest closed or reopened (to client), verdict recorded on your finding (to tester). (X2) **M**, and it unblocks 3 and 4
-3. **Forgot password** on all three sign-in pages, token by email, 30 minute expiry. (X4) **S** once 2 exists
-4. **Fix the tester gate.** Retire Foundry. New order: apply, founder or lead approves in Applications (button, not read-only), agreements must be signed before the queue opens, calibration pass rate above a threshold before live scenarios. Rewrite the application form for security testers: experience, tooling, LLM red-team exposure, one short work sample. (X3) **M**
+1. ~~Wire the two forms~~ **Done** (X1)
+2. **Transactional email.** ~~Helper and provider~~ **Done.** Still to wire: account created with sign-in link, tester application received, finding verified (client), retest closed or reopened (client), verdict recorded (tester). (X2) **S** each
+3. ~~Forgot password~~ **Done** (X4)
+4. **Fix the tester gate.** ~~Approval step, agreements and calibration required, Foundry retired~~ **Done.** Still to do: rewrite the application form for security testers (experience, tooling, LLM red-team exposure, one short work sample). (X3) **S**
 5. **First-login empty state.** No score until at least one verified finding or one completed scenario; show engagement phase and "testing begins on" instead. (X10) **S**
 6. **Delete legacy dev data** and the `campaigns`/`batches` seed from the shared database. (X12) **S**
 
