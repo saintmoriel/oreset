@@ -192,12 +192,12 @@ OK means it works and reads right. FLAW means it breaks, lies, or leads nowhere.
 
 ## Cross-cutting flaws (the ones behind many rows above)
 
-**Status as of 18 September 2026.** X1, X3, X4 fixed. X2 partly fixed: the mail helper exists and sends lead acknowledgements, approval and rejection notices, and password reset links; finding-lifecycle and verdict notifications still to do. X9 partly fixed (sign-in copy, site metadata). Feedback toasts now cover sign-in, application, submissions, verdicts, account actions. Everything else below is still open.
+**Status as of 18 September 2026.** X1, X3, X4, X10 fixed. X2 fixed for every person-to-person loop: lead received and acknowledged, application received, approved, rejected, password reset, account created, finding verified (client and tester), retest closed or reopened (client). Only the admin "needs your decision" digest remains, and the emails only send once `RESEND_API_KEY` is set. X9 partly fixed (sign-in copy, site metadata). Feedback toasts cover sign-in, application, submissions, verdicts, account actions. Everything else below is still open.
 
 | ID | Flaw | Hits | Severity |
 |----|------|------|----------|
 | X1 | ~~Both public forms fake their submit.~~ **Fixed:** leads table, admin Leads inbox, acknowledgement email, rate limit and honeypot. | Tunde, founder | ~~F0~~ done |
-| X2 | **The system sends no email of any kind.** **Partly fixed:** `lib/mail.ts` (Resend or console). Wired: lead received, lead acknowledgement, tester approved, tester rejected, password reset link, password changed. **Still open:** finding verified (client), retest closed or reopened (client), verdict recorded on your finding (tester), "needs your decision" (admin). | Everyone | **F1** (was F0) |
+| X2 | ~~The system sends no email of any kind.~~ **Fixed** via `lib/mail.ts` (Resend or console): lead received and acknowledged, application received, approved, rejected, password reset and changed, client and staff account created, finding verified (client and tester), retest closed or reopened (client). **Still open:** a "needs your decision" digest for admins. Requires `RESEND_API_KEY` in production. | Everyone | ~~F0~~ done |
 | X3 | ~~Tester onboarding gate is the wrong test and has no human step.~~ **Fixed:** Foundry retired, admin or lead approves from Applications, agreements and two calibration passes required before the queue opens, pending status page. Application form questions still language-era (see X9). | Musa, founder, every client | ~~F0~~ done |
 | X4 | ~~No forgot-password flow.~~ **Fixed:** all three sign-ins, 30 minute single-use token by email, all sessions ended on reset. | Everyone | ~~F1~~ done |
 | X5 | **No engagement object.** No scope, tier, dates, price, or phase. Clients page and client home both want it. | Founder, Tunde, Amara | **F1** |
@@ -221,7 +221,7 @@ Ordered by how much damage each flaw does today, then by how small the fix is. S
 2. **Transactional email.** ~~Helper and provider~~ **Done.** Still to wire: account created with sign-in link, tester application received, finding verified (client), retest closed or reopened (client), verdict recorded (tester). (X2) **S** each
 3. ~~Forgot password~~ **Done** (X4)
 4. **Fix the tester gate.** ~~Approval step, agreements and calibration required, Foundry retired~~ **Done.** Still to do: rewrite the application form for security testers (experience, tooling, LLM red-team exposure, one short work sample). (X3) **S**
-5. **First-login empty state.** No score until at least one verified finding or one completed scenario; show engagement phase and "testing begins on" instead. (X10) **S**
+5. ~~First-login empty state.~~ **Done:** "Not scored yet" until the first scenario is assessed. Engagement phase and "testing begins on" wait for the engagement object (item 7). (X10)
 6. **Delete legacy dev data** and the `campaigns`/`batches` seed from the shared database. (X12) **S**
 
 ### Make it a system, not a set of screens (next two weeks)
