@@ -3,16 +3,27 @@ import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
 import { requireActive } from '../../middleware/require-active'
+import { requireOnboarded, onboardingStatus } from '../../middleware/require-onboarded'
 import * as controller from './operator.controller'
 
 export const operatorRouter = Router()
 
+// Live client scenarios need an approved AND onboarded tester.
 operatorRouter.get(
   '/queue',
   requireAuth,
   requireRole('operator'),
   requireActive,
+  requireOnboarded,
   asyncHandler(controller.queue),
+)
+operatorRouter.get(
+  '/me/onboarding',
+  requireAuth,
+  requireRole('operator'),
+  asyncHandler(async (req, res) => {
+    res.status(200).json(await onboardingStatus(req.user!.sub))
+  }),
 )
 operatorRouter.get(
   '/me/stats',
@@ -33,6 +44,7 @@ operatorRouter.post(
   requireAuth,
   requireRole('operator'),
   requireActive,
+  requireOnboarded,
   asyncHandler(controller.decide),
 )
 operatorRouter.get(

@@ -1,9 +1,10 @@
-import { randomInt, createHash } from 'node:crypto'
+import { randomInt, randomBytes, createHash } from 'node:crypto'
 import { eq, and, gt, isNull, desc } from 'drizzle-orm'
 import { signAccessToken, signRefreshToken, verifyRefreshToken, type AuthUser } from '@oreset/shared'
 import { db } from '../../db/client'
-import { users, otpCodes, sessions, type User } from '../../db/schema'
+import { users, otpCodes, sessions, passwordResets, type User } from '../../db/schema'
 import { env } from '../../config/env'
+import { sendMail } from '../../lib/mail'
 import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '../../config/cookies'
 import { hashPassword, verifyPassword } from '../../lib/password'
 import { writeAuditLog } from '../../lib/audit'
@@ -224,4 +225,106 @@ export async function revokeAllSessions(userId: string): Promise<void> {
     .update(sessions)
     .set({ revokedAt: new Date() })
     .where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)))
+}
+
+// ---------------------------------------------------------------------------
+// Forgot password
+// ---------------------------------------------------------------------------
+
+const RESET_TTL_MS = 30 * 60 * 1000
+
+function portalPathFor(user: Pick<User, 'role'>): string {
+  if (user.role === 'buyer') return '/buyer'
+  if (user.role === 'operator') return '/operator'
+  if (user.role === 'staff') return '/admin'
+  return '/'
+}
+
+// Always resolves the same way whether or not the email exists, so the
+// endpoint cannot be used to discover accounts.
+export async function requestPasswordReset(email: string, ip?: string): Promise<void> {
+  const user = await db.query.users.findFirst({ where: eq(users.email, email) })
+  if (!user || !user.passwordHash || user.status === 'suspended') return
+
+  const token = randomBytes(32).toString('base64url')
+  await db.insert(passwordResets).values({
+    userId: user.id,
+    tokenHash: hashCode(token),
+    expiresAt: new Date(Date.now() + RESET_TTL_MS),
+    requestedIp: ip,
+  })
+
+  const link = `${env.WEB_PUBLIC_URL}/reset-password?token=${token}`
+  void sendMail({
+    to: user.email!,
+    subject: 'Reset your Oreset password',
+    text: [
+      `Hi ${user.displayName?.split(' ')[0] ?? 'there'},`,
+      '',
+      'Someone asked to reset the password for this Oreset account. If that was you, use the link below within 30 minutes:',
+      '',
+      link,
+      '',
+      'If it was not you, ignore this email. Your password has not changed.',
+      '',
+      'Oreset',
+    ].join('\n'),
+  })
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorLabel: user.email ?? user.id,
+    actorRole: user.role === 'staff' ? (user.staffRole ?? 'staff') : user.role,
+    action: 'auth.password_reset_requested',
+  })
+}
+
+export async function resetPasswordWithToken(
+  token: string,
+  newPassword: string,
+): Promise<{ portalPath: string }> {
+  const record = await db.query.passwordResets.findFirst({
+    where: and(
+      eq(passwordResets.tokenHash, hashCode(token)),
+      isNull(passwordResets.consumedAt),
+      gt(passwordResets.expiresAt, new Date()),
+    ),
+  })
+  if (!record) {
+    throw new HttpError(400, 'invalid_or_expired_token', 'This reset link is invalid or has expired. Request a new one.')
+  }
+
+  const user = await db.query.users.findFirst({ where: eq(users.id, record.userId) })
+  if (!user) throw new HttpError(400, 'invalid_or_expired_token', 'This reset link is invalid or has expired. Request a new one.')
+
+  const passwordHash = await hashPassword(newPassword)
+  await Promise.all([
+    db.update(users).set({ passwordHash, updatedAt: new Date() }).where(eq(users.id, user.id)),
+    db.update(passwordResets).set({ consumedAt: new Date() }).where(eq(passwordResets.id, record.id)),
+    // A reset means the old credential may be compromised: end every session.
+    db.delete(sessions).where(eq(sessions.userId, user.id)),
+  ])
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorLabel: user.email ?? user.id,
+    actorRole: user.role === 'staff' ? (user.staffRole ?? 'staff') : user.role,
+    action: 'auth.password_reset_completed',
+  })
+
+  void sendMail({
+    to: user.email!,
+    subject: 'Your Oreset password was changed',
+    text: [
+      `Hi ${user.displayName?.split(' ')[0] ?? 'there'},`,
+      '',
+      'Your password was just changed and every other session was signed out.',
+      '',
+      'If you did not do this, reply to this email immediately.',
+      '',
+      'Oreset',
+    ].join('\n'),
+  })
+
+  return { portalPath: portalPathFor(user) }
 }

@@ -22,18 +22,21 @@ const GATES: RouteGate[] = [
   },
   {
     // Must precede the plain '/operator' gate below: GATES.find() returns
-    // the FIRST match, and '/operator/foundry' also satisfies
-    // pathname.startsWith('/operator/') — if the stricter (active-only)
-    // gate were listed first, a still-pending operator hitting
-    // /operator/foundry would be caught by it and bounced, defeating the
-    // whole point of Foundry being reachable pre-certification.
+    // the FIRST match. A still-pending applicant may see their status page
+    // and nothing else in the portal.
+    matcher: '/operator/pending',
+    signInPath: '/operator',
+    isAllowed: (c) => c.role === 'operator',
+  },
+  {
+    // Legacy Foundry route: redirects to /operator/pending, so pending
+    // applicants must be allowed through to reach the redirect.
     matcher: '/operator/foundry',
     signInPath: '/operator',
     isAllowed: (c) => c.role === 'operator',
   },
   {
-    // Catches /operator/queue, /operator/item, /operator/complete via
-    // prefix match — but NOT /operator/foundry, matched above first.
+    // Everything else in the portal needs an approved (active) tester.
     matcher: '/operator',
     signInPath: '/operator',
     isAllowed: (c) => c.role === 'operator' && c.status === 'active',

@@ -7,6 +7,36 @@ import { setSessionCookies, requestContext } from '../../lib/session-cookies'
 const otpRequestSchema = z.object({ phone: z.string().min(8) })
 const otpVerifySchema = z.object({ phone: z.string().min(8), code: z.string().length(6) })
 const loginSchema = z.object({ email: z.string().email(), password: z.string().min(1) })
+const forgotSchema = z.object({ email: z.string().trim().email() })
+const resetSchema = z.object({ token: z.string().min(20).max(200), password: z.string().min(8).max(200) })
+
+// Public endpoints: small per-IP limit so nobody can spray reset emails.
+const forgotHits = new Map<string, { count: number; windowStart: number }>()
+function limitForgot(ip: string) {
+  const now = Date.now()
+  const e = forgotHits.get(ip)
+  if (!e || now - e.windowStart > 15 * 60_000) {
+    forgotHits.set(ip, { count: 1, windowStart: now })
+    return true
+  }
+  e.count += 1
+  return e.count <= 5
+}
+
+export async function forgotPassword(req: Request, res: Response) {
+  const { email } = forgotSchema.parse(req.body)
+  if (limitForgot(req.ip ?? 'unknown')) {
+    await authService.requestPasswordReset(email, req.ip)
+  }
+  // Same answer whether or not the account exists.
+  res.status(200).json({ ok: true })
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  const { token, password } = resetSchema.parse(req.body)
+  const result = await authService.resetPasswordWithToken(token, password)
+  res.status(200).json(result)
+}
 
 export async function requestOtp(req: Request, res: Response) {
   const { phone } = otpRequestSchema.parse(req.body)

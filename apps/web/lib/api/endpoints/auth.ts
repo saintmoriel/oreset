@@ -20,3 +20,11 @@ export function logout() {
 export function getMe() {
   return apiFetch<{ user: AuthUser }>('/api/v1/auth/me')
 }
+
+export function forgotPassword(email: string) {
+  return apiFetch<{ ok: true }>('/api/v1/auth/password/forgot', { method: 'POST', body: { email } })
+}
+
+export function resetPassword(token: string, password: string) {
+  return apiFetch<{ portalPath: string }>('/api/v1/auth/password/reset', { method: 'POST', body: { token, password } })
+}

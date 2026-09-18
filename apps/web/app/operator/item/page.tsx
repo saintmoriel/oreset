@@ -30,6 +30,11 @@ export default function OperatorItemPage() {
       }
       setItems(res.items)
     } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        // Not onboarded yet: the queue page explains the two remaining steps.
+        router.push('/operator/queue')
+        return
+      }
       setError(err instanceof ApiError ? err.message : 'Could not load the queue.')
     }
   }, [router])

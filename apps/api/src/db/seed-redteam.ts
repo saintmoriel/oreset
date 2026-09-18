@@ -366,6 +366,34 @@ async function main() {
     ])
   }
 
+  // Demo testers are fully onboarded: agreements signed and calibration
+  // passed, so their live queue is open on first sign-in. Idempotent.
+  const goldCases = await db.query.calibrationCases.findMany({ columns: { id: true, expectedDecision: true, expectedVulnTag: true, expectedSeverity: true, expectedExploitStatus: true } })
+  for (const tester of [tester1, tester2]) {
+    const signed = await db.query.operatorAgreements.findMany({ where: eq(schema.operatorAgreements.userId, tester.id) })
+    const have = new Set(signed.map((a) => a.agreementType))
+    const missing = (['nda', 'code_of_conduct', 'data_handling'] as const).filter((t) => !have.has(t))
+    if (missing.length > 0) {
+      await db.insert(schema.operatorAgreements).values(missing.map((agreementType) => ({ userId: tester.id, agreementType, ipAddress: '127.0.0.1', userAgent: 'seed' })))
+    }
+    const attempts = await db.query.calibrationAttempts.findMany({ where: eq(schema.calibrationAttempts.operatorId, tester.id) })
+    if (attempts.length === 0 && goldCases.length >= 2) {
+      await db.insert(schema.calibrationAttempts).values(
+        goldCases.slice(0, 2).map((c) => ({
+          calibrationCaseId: c.id,
+          operatorId: tester.id,
+          decision: c.expectedDecision,
+          vulnTag: c.expectedVulnTag,
+          severity: c.expectedSeverity,
+          exploitStatus: c.expectedExploitStatus,
+          result: 'pass' as const,
+          score: 1,
+          reviewTimeMs: 180_000,
+        })),
+      )
+    }
+  }
+
   console.log('Seeded:')
   console.log(`  client:        ${buyer.email} (password: ${PASSWORD})`)
   console.log(`  testers:       ${tester1.email}, ${tester2.email} (password: ${PASSWORD})`)

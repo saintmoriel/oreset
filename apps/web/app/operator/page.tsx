@@ -26,7 +26,7 @@ function OperatorSignInContent() {
     try {
       const { user } = await login(email, password)
       toast.success('Signed in', `Welcome back${user.displayName ? `, ${user.displayName}` : ''}.`)
-      router.push(user.status === 'pending' ? '/operator/foundry' : (next ?? '/operator/home'))
+      router.push(user.status === 'pending' ? '/operator/pending' : (next ?? '/operator/home'))
     } catch (err) {
       const message = err instanceof ApiError ? err.message : 'Sign-in failed. Try again.'
       setError(message)
@@ -85,6 +85,9 @@ function OperatorSignInContent() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
               />
+            </div>
+            <div className="flex justify-end">
+              <Link href="/forgot-password?portal=operator" className="cx-meta font-medium text-navy-500 hover:text-accent">Forgot password?</Link>
             </div>
             {error && (
               <p className="cx-meta text-destructive" role="alert">

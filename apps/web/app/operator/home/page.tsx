@@ -10,6 +10,7 @@ import {
   Circle,
   Globe,
   Shield,
+  Target,
 } from 'lucide-react'
 import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import { OperatorAppShell } from '@/components/operator/operator-app-shell'
@@ -23,6 +24,7 @@ import type {
   VerificationsResponse,
   AgreementsResponse,
 } from '@/lib/api/endpoints/operator'
+import type { OnboardingStatus } from '@/lib/api/endpoints/operators'
 
 type OnboardingStep = {
   id: string
@@ -38,14 +40,16 @@ export default async function OperatorHomePage() {
   let profile: OperatorProfile | null = null
   let verifications: VerificationsResponse | null = null
   let agreements: AgreementsResponse | null = null
+  let onboarding: OnboardingStatus | null = null
 
   try {
-    ;[stats, { decisions }, profile, verifications, agreements] = await Promise.all([
+    ;[stats, { decisions }, profile, verifications, agreements, onboarding] = await Promise.all([
       serverApiFetch<OperatorStats>('/api/v1/operator/me/stats'),
       serverApiFetch<{ decisions: OperatorDecisionRecord[] }>('/api/v1/operator/me/decisions'),
       serverApiFetch<OperatorProfile>('/api/v1/operator/me/profile').catch(() => null),
       serverApiFetch<VerificationsResponse>('/api/v1/operator/me/verifications').catch(() => null),
       serverApiFetch<AgreementsResponse>('/api/v1/operator/me/agreements').catch(() => null),
+      serverApiFetch<OnboardingStatus>('/api/v1/operator/me/onboarding').catch(() => null),
     ])
   } catch (err) {
     redirectIfSignedOut(err, '/operator')
@@ -83,6 +87,13 @@ export default async function OperatorHomePage() {
       href: '/operator/settings',
       complete: agreementsSigned,
       icon: FileSignature,
+    },
+    {
+      id: 'calibration',
+      label: `Pass calibration (${onboarding?.calibrationPassed ?? 0} of ${onboarding?.calibrationRequired ?? 2})`,
+      href: '/operator/calibration',
+      complete: (onboarding?.calibrationPassed ?? 0) >= (onboarding?.calibrationRequired ?? 2),
+      icon: Target,
     },
   ]
 
@@ -150,7 +161,7 @@ export default async function OperatorHomePage() {
             <div>
               <p className="text-sm font-semibold text-navy-900">Get started</p>
               <p className="cx-meta mt-0.5 text-navy-500">
-                Complete these steps to start receiving attack scenarios.
+                Agreements and calibration are required before your live queue opens. Profile and identity can follow.
               </p>
             </div>
             <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[11px] font-semibold tabular-nums text-accent">

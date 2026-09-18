@@ -7,7 +7,7 @@ import type { Request, Response, NextFunction } from 'express'
 export function requireActive(req: Request, res: Response, next: NextFunction) {
   if (req.user?.status !== 'active') {
     res.status(403).json({
-      error: { code: 'not_certified', message: 'Your operator account is not yet certified.' },
+      error: { code: 'not_approved', message: 'Your application is still under review. You will get an email when it is approved.' },
     })
     return
   }

@@ -3,21 +3,19 @@ import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
 import * as controller from './operators.controller'
+import * as applications from './applications.controller'
 
 export const operatorsRouter = Router()
 
 operatorsRouter.post('/apply', asyncHandler(controller.apply))
-// Deliberately no requireActive here — this IS the gate that lets a
-// still-pending operator become active.
-operatorsRouter.post('/certify', requireAuth, requireRole('operator'), asyncHandler(controller.certify))
+// Self-certification (POST /certify) was removed: a tester becomes active
+// only when an admin or lead auditor approves the application below.
 
-// Mounted at /api/v1/admin/operators — admin visibility into applications,
-// same dual-router-export shape buyers.routes.ts already established.
+// Mounted at /api/v1/admin/operators
 export const operatorsAdminRouter = Router()
 
-operatorsAdminRouter.get(
-  '/applications',
-  requireAuth,
-  requireRole('staff:admin'),
-  asyncHandler(controller.listApplications),
-)
+const reviewers = requireRole('staff:admin', 'staff:reviewer_lead')
+
+operatorsAdminRouter.get('/applications', requireAuth, reviewers, asyncHandler(controller.listApplications))
+operatorsAdminRouter.post('/applications/:userId/approve', requireAuth, reviewers, asyncHandler(applications.approve))
+operatorsAdminRouter.post('/applications/:userId/reject', requireAuth, reviewers, asyncHandler(applications.reject))
