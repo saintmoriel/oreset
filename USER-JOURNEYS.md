@@ -203,7 +203,7 @@ OK means it works and reads right. FLAW means it breaks, lies, or leads nowhere.
 | X5 | **No engagement object.** No scope, tier, dates, price, or phase. Clients page and client home both want it. | Founder, Tunde, Amara | **F1** |
 | X6 | **One login per client organisation.** No teammates, no roles inside a client. | Tunde, Amara | **F1** |
 | X7 | **Feedback loops are missing between roles.** Auditor to tester (verdict and notes), tester to client (nothing), client to Oreset (no comments or disputes). | Adaeze, Favour, Amara | **F1** |
-| X8 | **No machine access for clients.** Regression export and webhooks require a browser session. | Amara | **F1** |
+| X8 | ~~No machine access for clients.~~ **Fixed:** read-only API tokens for CI, an Integrations page for tokens and webhooks (create, pause, rotate, delete), curl example on the regression page. Token and webhook management stay session-only. | Amara | ~~F1~~ done |
 | X9 | **Payouts, applications, Support, Datasets, Foundry, sign-in copy** still describe the language-data business. | Musa, Adaeze, Tunde | **F2** |
 | X10 | **First-login empty state lies.** Score 100 "Production ready" with no data. | Tunde | **F1** |
 | X11 | **Verdicts and assessments cannot be corrected.** | Favour, Adaeze | **F1** |
@@ -232,7 +232,7 @@ Ordered by how much damage each flaw does today, then by how small the fix is. S
 10. **Comments on a finding**, visible to client, tester who wrote it, and auditors. Threaded, audit-logged. This is also how disputes happen. (X7) **M**
 11. **Auditor notes flow back to the tester**, on their History page and by email. Tester stats gain "false positive rate". (X7) **S** once 9 exists
 12. **Correctable verdicts**: an auditor can amend within 24 hours, with the change logged; a tester can withdraw a submission before the auditor opens it. (X11) **M**
-13. **Client API tokens** for regression export and webhooks, and a **Webhooks page** in the client portal. (X8) **M**
+13. ~~Client API tokens and a Webhooks page~~ **Done** (X8)
 14. **Invoice creation** from the Clients page, tied to an engagement. (founder 6) **S**, the API exists
 
 ### Finish the pivot (when time allows)
