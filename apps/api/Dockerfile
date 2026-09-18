@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 make g+
 RUN corepack enable && corepack prepare pnpm@10.34.5 --activate
 
 # Workspace manifests first so the install layer caches across code changes.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/api/package.json apps/api/
 RUN pnpm install --frozen-lockfile --filter @oreset/shared --filter @oreset/api
