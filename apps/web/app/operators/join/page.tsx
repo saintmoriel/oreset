@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { applyAsOperator } from '@/lib/api/endpoints/operators'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 
 const FLUENCY_LEVELS = ['Native', 'Level 4', 'Level 3', 'Level 2', 'Level 1']
 const ACADEMIC_BACKGROUNDS = [
@@ -127,6 +128,7 @@ export default function OperatorsJoinPage() {
       })
       setOperatorCode(user.operatorCode)
       setStatus('success')
+      toast.success('Application received', `Your tester code is ${user.operatorCode}. Sign in to continue onboarding.`)
     } catch (err) {
       if (err instanceof ApiError && err.code === 'email_taken') {
         setErrors((e) => ({ ...e, email: 'An account with that email already exists.' }))

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { login } from '@/lib/api/endpoints/auth'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 
 function AdminSignInContent() {
   const router = useRouter()
@@ -23,10 +24,13 @@ function AdminSignInContent() {
     setError(null)
     setSubmitting(true)
     try {
-      await login(email, password)
+      const { user } = await login(email, password)
+      toast.success('Signed in', `Welcome back${user.displayName ? `, ${user.displayName}` : ''}.`)
       router.push(next ?? '/admin/home')
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Sign-in failed. Try again.')
+      const message = err instanceof ApiError ? err.message : 'Sign-in failed. Try again.'
+      setError(message)
+      toast.error('Sign-in failed', message)
     } finally {
       setSubmitting(false)
     }
@@ -54,10 +58,10 @@ function AdminSignInContent() {
 
       <main className="container-narrow py-16 sm:py-24">
         <div className="cx-card p-8 sm:p-10">
-          <p className="cx-label text-accent">Admin · RBAC</p>
+          <p className="cx-label text-accent">Oreset staff</p>
           <h1 className="cx-page-title mt-2 text-navy-900">Staff sign-in</h1>
           <p className="cx-body mt-3 text-navy-500">
-            Role is assigned server-side from your account and enforced on every request.
+            Admins, lead auditors, and compliance. What you see is set by your role.
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">

@@ -1,7 +1,12 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
+import { Toaster } from '@/components/ui/toast'
 import './globals.css'
+
+const SITE_TITLE = 'Oreset | Human Red Team for AI Agents'
+const SITE_DESCRIPTION =
+  'Your AI agent will be attacked. It will also just decide wrong. Oreset red-teams both: security failures a hacker would exploit and judgement failures that need no hacker at all. Verified findings, live dashboard, free retest.'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,18 +28,16 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.oreset.africa'),
-  title: 'Oreset | Independent AI Decision Verification for African Languages',
-  description:
-    "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong. It can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   icons: {
     icon: '/oreset-logo v2.png',
     shortcut: '/oreset-logo v2.png',
     apple: '/oreset-logo v2.png',
   },
   openGraph: {
-    title: 'Oreset | Independent AI Decision Verification for African Languages',
-    description:
-      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong. It can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     url: 'https://www.oreset.africa',
     siteName: 'Oreset',
     locale: 'en_US',
@@ -44,15 +47,14 @@ export const metadata: Metadata = {
         url: 'https://www.oreset.africa/og-image.jpeg',
         width: 1200,
         height: 630,
-        alt: 'Oreset: Independent AI Decision Verification for African Languages',
+        alt: 'Oreset: human red team for AI agents',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Oreset | Independent AI Decision Verification for African Languages',
-    description:
-      "When AI misreads Yoruba, Hausa, or Pidgin, it doesn't just sound wrong. It can decide a claim, a loan, or a transaction incorrectly. Oreset verifies AI-driven decisions before they cost someone something.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: ['https://www.oreset.africa/og-image.jpeg'],
   },
 }
@@ -74,6 +76,7 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased">
         {children}
+        <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

@@ -87,6 +87,22 @@ async function main() {
     check('business numbers: 1 engagement running', overview.business.engagementsRunning >= 1, overview.business)
   }
 
+  // Leads: the two site forms post here. Create one, see it counted, close it.
+  const leadsSvc = await import('../modules/leads/leads.service')
+  const before = await leadsSvc.countNewLeads()
+  const newLead = await leadsSvc.createLead({
+    kind: 'pilot',
+    name: 'Smoke Test',
+    email: 'smoke@example.test',
+    organization: 'Smoke Co',
+    agentType: 'Customer support agent',
+    message: 'Automated smoke check. Safe to close.',
+  })
+  check('lead created', Boolean(newLead.id), newLead)
+  check('new leads count increments', (await leadsSvc.countNewLeads()) === before + 1, null)
+  const closed = await leadsSvc.updateLead({ id: tester1.id, role: 'staff:admin' }, newLead.id, { status: 'closed', notes: 'smoke' })
+  check('lead can be closed', closed.status === 'closed' && closed.notes === 'smoke', closed.status)
+
   console.log(failures.length === 0 ? '\nAll checks passed.' : `\n${failures.length} check(s) failed.`)
   process.exit(failures.length === 0 ? 0 : 1)
 }

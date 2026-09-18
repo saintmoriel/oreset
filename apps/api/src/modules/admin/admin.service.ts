@@ -16,6 +16,7 @@ import {
 import { getQueueCount as getOperatorQueueCount } from '../operator/operator.service'
 import { getVerificationQueue, getVerificationStats } from '../findings/findings.service'
 import { getBusinessNumbers } from './people.service'
+import { countNewLeads } from '../leads/leads.service'
 import { listAuditLog } from '../audit/audit.service'
 
 // ---------------------------------------------------------------------------
@@ -101,6 +102,7 @@ async function getAdminOverview() {
     findings,
     week,
     business,
+    newLeads,
     recentAuditEntries,
   ] = await Promise.all([
     getVerificationQueue(),
@@ -114,6 +116,7 @@ async function getAdminOverview() {
     getFindingLifecycleCounts(),
     getWeekActivity(),
     getBusinessNumbers(),
+    countNewLeads(),
     listAuditLog({ limit: 8 }),
   ])
 
@@ -121,7 +124,8 @@ async function getAdminOverview() {
 
   return {
     role: 'admin' as const,
-    needsAttention: findingsAwaitingVerification + openEscalations + consensusSplits + pendingTesterApplications,
+    needsAttention: findingsAwaitingVerification + openEscalations + consensusSplits + pendingTesterApplications + newLeads,
+    newLeads,
     findingsAwaitingVerification,
     openEscalations,
     consensusSplits,

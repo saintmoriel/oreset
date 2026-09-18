@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Building2, Loader2, Copy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 import { StatusTag } from '@/components/capture/status-tag'
 import { listClients, provisionClient, formatMoney } from '@/lib/api/endpoints/people'
 import type { Client } from '@/lib/api/endpoints/people'
@@ -36,10 +37,13 @@ function ProvisionForm({ onCreated }: { onCreated: () => Promise<void> }) {
     try {
       await provisionClient({ email, displayName, password })
       setSecret({ email, password })
+      toast.success('Client provisioned', `${displayName} can sign in at /buyer.`)
       setDisplayName(''); setEmail('')
       await onCreated()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not provision the client.')
+      const message = err instanceof ApiError ? err.message : 'Could not provision the client.'
+      setError(message)
+      toast.error('Client not provisioned', message)
     }
     setSubmitting(false)
   }

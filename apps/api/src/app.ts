@@ -28,6 +28,7 @@ import { calibrationRouter } from './modules/calibration/calibration.routes'
 import { consensusRouter } from './modules/consensus/consensus.routes'
 import { billingRouter } from './modules/billing/billing.routes'
 import { findingsRouter } from './modules/findings/findings.routes'
+import { leadsRouter, leadsAdminRouter } from './modules/leads/leads.routes'
 
 const allowedOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim())
 
@@ -65,7 +66,9 @@ app.use('/api/v1/admin/buyers', buyersAdminRouter)
 app.use('/api/v1/admin/datasets', datasetsRouter)
 app.use('/api/v1/admin/tickets', ticketsRouter)
 app.use('/api/v1/admin/operators', operatorsAdminRouter)
+app.use('/api/v1/admin/leads', leadsAdminRouter)
 app.use('/api/v1/admin', adminRouter)
+app.use('/api/v1/leads', leadsRouter)
 app.use('/api/v1/ingest', ingestionRouter)
 app.use('/api/v1/calibration', calibrationRouter)
 app.use('/api/v1/consensus', consensusRouter)

@@ -6,6 +6,7 @@ import { STAFF_ROLES } from '@oreset/shared'
 import type { StaffRole } from '@oreset/shared'
 import { cn } from '@/lib/utils'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 import { StatusTag } from '@/components/capture/status-tag'
 import { listPeople, createStaff, updateUser, resetUserPassword } from '@/lib/api/endpoints/people'
 import type { Person, RoleAccess } from '@/lib/api/endpoints/people'
@@ -75,10 +76,13 @@ function CreateStaffForm({ onCreated }: { onCreated: () => Promise<void> }) {
     try {
       const res = await createStaff({ email, displayName, staffRole })
       setSecret({ email, password: res.temporaryPassword })
+      toast.success('Staff account created', `${displayName}, ${STAFF_ROLE_LABEL[staffRole]}`)
       setEmail(''); setDisplayName('')
       await onCreated()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not create the account.')
+      const message = err instanceof ApiError ? err.message : 'Could not create the account.'
+      setError(message)
+      toast.error('Account not created', message)
     }
     setSubmitting(false)
   }
@@ -128,9 +132,19 @@ function PersonRow({ p, roles, isSelf, onChanged }: { p: Person; roles: RoleAcce
   const [secret, setSecret] = useState<string | null>(null)
   const access = roles[p.accessKey]
 
+  const DONE: Record<string, string> = { role: 'Role updated', status: 'Account status updated', reset: 'Password reset' }
+
   async function run(label: string, fn: () => Promise<unknown>) {
     setBusy(label); setError(null)
-    try { await fn(); await onChanged() } catch (err) { setError(err instanceof ApiError ? err.message : 'Action failed.') }
+    try {
+      await fn()
+      toast.success(DONE[label] ?? 'Done', p.displayName ?? p.email ?? undefined)
+      await onChanged()
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Action failed.'
+      setError(message)
+      toast.error('Action failed', message)
+    }
     setBusy(null)
   }
 

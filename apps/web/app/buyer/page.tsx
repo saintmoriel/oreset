@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { login } from '@/lib/api/endpoints/auth'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 
 function BuyerSignInContent() {
   const router = useRouter()
@@ -23,10 +24,13 @@ function BuyerSignInContent() {
     setError(null)
     setSubmitting(true)
     try {
-      await login(email, password)
+      const { user } = await login(email, password)
+      toast.success('Signed in', `Welcome back${user.displayName ? `, ${user.displayName}` : ''}.`)
       router.push(next ?? '/buyer/home')
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Sign-in failed. Try again.')
+      const message = err instanceof ApiError ? err.message : 'Sign-in failed. Try again.'
+      setError(message)
+      toast.error('Sign-in failed', message)
     } finally {
       setSubmitting(false)
     }
@@ -54,10 +58,10 @@ function BuyerSignInContent() {
 
       <main className="container-narrow py-16 sm:py-24">
         <div className="cx-card p-8 sm:p-10">
-          <p className="cx-label text-accent">Verification · Client Portal</p>
+          <p className="cx-label text-accent">Client portal</p>
           <h1 className="cx-page-title mt-2 text-navy-900">Client sign-in</h1>
           <p className="cx-body mt-3 text-navy-500">
-            Access your verification cases, evidence traces, and severity-scored results.
+            Your findings, resilience score, retest status, and regression suite.
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -100,9 +104,9 @@ function BuyerSignInContent() {
           <p className="mt-6 cx-meta text-navy-500">
             Not a client yet?{' '}
             <a href="/#contact" className="font-semibold text-accent hover:text-copper-600">
-              Start a pilot
+              Request early access
             </a>{' '}
-            to verify your first case.
+            and we will set up your account.
           </p>
         </div>
       </main>

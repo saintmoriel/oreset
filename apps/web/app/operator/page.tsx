@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { login } from '@/lib/api/endpoints/auth'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 
 function OperatorSignInContent() {
   const router = useRouter()
@@ -24,9 +25,12 @@ function OperatorSignInContent() {
     setSubmitting(true)
     try {
       const { user } = await login(email, password)
+      toast.success('Signed in', `Welcome back${user.displayName ? `, ${user.displayName}` : ''}.`)
       router.push(user.status === 'pending' ? '/operator/foundry' : (next ?? '/operator/home'))
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Sign-in failed. Try again.')
+      const message = err instanceof ApiError ? err.message : 'Sign-in failed. Try again.'
+      setError(message)
+      toast.error('Sign-in failed', message)
     } finally {
       setSubmitting(false)
     }
@@ -54,10 +58,10 @@ function OperatorSignInContent() {
 
       <main className="container-narrow py-16 sm:py-24">
         <div className="cx-card p-8 sm:p-10">
-          <p className="cx-label text-accent">Reviewers · Client Placement</p>
-          <h1 className="cx-page-title mt-2 text-navy-900">Certified Reviewer sign-in</h1>
+          <p className="cx-label text-accent">Oreset Red Team</p>
+          <h1 className="cx-page-title mt-2 text-navy-900">Tester sign-in</h1>
           <p className="cx-body mt-3 text-navy-500">
-            Not certified yet? Signing in will take you to Foundry to finish training.
+            Your queue, your findings, calibration, and payouts. New applicants finish onboarding after signing in.
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -98,7 +102,7 @@ function OperatorSignInContent() {
           </form>
 
           <p className="mt-6 cx-meta text-navy-500">
-            Not a reviewer yet?{' '}
+            Not on the red team yet?{' '}
             <Link href="/operators/join" className="font-semibold text-accent hover:text-copper-600">
               Apply here
             </Link>

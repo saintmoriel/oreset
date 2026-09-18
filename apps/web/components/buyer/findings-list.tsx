@@ -6,6 +6,7 @@ import { VULN_TAG_LABELS, SEVERITY_LABELS, EXPLOIT_STATUS_LABELS, FINDING_STATUS
 import type { FindingStatus, Severity } from '@oreset/shared'
 import { cn } from '@/lib/utils'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 import { getMyFindings, markFindingFixed } from '@/lib/api/endpoints/findings'
 import type { ClientFinding, ClientFindingsResponse } from '@/lib/api/endpoints/findings'
 
@@ -102,9 +103,12 @@ function FindingCard({ f, onChanged }: { f: ClientFinding; onChanged: () => Prom
     setError(null)
     try {
       await markFindingFixed(f.id)
+      toast.success('Retest queued', 'A tester will re-run the same attack. You will see the result here.')
       await onChanged()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not queue the retest.')
+      const message = err instanceof ApiError ? err.message : 'Could not queue the retest.'
+      setError(message)
+      toast.error('Retest not queued', message)
     }
     setSubmitting(false)
   }

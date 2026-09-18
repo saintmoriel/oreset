@@ -11,6 +11,7 @@ import {
 import type { AuditorDecision, Severity } from '@oreset/shared'
 import { cn } from '@/lib/utils'
 import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 import { getVerificationQueue, verifyFinding } from '@/lib/api/endpoints/findings'
 import type { VerificationQueueEntry } from '@/lib/api/endpoints/findings'
 import { ExploitTracePanel, Badge } from '@/components/reviewer/exploit-trace-panel'
@@ -85,9 +86,15 @@ function VerificationCard({
         blastRadius: blastRadius.trim() || undefined,
         auditorNotes: auditorNotes.trim() || undefined,
       })
+      toast.success(
+        verdict === 'verified' ? 'Finding verified' : verdict === 'severity_adjusted' ? `Severity adjusted to ${adjustedSeverity}` : 'Marked false positive',
+        `${decision.clientItemId}. ${verdict === 'false_positive' ? 'It will not reach the client.' : 'It is now on the client dashboard.'}`,
+      )
       onVerified()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not record the verdict.')
+      const message = err instanceof ApiError ? err.message : 'Could not record the verdict.'
+      setError(message)
+      toast.error('Verdict not recorded', message)
       setSubmitting(false)
     }
   }

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users, ShieldAlert, Building2, UserCog } from 'lucide-react'
+import { LayoutDashboard, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users, ShieldAlert, Building2, UserCog, Inbox } from 'lucide-react'
 import { SignOutButton } from '@/components/shared/sign-out-button'
 import { Avatar } from '@/components/capture/avatar'
 import { getMe } from '@/lib/api/endpoints/auth'
@@ -20,6 +20,7 @@ const ROLE_LABELS: Record<StaffRole, string> = {
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/admin/home', icon: LayoutDashboard },
+  { label: 'Leads', href: '/admin/leads', icon: Inbox },
   { label: 'Findings', href: '/admin/findings', icon: ShieldAlert },
   { label: 'Escalations', href: '/admin/tickets', icon: TriangleAlert },
   { label: 'Consensus', href: '/admin/consensus', icon: GitCompare },

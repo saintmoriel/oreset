@@ -27,6 +27,14 @@ const envSchema = z.object({
   PAYMENT_PROVIDER: z.enum(['dev-stub', 'paystack', 'flutterwave']).default('dev-stub'),
   FLW_SECRET_KEY: z.string().optional(),
   FLW_WEBHOOK_HASH: z.string().optional(),
+  // Transactional email. Without RESEND_API_KEY, mail is logged, not sent,
+  // so local development never needs an account.
+  RESEND_API_KEY: z.string().optional(),
+  MAIL_FROM: z.string().default('Oreset <hello@oreset.africa>'),
+  // Where new website leads are announced. Unset = no announcement email.
+  LEADS_NOTIFY_EMAIL: z.string().optional(),
+  // Public site URL used in emails.
+  WEB_PUBLIC_URL: z.string().default('http://localhost:3000'),
 })
 
 export type Env = z.infer<typeof envSchema> & { API_PUBLIC_URL: string }

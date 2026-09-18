@@ -13,6 +13,9 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, CheckCircle2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { submitLead } from '@/lib/api/endpoints/leads'
+import { ApiError } from '@/lib/api/client'
+import { toast } from '@/components/ui/toast'
 
 type FormState = {
   name: string
@@ -102,8 +105,25 @@ export function PilotScopingModal() {
     if (Object.keys(next).length) return
 
     setStatus('submitting')
-    await new Promise((r) => setTimeout(r, 700))
-    setStatus('success')
+    try {
+      await submitLead({
+        kind: 'pilot',
+        name: values.name,
+        email: values.email,
+        organization: values.org,
+        agentType: values.domain,
+        languages: values.language,
+        message: values.caseDescription,
+        sourcePath: window.location.pathname,
+      })
+      setStatus('success')
+      toast.success('Request received', 'A person on the team will reply, usually within one working day.')
+    } catch (err) {
+      setStatus('idle')
+      const message = err instanceof ApiError ? err.message : 'Could not send your request. Check your connection and try again.'
+      setErrors((e) => ({ ...e, caseDescription: message }))
+      toast.error('Not sent', message)
+    }
   }
 
   if (!mounted) return null

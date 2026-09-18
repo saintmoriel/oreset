@@ -6,6 +6,7 @@ export type AdminOverview =
   | {
       role: 'admin'
       needsAttention: number
+      newLeads: number
       findingsAwaitingVerification: number
       openEscalations: number
       consensusSplits: number

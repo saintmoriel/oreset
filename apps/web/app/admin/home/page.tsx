@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, ShieldAlert, TriangleAlert, GitCompare, Users, Crosshair, RotateCcw } from 'lucide-react'
+import { ArrowRight, ShieldAlert, TriangleAlert, GitCompare, Users, Crosshair, RotateCcw, Inbox } from 'lucide-react'
 import { AdminAppShell } from '@/components/admin/admin-app-shell'
 import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import type { AdminOverview } from '@/lib/api/endpoints/admin'
@@ -74,11 +74,12 @@ function AdminOverviewView({ overview: o }: { overview: Extract<AdminOverview, {
           {o.needsAttention}
         </p>
         <p className="cx-meta mt-2 text-white/60">
-          Findings to verify, escalations to resolve, split assessments to adjudicate, testers to approve.
+          New leads to answer, findings to verify, escalations to resolve, split assessments to adjudicate, testers to approve.
         </p>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <ActionTile href="/admin/leads" icon={Inbox} label="New leads" value={o.newLeads} tone="warning" />
         <ActionTile href="/admin/findings" icon={ShieldAlert} label="Findings awaiting verification" value={o.findingsAwaitingVerification} tone="destructive" />
         <ActionTile href="/admin/tickets" icon={TriangleAlert} label="Open escalations" value={o.openEscalations} tone="warning" />
         <ActionTile href="/admin/consensus" icon={GitCompare} label="Split assessments" value={o.consensusSplits} tone="warning" />
