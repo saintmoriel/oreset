@@ -131,7 +131,7 @@ export function BuyerRegressionExplorer() {
           that can read JSON or JSONL) and replay the exact prompts against your agent after each change. If a closed finding
           starts landing again, you find out before your users do.
         </p>
-        <p className="cx-mono-meta mt-2 text-navy-500">GET /api/v1/buyer/regressions?format=jsonl</p>
+        <p className="cx-mono-meta mt-2 text-navy-500">GET /api/v1/buyer/regressions?format=jsonl with an API token from Integrations</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

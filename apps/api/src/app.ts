@@ -29,6 +29,7 @@ import { consensusRouter } from './modules/consensus/consensus.routes'
 import { billingRouter } from './modules/billing/billing.routes'
 import { findingsRouter } from './modules/findings/findings.routes'
 import { leadsRouter, leadsAdminRouter } from './modules/leads/leads.routes'
+import { apiTokensRouter } from './modules/api-tokens/api-tokens.routes'
 
 const allowedOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim())
 
@@ -61,6 +62,7 @@ app.use('/api/v1/payouts', payoutsRouter)
 app.use('/api/v1/me', meRouter)
 app.use('/api/v1/admin/retention', retentionRouter)
 app.use('/api/v1/admin/payouts', payoutsAdminRouter)
+app.use('/api/v1/buyer/api-tokens', apiTokensRouter)
 app.use('/api/v1/buyer', buyersRouter)
 app.use('/api/v1/admin/buyers', buyersAdminRouter)
 app.use('/api/v1/admin/datasets', datasetsRouter)

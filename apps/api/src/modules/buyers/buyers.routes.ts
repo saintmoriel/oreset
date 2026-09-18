@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { asyncHandler } from '../../lib/async-handler'
-import { requireAuth } from '../../middleware/auth'
+import { requireAuth, sessionOnly } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
 import * as controller from './buyers.controller'
 import * as findingsController from '../findings/findings.controller'
@@ -34,11 +34,13 @@ buyersRouter.get('/findings', requireAuth, requireRole('buyer'), asyncHandler(fi
 buyersRouter.post('/findings/:id/fixed', requireAuth, requireRole('buyer'), asyncHandler(findingsController.markFixed))
 
 // Webhooks
-buyersRouter.get('/webhooks', requireAuth, requireRole('buyer'), asyncHandler(controller.listWebhooks))
-buyersRouter.post('/webhooks', requireAuth, requireRole('buyer'), asyncHandler(controller.createWebhook))
-buyersRouter.patch('/webhooks/:id', requireAuth, requireRole('buyer'), asyncHandler(controller.updateWebhook))
-buyersRouter.delete('/webhooks/:id', requireAuth, requireRole('buyer'), asyncHandler(controller.deleteWebhook))
-buyersRouter.post('/webhooks/:id/rotate', requireAuth, requireRole('buyer'), asyncHandler(controller.rotateWebhookSecret))
+// Webhook management is session-only: an API token must not be able to point
+// findings at a new URL.
+buyersRouter.get('/webhooks', requireAuth, sessionOnly, requireRole('buyer'), asyncHandler(controller.listWebhooks))
+buyersRouter.post('/webhooks', requireAuth, sessionOnly, requireRole('buyer'), asyncHandler(controller.createWebhook))
+buyersRouter.patch('/webhooks/:id', requireAuth, sessionOnly, requireRole('buyer'), asyncHandler(controller.updateWebhook))
+buyersRouter.delete('/webhooks/:id', requireAuth, sessionOnly, requireRole('buyer'), asyncHandler(controller.deleteWebhook))
+buyersRouter.post('/webhooks/:id/rotate', requireAuth, sessionOnly, requireRole('buyer'), asyncHandler(controller.rotateWebhookSecret))
 
 // Mounted at /api/v1/admin/buyers — admin provisioning + the handoff picker.
 export const buyersAdminRouter = Router()

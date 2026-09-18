@@ -103,6 +103,16 @@ async function main() {
   const closed = await leadsSvc.updateLead({ id: tester1.id, role: 'staff:admin' }, newLead.id, { status: 'closed', notes: 'smoke' })
   check('lead can be closed', closed.status === 'closed' && closed.notes === 'smoke', closed.status)
 
+  // Client API tokens: created once with a plaintext, listed without it, revoked.
+  const tokensSvc = await import('../modules/api-tokens/api-tokens.service')
+  const created = await tokensSvc.createToken(buyer.id, { name: 'smoke ci', expiresInDays: 1 })
+  check('api token plaintext has prefix', created.secret.startsWith('ort_'), created.secret.slice(0, 4))
+  check('api token record carries no hash', !('tokenHash' in created.token), Object.keys(created.token))
+  const listed = await tokensSvc.listTokens(buyer.id)
+  check('api token appears in list', listed.some((t) => t.id === created.token.id), listed.length)
+  const revoked = await tokensSvc.revokeToken(buyer.id, created.token.id)
+  check('api token can be revoked', Boolean(revoked.revokedAt), revoked.revokedAt)
+
   console.log(failures.length === 0 ? '\nAll checks passed.' : `\n${failures.length} check(s) failed.`)
   process.exit(failures.length === 0 ? 0 : 1)
 }
