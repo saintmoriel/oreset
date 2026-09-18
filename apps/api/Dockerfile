@@ -8,7 +8,9 @@ WORKDIR /app
 
 # argon2 compiles a native module; these are its build tools.
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Pinned to the version that wrote pnpm-lock.yaml. pnpm 12 changed where
+# workspace settings live and rejects this lockfile under --frozen-lockfile.
+RUN corepack enable && corepack prepare pnpm@10.34.5 --activate
 
 # Workspace manifests first so the install layer caches across code changes.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
