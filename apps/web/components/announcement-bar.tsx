@@ -28,7 +28,7 @@ export function AnnouncementBar() {
           <div className="container-wide flex items-center justify-center gap-2 py-2.5 text-center">
             <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
             <a
-              href="#contact"
+              href="/operators/join"
               className="group inline-flex flex-wrap items-center justify-center gap-x-1.5 text-xs font-medium tracking-wide text-ink-foreground/90 transition-colors hover:text-white sm:text-sm"
             >
               <span>

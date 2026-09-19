@@ -119,7 +119,7 @@ function AdminOverviewView({ overview: o }: { overview: Extract<AdminOverview, {
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
-        <Link href="/admin/operators" className="cx-card flex items-center gap-3 p-4 hover:bg-navy-50/60">
+        <Link href="/admin/testers" className="cx-card flex items-center gap-3 p-4 hover:bg-navy-50/60">
           <Users className="size-4 text-accent" />
           <span className="cx-body font-medium text-navy-900">Tester performance</span>
         </Link>

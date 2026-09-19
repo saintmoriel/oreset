@@ -1,15 +1,31 @@
 import type { AuthUser, UserStatus } from '@oreset/shared'
 import { apiFetch } from '../client'
 
+export type LanguageRow = { language: string; fluency: string }
+
+export type SecurityExperienceYears = 'none' | 'under_2' | '2_to_5' | 'over_5'
+
+export const EXPERIENCE_LABELS: Record<SecurityExperienceYears, string> = {
+  none: 'No professional security testing yet',
+  under_2: 'Under 2 years',
+  '2_to_5': '2 to 5 years',
+  over_5: 'Over 5 years',
+}
+
 export type OperatorApplication = {
   id: string
   location: string
   languages: LanguageRow[]
-  dialect: string | null
-  academicBackground: string
-  englishProficiency: string
-  availability: string[] | null
+  securityExperienceYears: SecurityExperienceYears | null
   experience: string | null
+  aiRedTeamExposure: string | null
+  tools: string | null
+  workSample: string | null
+  portfolioUrl: string | null
+  availability: string[] | null
+  dialect: string | null
+  academicBackground: string | null
+  englishProficiency: string | null
   createdAt: string
   user: {
     id: string
@@ -20,8 +36,6 @@ export type OperatorApplication = {
   }
 }
 
-export type LanguageRow = { language: string; fluency: string }
-
 export type ApplyAsOperatorInput = {
   name: string
   email: string
@@ -29,11 +43,13 @@ export type ApplyAsOperatorInput = {
   password: string
   location: string
   languages: LanguageRow[]
-  dialect?: string
-  academicBackground: string
-  englishProficiency: string
+  securityExperienceYears: SecurityExperienceYears
+  experience: string
+  aiRedTeamExposure?: string
+  tools?: string
+  workSample: string
+  portfolioUrl?: string
   availability?: string[]
-  experience?: string
 }
 
 export type OnboardingStatus = {

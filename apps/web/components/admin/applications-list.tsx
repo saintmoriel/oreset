@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { ApiError } from '@/lib/api/client'
 import { StatusTag } from '@/components/capture/status-tag'
 import { toast } from '@/components/ui/toast'
-import { approveApplication, rejectApplication, listOperatorApplications } from '@/lib/api/endpoints/operators'
+import { approveApplication, rejectApplication, listOperatorApplications, EXPERIENCE_LABELS } from '@/lib/api/endpoints/operators'
 import type { OperatorApplication } from '@/lib/api/endpoints/operators'
 
 function ApplicationRow({ a, onChanged }: { a: OperatorApplication; onChanged: () => Promise<void> }) {
@@ -48,10 +48,34 @@ function ApplicationRow({ a, onChanged }: { a: OperatorApplication; onChanged: (
             {a.user.operatorCode} · {a.user.email} · {a.location} · applied {new Date(a.createdAt).toLocaleDateString()}
           </p>
           <p className="cx-meta mt-1 text-navy-500">
+            {a.securityExperienceYears ? `${EXPERIENCE_LABELS[a.securityExperienceYears]} in security testing · ` : ''}
             {a.languages.map((l) => `${l.language} (${l.fluency})`).join(', ')}
-            {a.academicBackground ? ` · ${a.academicBackground}` : ''}
+            {a.tools ? ` · ${a.tools}` : ''}
           </p>
-          {a.experience && <p className="cx-meta mt-2 whitespace-pre-wrap text-navy-700">{a.experience}</p>}
+          {a.portfolioUrl && (
+            <a href={a.portfolioUrl} target="_blank" rel="noreferrer" className="cx-meta mt-1 inline-block font-semibold text-accent hover:text-copper-600">{a.portfolioUrl}</a>
+          )}
+          {a.experience && (
+            <div className="mt-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-navy-400">Experience</p>
+              <p className="cx-meta mt-0.5 whitespace-pre-wrap text-navy-700">{a.experience}</p>
+            </div>
+          )}
+          {a.aiRedTeamExposure && (
+            <div className="mt-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-navy-400">AI testing exposure</p>
+              <p className="cx-meta mt-0.5 whitespace-pre-wrap text-navy-700">{a.aiRedTeamExposure}</p>
+            </div>
+          )}
+          {a.workSample && (
+            <div className="mt-3 rounded-lg border border-accent/20 bg-accent/5 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Work sample</p>
+              <p className="cx-meta mt-1 whitespace-pre-wrap text-navy-800">{a.workSample}</p>
+            </div>
+          )}
+          {!a.workSample && a.academicBackground && (
+            <p className="cx-meta mt-2 text-navy-400">Legacy application (language reviewer form): {a.academicBackground}, {a.englishProficiency}.</p>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {a.user.status === 'active' && <StatusTag tone="success">Approved</StatusTag>}

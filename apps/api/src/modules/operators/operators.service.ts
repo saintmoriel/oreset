@@ -17,16 +17,18 @@ type ApplyInput = {
   password: string
   location: string
   languages: LanguageRow[]
-  dialect?: string
-  academicBackground: string
-  englishProficiency: string
+  securityExperienceYears: string
+  experience: string
+  aiRedTeamExposure?: string
+  tools?: string
+  workSample: string
+  portfolioUrl?: string
   availability?: string[]
-  experience?: string
 }
 
 async function generateOperatorCode(): Promise<string> {
   for (let attempt = 0; attempt < 5; attempt++) {
-    const code = `OP-${randomInt(1000, 9999)}`
+    const code = `ORT-${randomInt(1000, 9999)}`
     const existing = await db.query.users.findFirst({ where: eq(users.operatorCode, code) })
     if (!existing) return code
   }
@@ -71,11 +73,13 @@ export async function apply(input: ApplyInput): Promise<{ user: AuthUser }> {
     userId: user.id,
     location: input.location,
     languages: input.languages,
-    dialect: input.dialect,
-    academicBackground: input.academicBackground,
-    englishProficiency: input.englishProficiency,
-    availability: input.availability,
+    securityExperienceYears: input.securityExperienceYears,
     experience: input.experience,
+    aiRedTeamExposure: input.aiRedTeamExposure || null,
+    tools: input.tools || null,
+    workSample: input.workSample,
+    portfolioUrl: input.portfolioUrl || null,
+    availability: input.availability,
   })
 
   await writeAuditLog({

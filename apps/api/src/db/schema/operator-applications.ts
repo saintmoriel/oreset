@@ -1,11 +1,12 @@
 import { pgTable, uuid, text, jsonb, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
 import { users } from './users'
 
-// One-to-one with users (role='operator'). Holds the rich application-form
-// fields with no home on `users`. Free-text/jsonb rather than enums for
-// academicBackground/englishProficiency/languages/availability — these are
-// UI-only option labels, not values any RBAC or workflow logic reads,
-// unlike ERR_TAGS/SEVERITY_LEVELS.
+// One-to-one with users (role='operator'). The red team application: who
+// they are, what security and AI testing they have done, and a short work
+// sample a lead auditor reads before approving them. Languages stay because
+// they matter for judgement testing. Legacy language-era columns
+// (academicBackground, englishProficiency, dialect) are nullable and unused
+// by the current form.
 export const operatorApplications = pgTable(
   'operator_applications',
   {
@@ -15,11 +16,17 @@ export const operatorApplications = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     location: text('location').notNull(),
     languages: jsonb('languages').notNull(), // { language: string; fluency: string }[]
-    dialect: text('dialect'),
-    academicBackground: text('academic_background').notNull(),
-    englishProficiency: text('english_proficiency').notNull(),
-    availability: jsonb('availability'), // string[] | null
+    // 'none' | 'under_2' | '2_to_5' | 'over_5'
+    securityExperienceYears: text('security_experience_years'),
     experience: text('experience'),
+    aiRedTeamExposure: text('ai_red_team_exposure'),
+    tools: text('tools'),
+    workSample: text('work_sample'),
+    portfolioUrl: text('portfolio_url'),
+    availability: jsonb('availability'), // string[] | null
+    dialect: text('dialect'),
+    academicBackground: text('academic_background'),
+    englishProficiency: text('english_proficiency'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({

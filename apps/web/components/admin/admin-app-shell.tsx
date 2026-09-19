@@ -26,7 +26,7 @@ const NAV_ITEMS = [
   { label: 'Consensus', href: '/admin/consensus', icon: GitCompare },
   { label: 'Calibration', href: '/admin/calibration', icon: Target },
   { label: 'Regressions', href: '/admin/regressions', icon: FlaskConical },
-  { label: 'Testers', href: '/admin/operators', icon: Users },
+  { label: 'Testers', href: '/admin/testers', icon: Users },
   { label: 'Clients', href: '/admin/clients', icon: Building2 },
   { label: 'People', href: '/admin/people', icon: UserCog },
   { label: 'Payouts', href: '/admin/payouts', icon: Wallet },

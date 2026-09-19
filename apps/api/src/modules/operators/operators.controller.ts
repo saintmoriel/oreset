@@ -8,17 +8,19 @@ import { setSessionCookies, requestContext } from '../../lib/session-cookies'
 const languageRowSchema = z.object({ language: z.string().min(1), fluency: z.string().min(1) })
 
 const applySchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().min(8),
-  password: z.string().min(8),
-  location: z.string().min(1),
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email(),
+  phone: z.string().trim().min(8).max(40),
+  password: z.string().min(8).max(200),
+  location: z.string().trim().min(1).max(120),
   languages: z.array(languageRowSchema).min(1),
-  dialect: z.string().optional(),
-  academicBackground: z.string().min(1),
-  englishProficiency: z.string().min(1),
+  securityExperienceYears: z.enum(['none', 'under_2', '2_to_5', 'over_5']),
+  experience: z.string().trim().min(20).max(4000),
+  aiRedTeamExposure: z.string().trim().max(4000).optional(),
+  tools: z.string().trim().max(1000).optional(),
+  workSample: z.string().trim().min(80).max(6000),
+  portfolioUrl: z.string().trim().url().max(300).optional().or(z.literal('')),
   availability: z.array(z.string()).optional(),
-  experience: z.string().optional(),
 })
 
 export async function apply(req: Request, res: Response) {
