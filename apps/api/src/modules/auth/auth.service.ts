@@ -10,6 +10,17 @@ import { hashPassword, verifyPassword } from '../../lib/password'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 import { DevConsoleOtpProvider, type OtpProvider } from './otp.provider'
+import {
+  decryptSecret,
+  encryptSecret,
+  generateRecoveryCodes,
+  generateSecret,
+  hashRecoveryCode,
+  otpauthUrl,
+  signMfaToken,
+  verifyCode,
+  verifyMfaToken,
+} from '../../lib/totp'
 
 const OTP_TTL_MS = 5 * 60 * 1000
 const OTP_MAX_REQUESTS_PER_WINDOW = 3
@@ -34,6 +45,7 @@ export function toAuthUser(user: User): AuthUser {
     phone: user.phone,
     email: user.email,
     createdAt: user.createdAt.toISOString(),
+    twoFactorEnabled: user.totpEnabledAt !== null && user.totpEnabledAt !== undefined,
   }
 }
 
@@ -106,11 +118,15 @@ export async function verifyOtp(
   return { user: toAuthUser(user), ...tokens }
 }
 
+export type LoginResult =
+  | { mfaRequired: false; user: AuthUser; accessToken: string; refreshToken: string }
+  | { mfaRequired: true; mfaToken: string }
+
 export async function loginWithPassword(
   email: string,
   password: string,
   context: { userAgent?: string; ip?: string },
-): Promise<{ user: AuthUser; accessToken: string; refreshToken: string }> {
+): Promise<LoginResult> {
   const user = await db.query.users.findFirst({ where: eq(users.email, email) })
 
   // Generic failure message regardless of which check fails — no
@@ -123,6 +139,20 @@ export async function loginWithPassword(
     throw new HttpError(403, 'account_suspended', 'This account has been suspended. Contact your administrator.')
   }
 
+  // Password is right; if the account has an authenticator, stop here and
+  // hand back a short-lived token for the code step. No session yet.
+  if (user.totpEnabledAt) {
+    return { mfaRequired: true, mfaToken: signMfaToken(user.id) }
+  }
+
+  return finishLogin(user, context, 'auth.login')
+}
+
+async function finishLogin(
+  user: User,
+  context: { userAgent?: string; ip?: string },
+  action: string,
+): Promise<{ mfaRequired: false; user: AuthUser; accessToken: string; refreshToken: string }> {
   const tokens = await issueSession(user, context)
   await Promise.all([
     db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id)),
@@ -130,11 +160,107 @@ export async function loginWithPassword(
       actorId: user.id,
       actorLabel: user.email ?? user.id,
       actorRole: user.role === 'staff' ? (user.staffRole ?? 'staff') : user.role,
-      action: 'auth.login',
+      action,
     }),
   ])
 
-  return { user: toAuthUser(user), ...tokens }
+  return { mfaRequired: false, user: toAuthUser(user), ...tokens }
+}
+
+// ---------------------------------------------------------------------------
+// Two-factor authentication (authenticator app)
+// ---------------------------------------------------------------------------
+
+function mfaActor(user: User) {
+  return { actorId: user.id, actorLabel: user.email ?? user.id, actorRole: user.role === 'staff' ? (user.staffRole ?? 'staff') : user.role }
+}
+
+// Second step of sign-in: the code from the app, or a recovery code.
+export async function completeMfaLogin(
+  mfaToken: string,
+  code: string,
+  context: { userAgent?: string; ip?: string },
+): Promise<{ mfaRequired: false; user: AuthUser; accessToken: string; refreshToken: string }> {
+  const claims = verifyMfaToken(mfaToken)
+  if (!claims) throw new HttpError(401, 'mfa_expired', 'That sign-in attempt expired. Enter your password again.')
+  const user = await db.query.users.findFirst({ where: eq(users.id, claims.sub) })
+  if (!user || !user.totpEnabledAt || !user.totpSecret) throw new HttpError(401, 'mfa_expired', 'That sign-in attempt expired. Enter your password again.')
+  if (user.status === 'suspended') throw new HttpError(403, 'account_suspended', 'This account has been suspended.')
+
+  if (verifyCode(decryptSecret(user.totpSecret), code)) {
+    return finishLogin(user, context, 'auth.login.mfa')
+  }
+
+  // Recovery code: single use, removed on success.
+  const hashes = Array.isArray(user.totpRecoveryCodes) ? (user.totpRecoveryCodes as string[]) : []
+  const attempt = hashRecoveryCode(code)
+  if (hashes.includes(attempt)) {
+    const remaining = hashes.filter((h) => h !== attempt)
+    await db.update(users).set({ totpRecoveryCodes: remaining }).where(eq(users.id, user.id))
+    await writeAuditLog({ ...mfaActor(user), action: 'auth.mfa.recovery_used', metadata: { remaining: remaining.length } })
+    return finishLogin(user, context, 'auth.login.mfa_recovery')
+  }
+
+  await writeAuditLog({ ...mfaActor(user), action: 'auth.mfa.failed' })
+  throw new HttpError(401, 'mfa_invalid', 'That code is not right. Codes change every 30 seconds; try the current one.')
+}
+
+// Step 1 of enrolment: create a secret and show it. Not enabled until a
+// code is confirmed, so a half-finished setup never locks anyone out.
+export async function beginMfaSetup(userId: string): Promise<{ secret: string; otpauthUrl: string }> {
+  const user = await db.query.users.findFirst({ where: eq(users.id, userId) })
+  if (!user) throw new HttpError(404, 'not_found', 'Account not found.')
+  if (user.totpEnabledAt) throw new HttpError(409, 'mfa_already_enabled', 'Two-factor is already on for this account. Turn it off first to set up a new device.')
+  const secret = generateSecret()
+  await db.update(users).set({ totpSecret: encryptSecret(secret) }).where(eq(users.id, userId))
+  return { secret, otpauthUrl: otpauthUrl(secret, user.email ?? user.displayName ?? 'Oreset account') }
+}
+
+// Step 2: confirm with a code from the app. Returns recovery codes once.
+export async function enableMfa(userId: string, code: string): Promise<{ recoveryCodes: string[] }> {
+  const user = await db.query.users.findFirst({ where: eq(users.id, userId) })
+  if (!user || !user.totpSecret) throw new HttpError(400, 'mfa_not_started', 'Start setup first.')
+  if (user.totpEnabledAt) throw new HttpError(409, 'mfa_already_enabled', 'Two-factor is already on.')
+  if (!verifyCode(decryptSecret(user.totpSecret), code)) {
+    throw new HttpError(400, 'mfa_invalid', 'That code did not match. Scan the QR again if you are unsure, then enter the current code.')
+  }
+  const recoveryCodes = generateRecoveryCodes()
+  await db
+    .update(users)
+    .set({ totpEnabledAt: new Date(), totpRecoveryCodes: recoveryCodes.map(hashRecoveryCode) })
+    .where(eq(users.id, userId))
+  await writeAuditLog({ ...mfaActor(user), action: 'auth.mfa.enabled' })
+  return { recoveryCodes }
+}
+
+// Turning it off requires a current code (or a recovery code) plus the
+// password, so a hijacked open session cannot quietly remove the lock.
+export async function disableMfa(userId: string, code: string, password: string): Promise<void> {
+  const user = await db.query.users.findFirst({ where: eq(users.id, userId) })
+  if (!user || !user.totpEnabledAt || !user.totpSecret) throw new HttpError(400, 'mfa_not_enabled', 'Two-factor is not on.')
+  if (!user.passwordHash || !(await verifyPassword(user.passwordHash, password))) throw new HttpError(401, 'invalid_credentials', 'Password is not right.')
+  const hashes = Array.isArray(user.totpRecoveryCodes) ? (user.totpRecoveryCodes as string[]) : []
+  const ok = verifyCode(decryptSecret(user.totpSecret), code) || hashes.includes(hashRecoveryCode(code))
+  if (!ok) throw new HttpError(401, 'mfa_invalid', 'That code is not right.')
+  await db.update(users).set({ totpSecret: null, totpEnabledAt: null, totpRecoveryCodes: null }).where(eq(users.id, userId))
+  await writeAuditLog({ ...mfaActor(user), action: 'auth.mfa.disabled' })
+}
+
+export async function regenerateRecoveryCodes(userId: string, code: string): Promise<{ recoveryCodes: string[] }> {
+  const user = await db.query.users.findFirst({ where: eq(users.id, userId) })
+  if (!user || !user.totpEnabledAt || !user.totpSecret) throw new HttpError(400, 'mfa_not_enabled', 'Two-factor is not on.')
+  if (!verifyCode(decryptSecret(user.totpSecret), code)) throw new HttpError(401, 'mfa_invalid', 'That code is not right.')
+  const recoveryCodes = generateRecoveryCodes()
+  await db.update(users).set({ totpRecoveryCodes: recoveryCodes.map(hashRecoveryCode) }).where(eq(users.id, userId))
+  await writeAuditLog({ ...mfaActor(user), action: 'auth.mfa.recovery_regenerated' })
+  return { recoveryCodes }
+}
+
+export async function mfaStatus(userId: string): Promise<{ enabled: boolean; recoveryCodesLeft: number | null; enabledAt: string | null }> {
+  const user = await db.query.users.findFirst({ where: eq(users.id, userId), columns: { totpEnabledAt: true, totpRecoveryCodes: true } })
+  if (!user) throw new HttpError(404, 'not_found', 'Account not found.')
+  const hashes = Array.isArray(user.totpRecoveryCodes) ? (user.totpRecoveryCodes as string[]) : null
+  return { enabled: !!user.totpEnabledAt, recoveryCodesLeft: user.totpEnabledAt ? (hashes?.length ?? 0) : null, enabledAt: user.totpEnabledAt?.toISOString() ?? null }
 }
 
 export async function issueSession(

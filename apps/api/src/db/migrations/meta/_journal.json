@@ -169,6 +169,13 @@
       "when": 1789800000000,
       "tag": "0023_module_access",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1789900000000,
+      "tag": "0024_two_factor",
+      "breakpoints": true
     }
   ]
 }

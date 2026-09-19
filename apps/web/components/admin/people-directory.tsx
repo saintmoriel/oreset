@@ -152,7 +152,19 @@ function PersonRow({ p, roles, isSelf, onChanged }: { p: Person; roles: RoleAcce
           </p>
           <p className="cx-mono-meta truncate text-navy-400">{p.email ?? p.phone ?? p.id.slice(0, 8)}{p.operatorCode ? ` · ${p.operatorCode}` : ''}</p>
         </div>
-        <div><span className="rounded bg-navy-100 px-2 py-0.5 text-[11px] font-semibold text-navy-700">{p.accessLabel}</span></div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="rounded bg-navy-100 px-2 py-0.5 text-[11px] font-semibold text-navy-700">{p.accessLabel}</span>
+          {p.role === 'staff' && (
+            <span className={`rounded px-2 py-0.5 text-[11px] font-semibold ${p.twoFactor ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`} title="Two-factor authentication">
+              {p.twoFactor ? '2FA on' : '2FA off'}
+            </span>
+          )}
+          {p.grants && p.grants.length > 0 && (
+            <span className="rounded bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent" title={p.grants.map((g) => g.module).join(', ')}>
+              +{p.grants.length} granted
+            </span>
+          )}
+        </div>
         <div>
           {p.status === 'active' && <StatusTag tone="success">Active</StatusTag>}
           {p.status === 'pending' && <StatusTag tone="warning">Pending</StatusTag>}

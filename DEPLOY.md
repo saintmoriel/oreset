@@ -74,6 +74,21 @@ Time: about 45 minutes the first time. Cost: roughly $5 to $10 a month at curren
 - **Logs**: Railway → service → Deployments → View logs. Emails appear there as `[mail:not-sent]` until `RESEND_API_KEY` is set.
 - **Database backups**: Railway → Postgres service → Backups. Turn on daily backups before the first real client.
 
+## Backups (do this before the first paying client)
+
+Railway's built-in backups need the Pro plan. The cheaper route is to move the database to Neon, which includes daily backups and point-in-time restore on its free and launch tiers. The API does not care where Postgres lives; only `DATABASE_URL` changes.
+
+1. Create an account at neon.tech. New project: name `oreset`, region closest to Railway's (pick a US or EU region matching your Railway service), Postgres 16.
+2. Copy the pooled connection string from the Neon dashboard (it ends in `?sslmode=require`).
+3. Export the current data from Railway: in the Railway Postgres service, open Data → Connect, copy its connection string, then on your machine run `pg_dump "<railway url>" --no-owner --no-acl -Fc -f oreset.dump` and `pg_restore -d "<neon url>" --no-owner --no-acl oreset.dump`. If you do not have `pg_dump` locally, install PostgreSQL client tools or ask George to run it.
+4. On the Railway API service, Variables: replace `DATABASE_URL` with the Neon string (keep the old one noted somewhere safe for a week).
+5. Redeploy the API. Watch the deploy log for "Migrations complete" and check `/health`.
+6. Sign in and confirm People, Clients and Leads look the same as before.
+7. In Neon: Settings → enable a 7-day (or longer) history for point-in-time restore. Write the date in the Decision Log.
+8. After a week with no problems, delete the Railway Postgres service so nobody points at stale data by mistake.
+
+Restore test (quarterly): in Neon, create a branch from a point in time, connect to it with `psql`, confirm recent rows exist. Note how long it took.
+
 ## If something breaks
 
 Lessons from the first real deployment (19 September 2026), all hit and fixed:

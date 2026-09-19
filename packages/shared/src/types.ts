@@ -22,6 +22,8 @@ export type AuthUser = {
   email: string | null
   // ISO timestamp string.
   createdAt: string
+  // Authenticator app two-factor is confirmed on this account.
+  twoFactorEnabled: boolean
 }
 
 // Claims embedded in the oreset_at access token — kept minimal so the

@@ -3,34 +3,70 @@
 import { Suspense, useState, type FormEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { login } from '@/lib/api/endpoints/auth'
-import { ApiError } from '@/lib/api/client'
+import { useSearchParams } from 'next/navigation'
+import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
+import { login, verifyMfa } from '@/lib/api/endpoints/auth'
+import { describeError } from '@/lib/api/client'
 import { toast } from '@/components/ui/toast'
 
+const INPUT =
+  'mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20'
+
 function AdminSignInContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const next = searchParams.get('next')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [mfaToken, setMfaToken] = useState<string | null>(null)
+  const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  function go(displayName: string | null) {
+    toast.success('Signed in', `Welcome back${displayName ? `, ${displayName}` : ''}.`)
+    // Full navigation, not the client router: the router may have prefetched
+    // the destination while signed out and cached its redirect to sign-in.
+    window.location.assign(next ?? '/admin/home')
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setSubmitting(true)
     try {
-      const { user } = await login(email, password)
-      toast.success('Signed in', `Welcome back${user.displayName ? `, ${user.displayName}` : ''}.`)
-      router.push(next ?? '/admin/home')
+      const result = await login(email, password)
+      if (result.mfaRequired) {
+        setMfaToken(result.mfaToken)
+        toast.success('Password accepted', 'Now enter the code from your authenticator app.')
+        return
+      }
+      go(result.user.displayName)
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : 'Sign-in failed. Try again.'
+      const message = describeError(err, 'Sign-in failed. Try again.')
       setError(message)
       toast.error('Sign-in failed', message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function onSubmitCode(e: FormEvent) {
+    e.preventDefault()
+    if (!mfaToken) return
+    setError(null)
+    setSubmitting(true)
+    try {
+      const result = await verifyMfa(mfaToken, code)
+      go(result.user.displayName)
+    } catch (err) {
+      const message = describeError(err, 'That code did not work.')
+      setError(message)
+      toast.error('Code not accepted', message)
+      if (message.toLowerCase().includes('expired')) {
+        setMfaToken(null)
+        setCode('')
+      }
     } finally {
       setSubmitting(false)
     }
@@ -46,10 +82,7 @@ function AdminSignInContent() {
             </span>
             <span className="font-display text-lg font-semibold tracking-display">Oreset</span>
           </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-body-sm font-medium text-muted-foreground hover:text-foreground"
-          >
+          <Link href="/" className="inline-flex items-center gap-1.5 text-body-sm font-medium text-muted-foreground hover:text-foreground">
             <ArrowLeft className="size-4" />
             Back to site
           </Link>
@@ -59,50 +92,69 @@ function AdminSignInContent() {
       <main className="container-narrow py-16 sm:py-24">
         <div className="cx-card p-8 sm:p-10">
           <p className="cx-label text-accent">Oreset staff</p>
-          <h1 className="cx-page-title mt-2 text-navy-900">Staff sign-in</h1>
+          <h1 className="cx-page-title mt-2 text-navy-900">{mfaToken ? 'Enter your code' : 'Staff sign-in'}</h1>
           <p className="cx-body mt-3 text-navy-500">
-            Admins, lead auditors, and compliance. What you see is set by your role.
+            {mfaToken
+              ? 'Open your authenticator app and type the six-digit code for Oreset. A recovery code works too.'
+              : 'Owner, lead auditors, engineers, sales and compliance. What you see is set by your role and the modules granted to you.'}
           </p>
 
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
-            <div>
-              <label className="cx-meta font-medium text-navy-800">Email</label>
-              <input
-                required
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@oreset.dev"
-                className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none placeholder:text-muted-foreground/70 focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
-              />
-            </div>
-            <div>
-              <label className="cx-meta font-medium text-navy-800">Password</label>
-              <input
-                required
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-body outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/20"
-              />
-            </div>
-            <div className="flex justify-end">
-              <Link href="/forgot-password?portal=admin" className="cx-meta font-medium text-navy-500 hover:text-accent">Forgot password?</Link>
-            </div>
-            {error && (
-              <p className="cx-meta text-destructive" role="alert">
-                {error}
-              </p>
-            )}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60"
-            >
-              {submitting ? 'Signing in…' : 'Sign in'}
-              {!submitting && <ArrowRight className="size-4" />}
-            </button>
-          </form>
+          {mfaToken ? (
+            <form onSubmit={onSubmitCode} className="mt-8 space-y-4">
+              <div>
+                <label className="cx-meta font-medium text-navy-800">Six-digit code</label>
+                <input
+                  required
+                  autoFocus
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="123 456"
+                  className={`${INPUT} font-mono text-lg tracking-widest`}
+                />
+              </div>
+              {error && <p className="cx-meta text-destructive" role="alert">{error}</p>}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60"
+              >
+                {submitting ? 'Checking…' : 'Continue'}
+                {!submitting && <ShieldCheck className="size-4" />}
+              </button>
+              <button type="button" onClick={() => { setMfaToken(null); setCode(''); setError(null) }} className="cx-meta w-full text-center font-medium text-navy-500 hover:text-accent">
+                Start over
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={onSubmit} className="mt-8 space-y-4">
+              <div>
+                <label className="cx-meta font-medium text-navy-800">Email</label>
+                <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@oreset.africa" className={INPUT} />
+              </div>
+              <div>
+                <label className="cx-meta font-medium text-navy-800">Password</label>
+                <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={INPUT} />
+              </div>
+              <div className="flex justify-end">
+                <Link href="/forgot-password?portal=admin" className="cx-meta font-medium text-navy-500 hover:text-accent">Forgot password?</Link>
+              </div>
+              {error && <p className="cx-meta text-destructive" role="alert">{error}</p>}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60"
+              >
+                {submitting ? 'Signing in…' : 'Sign in'}
+                {!submitting && <ArrowRight className="size-4" />}
+              </button>
+            </form>
+          )}
+
+          <p className="cx-meta mt-6 text-navy-400">
+            One browser holds one Oreset session. To be signed in as two accounts at once, use a private window or a second browser for the other account.
+          </p>
         </div>
       </main>
     </div>

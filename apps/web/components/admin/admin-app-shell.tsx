@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users, ShieldAlert, Building2, UserCog, Inbox, KeyRound } from 'lucide-react'
+import { LayoutDashboard, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users, ShieldAlert, Building2, UserCog, Inbox, KeyRound, ShieldCheck } from 'lucide-react'
 import { SignOutButton } from '@/components/shared/sign-out-button'
 import { Avatar } from '@/components/capture/avatar'
 import { getMe } from '@/lib/api/endpoints/auth'
@@ -28,6 +28,7 @@ const NAV_ITEMS: { label: string; href: string; icon: typeof LayoutDashboard; mo
   { label: 'Payouts', href: '/admin/payouts', icon: Wallet, module: 'payouts' },
   { label: 'Audit Log', href: '/admin/audit-log', icon: ScrollText, module: 'audit' },
   { label: 'Access', href: '/admin/access', icon: KeyRound },
+  { label: 'Security', href: '/admin/security', icon: ShieldCheck },
 ]
 
 function useActiveNavItem() {
@@ -210,7 +211,20 @@ export function AdminAppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <main className="px-4 py-5 sm:px-6 sm:py-6">
-            <div className="mx-auto max-w-6xl">{children}</div>
+            <div className="mx-auto max-w-6xl">
+              {user && !user.twoFactorEnabled && (
+                <Link
+                  href="/admin/security"
+                  className="mb-5 flex items-center justify-between gap-4 rounded-md border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-navy-800 hover:bg-warning/15"
+                >
+                  <span>
+                    <span className="font-medium">Two-factor authentication is off on your account.</span> Staff accounts must have it on. Takes a minute.
+                  </span>
+                  <span className="shrink-0 font-semibold text-accent">Set up</span>
+                </Link>
+              )}
+              {children}
+            </div>
           </main>
         </div>
       </div>

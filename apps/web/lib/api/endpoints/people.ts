@@ -7,6 +7,9 @@ export type Person = {
   staffRole: StaffRole | null
   accessKey: string
   accessLabel: string
+  twoFactor: boolean
+  modules: string[] | null
+  grants: { id: string; module: string; reason: string; expiresAt: string | null }[] | null
   email: string | null
   phone: string | null
   displayName: string | null

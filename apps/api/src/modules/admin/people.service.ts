@@ -85,7 +85,7 @@ export async function listPeople() {
   const rows = await db.query.users.findMany({
     columns: {
       id: true, role: true, staffRole: true, email: true, phone: true, displayName: true,
-      operatorCode: true, status: true, lastLoginAt: true, createdAt: true,
+      operatorCode: true, status: true, lastLoginAt: true, createdAt: true, totpEnabledAt: true,
     },
     orderBy: [desc(users.createdAt)],
   })
@@ -126,6 +126,7 @@ export async function listPeople() {
       staffRole: u.staffRole,
       accessKey: key,
       accessLabel: ROLE_ACCESS[key]?.label ?? key,
+      twoFactor: !!u.totpEnabledAt,
       modules,
       grants: u.role === 'staff' ? grants.map((g) => ({ id: g.id, module: g.module, reason: g.reason, expiresAt: g.expiresAt?.toISOString() ?? null })) : null,
       email: u.email,

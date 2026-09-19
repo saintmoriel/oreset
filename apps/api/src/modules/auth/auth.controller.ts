@@ -53,13 +53,49 @@ export async function verifyOtp(req: Request, res: Response) {
 
 export async function login(req: Request, res: Response) {
   const { email, password } = loginSchema.parse(req.body)
-  const { user, accessToken, refreshToken } = await authService.loginWithPassword(
-    email,
-    password,
-    requestContext(req),
-  )
-  setSessionCookies(res, accessToken, refreshToken)
-  res.status(200).json({ user })
+  const result = await authService.loginWithPassword(email, password, requestContext(req))
+  if (result.mfaRequired) {
+    // Password accepted; the client now asks for the authenticator code.
+    res.status(200).json({ mfaRequired: true, mfaToken: result.mfaToken })
+    return
+  }
+  setSessionCookies(res, result.accessToken, result.refreshToken)
+  res.status(200).json({ mfaRequired: false, user: result.user })
+}
+
+const mfaVerifySchema = z.object({ mfaToken: z.string().min(10), code: z.string().trim().min(6).max(20) })
+const codeSchema = z.object({ code: z.string().trim().min(6).max(20) })
+const disableSchema = z.object({ code: z.string().trim().min(6).max(20), password: z.string().min(1) })
+
+export async function mfaVerify(req: Request, res: Response) {
+  const { mfaToken, code } = mfaVerifySchema.parse(req.body)
+  const result = await authService.completeMfaLogin(mfaToken, code, requestContext(req))
+  setSessionCookies(res, result.accessToken, result.refreshToken)
+  res.status(200).json({ mfaRequired: false, user: result.user })
+}
+
+export async function mfaStatus(req: Request, res: Response) {
+  res.json(await authService.mfaStatus(req.user!.sub))
+}
+
+export async function mfaSetup(req: Request, res: Response) {
+  res.json(await authService.beginMfaSetup(req.user!.sub))
+}
+
+export async function mfaEnable(req: Request, res: Response) {
+  const { code } = codeSchema.parse(req.body)
+  res.json(await authService.enableMfa(req.user!.sub, code))
+}
+
+export async function mfaDisable(req: Request, res: Response) {
+  const { code, password } = disableSchema.parse(req.body)
+  await authService.disableMfa(req.user!.sub, code, password)
+  res.status(204).end()
+}
+
+export async function mfaRecoveryCodes(req: Request, res: Response) {
+  const { code } = codeSchema.parse(req.body)
+  res.json(await authService.regenerateRecoveryCodes(req.user!.sub, code))
 }
 
 export async function refresh(req: Request, res: Response) {

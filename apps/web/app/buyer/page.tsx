@@ -24,9 +24,16 @@ function BuyerSignInContent() {
     setError(null)
     setSubmitting(true)
     try {
-      const { user } = await login(email, password)
+      const result = await login(email, password)
+      if (result.mfaRequired) {
+        toast.error('Two-factor required', 'Sign in through the staff console for this account.')
+        return
+      }
+      const { user } = result
       toast.success('Signed in', `Welcome back${user.displayName ? `, ${user.displayName}` : ''}.`)
-      router.push(next ?? '/buyer/home')
+      // Full navigation, not the client router: the router may have prefetched
+      // the destination while signed out and cached its redirect to sign-in.
+      window.location.assign(next ?? '/buyer/home')
     } catch (err) {
       const message = err instanceof ApiError ? err.message : 'Sign-in failed. Try again.'
       setError(message)

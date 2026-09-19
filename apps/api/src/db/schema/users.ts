@@ -25,6 +25,12 @@ export const users = pgTable(
     // Stamped on password login. Shown on the admin People page so an owner
     // can see who actually uses their access.
     lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+    // Two-factor authentication (authenticator app). The secret is stored
+    // encrypted (see lib/totp.ts); enabled_at null means setup started but
+    // not confirmed, or never started. Recovery codes are sha256 hashes.
+    totpSecret: text('totp_secret'),
+    totpEnabledAt: timestamp('totp_enabled_at', { withTimezone: true }),
+    totpRecoveryCodes: jsonb('totp_recovery_codes'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

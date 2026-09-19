@@ -24,9 +24,17 @@ function OperatorSignInContent() {
     setError(null)
     setSubmitting(true)
     try {
-      const { user } = await login(email, password)
+      const result = await login(email, password)
+      if (result.mfaRequired) {
+        // Testers cannot enrol yet; the staff console is the only portal with a code step.
+        toast.error('Two-factor required', 'Sign in through the staff console for this account.')
+        return
+      }
+      const { user } = result
       toast.success('Signed in', `Welcome back${user.displayName ? `, ${user.displayName}` : ''}.`)
-      router.push(user.status === 'pending' ? '/operator/pending' : (next ?? '/operator/home'))
+      // Full navigation, not the client router: the router may have prefetched
+      // the destination while signed out and cached its redirect to sign-in.
+      window.location.assign(user.status === 'pending' ? '/operator/pending' : (next ?? '/operator/home'))
     } catch (err) {
       const message = err instanceof ApiError ? err.message : 'Sign-in failed. Try again.'
       setError(message)
