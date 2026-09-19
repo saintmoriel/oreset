@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { applyAsOperator, EXPERIENCE_LABELS } from '@/lib/api/endpoints/operators'
 import type { SecurityExperienceYears } from '@/lib/api/endpoints/operators'
-import { ApiError } from '@/lib/api/client'
+import { ApiError, describeError, fieldMessages } from '@/lib/api/client'
 import { toast } from '@/components/ui/toast'
 
 const FLUENCY_LEVELS = ['Native', 'Fluent', 'Professional', 'Conversational']
@@ -57,9 +57,11 @@ export default function OperatorsJoinPage() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
   const [operatorCode, setOperatorCode] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(null)
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setValues((v) => ({ ...v, [key]: value }))
+    if (formError) setFormError(null)
     if (key in errors) setErrors((e) => ({ ...e, [key]: undefined }))
   }
 
@@ -108,12 +110,33 @@ export default function OperatorsJoinPage() {
       setStatus('success')
       toast.success('Application received', `Your tester code is ${user.operatorCode}. We will email you when a lead has reviewed it.`)
     } catch (err) {
-      const message = err instanceof ApiError && err.code === 'email_taken'
-        ? 'An account with that email already exists.'
-        : err instanceof ApiError ? err.message : 'Could not submit your application. Try again.'
-      setErrors((e) => ({ ...e, email: message }))
+      // Put every server message on the field it belongs to, so the person
+      // sees what to change instead of a bare "invalid request".
+      const serverFields = fieldMessages(err)
+      const known: FieldErrors = {}
+      const unknown: string[] = []
+      for (const [field, msg] of Object.entries(serverFields)) {
+        if (field in initial) known[field as keyof FormState] = msg
+        else unknown.push(field)
+      }
+      setErrors(known)
+
+      let message: string
+      if (err instanceof ApiError && err.code === 'email_taken') {
+        message = 'An account with that email already exists. Sign in instead, or use another email.'
+        setErrors({ email: message })
+      } else if (unknown.length) {
+        message = `The server asked for answers this form does not have (${unknown.join(', ')}). The API is likely running an older version. Please tell us at info@oreset.africa and try again later.`
+      } else if (Object.keys(known).length) {
+        message = 'Fix the highlighted answers and submit again.'
+      } else {
+        message = describeError(err, 'Could not reach the server. Check your connection and try again.')
+      }
+      setFormError(message)
       toast.error('Not submitted', message)
       setStatus('idle')
+      // Bring the first problem into view; long forms hide it below the fold.
+      setTimeout(() => document.querySelector('[role="alert"]')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 50)
     }
   }
 
@@ -285,6 +308,11 @@ export default function OperatorsJoinPage() {
                 </section>
 
                 <div className="border-t border-border/70 pt-6">
+                  {formError && (
+                    <p role="alert" className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                      {formError}
+                    </p>
+                  )}
                   <button type="submit" disabled={status === 'submitting'} className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-copper-600 disabled:opacity-60">
                     {status === 'submitting' ? 'Submitting…' : 'Submit application'}
                     {status !== 'submitting' && <ArrowRight className="size-4" />}

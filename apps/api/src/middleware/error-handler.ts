@@ -14,9 +14,13 @@ export class HttpError extends Error {
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   if (err instanceof ZodError) {
-    res.status(400).json({
-      error: { code: 'validation_error', message: 'Invalid request.', details: err.flatten() },
-    })
+    const flat = err.flatten()
+    const fields = Object.keys(flat.fieldErrors)
+    // Name the fields so a person (or a log line) can see what to change.
+    const message = fields.length
+      ? `Some answers could not be accepted: ${fields.join(', ')}.`
+      : 'The request was not in the expected shape.'
+    res.status(400).json({ error: { code: 'validation_error', message, details: flat } })
     return
   }
 

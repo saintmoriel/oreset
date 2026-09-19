@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, CheckCircle2, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { submitLead } from '@/lib/api/endpoints/leads'
-import { ApiError } from '@/lib/api/client'
+import { ApiError, describeError } from '@/lib/api/client'
 import { toast } from '@/components/ui/toast'
 
 // The form branches on intent. A prospective client gets the questions a
@@ -131,7 +131,7 @@ export function Contact() {
       toast.success('Message received', 'A person on the team will reply, usually within one working day.')
     } catch (err) {
       setStatus('idle')
-      const m = err instanceof ApiError ? err.message : 'Could not send your message. Check your connection and try again.'
+      const m = describeError(err, 'Could not send your message. Check your connection and try again.')
       setErrors((e) => ({ ...e, message: m }))
       toast.error('Not sent', m)
     }

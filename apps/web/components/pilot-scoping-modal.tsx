@@ -14,7 +14,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, CheckCircle2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { submitLead } from '@/lib/api/endpoints/leads'
-import { ApiError } from '@/lib/api/client'
+import { ApiError, describeError } from '@/lib/api/client'
 import { toast } from '@/components/ui/toast'
 
 type FormState = {
@@ -120,7 +120,7 @@ export function PilotScopingModal() {
       toast.success('Request received', 'A person on the team will reply, usually within one working day.')
     } catch (err) {
       setStatus('idle')
-      const message = err instanceof ApiError ? err.message : 'Could not send your request. Check your connection and try again.'
+      const message = describeError(err, 'Could not send your request. Check your connection and try again.')
       setErrors((e) => ({ ...e, caseDescription: message }))
       toast.error('Not sent', message)
     }
