@@ -9,7 +9,6 @@ import { ScrollOrchestrator } from '@/components/scroll-orchestrator'
 import { AboutSection } from '@/components/about-section'
 import { WhyNow } from '@/components/why-now'
 import { Contact } from '@/components/contact'
-import { PilotScopingModal } from '@/components/pilot-scoping-modal'
 
 export default function CompanyPage() {
   return (
@@ -17,7 +16,6 @@ export default function CompanyPage() {
       <SmoothScroll />
       <ScrollOrchestrator />
       <SiteNav />
-      <PilotScopingModal />
       <main className="min-h-svh bg-background pt-24 sm:pt-28 md:pt-32">
         <div className="container-wide">
           <Link href="/" className="inline-flex items-center gap-1.5 text-body-sm font-medium text-muted-foreground transition-colors hover:text-foreground">

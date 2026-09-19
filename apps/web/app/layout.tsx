@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from '@/components/ui/toast'
+import { PilotScopingModal } from '@/components/pilot-scoping-modal'
 import './globals.css'
 
 const SITE_TITLE = 'Oreset | Human Red Team for AI Agents'
@@ -76,6 +77,8 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased">
         {children}
+        {/* Mounted once so every "Request early access" button on any page opens it. */}
+        <PilotScopingModal />
         <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
