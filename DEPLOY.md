@@ -80,7 +80,8 @@ Lessons from the first real deployment (19 September 2026), all hit and fixed:
 
 - **Variables must go on the API service, not the Postgres service.** Click the API box before Variables. A key saved on the database box is silently ignored; the symptom was "Resend's email list stays empty".
 - **Vercel shows "Needs Attention" on a variable** when the value has a trailing space or newline, which `openssl rand` output has. Re-paste the value with nothing after the last character.
-- **Railway did not always auto-redeploy after a push.** Deployments → ⋮ → Redeploy, or push any change under `apps/api/`.
+- **Railway Watch Paths: one path per row, no brackets or quotes.** The API service must list `/apps/api/**`, `/packages/shared/**`, `/package.json` and `/pnpm-lock.yaml` as four separate rows. A JSON array pasted as a single row (`["/apps/api/**", "/packages/shared/**"]`) is treated as one literal path that matches nothing, so pushes to the API were silently ignored for a morning while the old build kept running.
+- **To check which build is live**, send an empty application: `curl -s -X POST https://api.oreset.africa/api/v1/operators/apply -H "Content-Type: application/json" -d '{}'`. The `fieldErrors` list shows the fields the running code expects; compare with `applySchema` in `apps/api/src/modules/operators/operators.controller.ts`.
 - **pnpm version is pinned** (`packageManager` in the root `package.json`, and the Dockerfile). Do not bump one without the other and the lockfile.
 - **Set `MAIL_FROM` to a real mailbox** you read, for example `Oreset <info@oreset.africa>`, so replies land somewhere.
 
@@ -91,6 +92,7 @@ Lessons from the first real deployment (19 September 2026), all hit and fixed:
 | Site loads, sign-in says "Sign-in failed" with no detail | `CORS_ORIGINS` does not include the exact site origin, or `NEXT_PUBLIC_API_URL` is wrong |
 | Sign-in succeeds then bounces straight back to sign-in | `ACCESS_TOKEN_SECRET` differs between Vercel and Railway, or `COOKIE_DOMAIN` is wrong, or the API is not on `api.oreset.africa` |
 | Deploy log shows `Migration failed` | Read the message above it; usually `DATABASE_URL` reference missing |
+| A form says "The server asked for answers this form does not have" | Website is newer than the API. Railway did not deploy the latest commit; check Watch Paths (one path per row) and Deployments |
 | `/health` works, everything else 500s | Check Variables for a missing required secret; the API refuses to start with invalid config and says which |
 
 ## Local development is unchanged
