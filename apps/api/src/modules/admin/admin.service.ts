@@ -188,7 +188,21 @@ export async function getOperatorPerformance() {
     .where(eq(users.role, 'operator'))
 
   const operatorIds = operators.map((o) => o.id)
-  if (operatorIds.length === 0) return { operators: [] }
+  // A fresh production database has no testers yet. Return the full shape so
+  // the page renders its empty state instead of crashing on globalStats.
+  if (operatorIds.length === 0) {
+    return {
+      operators: [],
+      globalStats: {
+        totalOperators: 0,
+        activeOperators: 0,
+        totalReviews: 0,
+        avgReviewsPerOperator: 0,
+        totalCalibrationAttempts: 0,
+        totalConsensusPairs: 0,
+      },
+    }
+  }
 
   const allDecisions = await db.query.operatorReviewDecisions.findMany({
     columns: {

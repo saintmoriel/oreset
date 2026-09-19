@@ -16,11 +16,11 @@ export default async function AdminOperatorsPage() {
 
   return (
     <AdminAppShell>
-      <p className="cx-label text-navy-400">Workforce &middot; Reviewer Metrics</p>
-      <h1 className="cx-page-title mt-1.5 text-navy-900">Reviewer Performance</h1>
+      <p className="cx-label text-navy-400">Red Team &middot; Tester performance</p>
+      <h1 className="cx-page-title mt-1.5 text-navy-900">Testers</h1>
       <p className="cx-body mt-2 max-w-lg text-navy-500">
-        Per-reviewer metrics: review volume, speed, decision patterns, calibration scores,
-        and consensus agreement rates.
+        Per-tester metrics: scenarios assessed, speed, exploit rate, calibration scores,
+        and agreement with other testers on dual-solve scenarios.
       </p>
 
       {!canView ? (
@@ -29,7 +29,7 @@ export default async function AdminOperatorsPage() {
             <Lock className="size-5 text-navy-400" />
           </span>
           <p className="cx-body font-semibold text-navy-900">Access restricted</p>
-          <p className="cx-meta max-w-sm text-navy-500">Admin and Reviewer Lead roles only.</p>
+          <p className="cx-meta max-w-sm text-navy-500">Admin and lead auditor roles only.</p>
         </div>
       ) : data ? (
         <>
@@ -44,7 +44,7 @@ export default async function AdminOperatorsPage() {
                   {data.globalStats.activeOperators}
                   <span className="cx-meta font-normal text-navy-400"> / {data.globalStats.totalOperators}</span>
                 </p>
-                <p className="cx-meta text-navy-400">Active Operators</p>
+                <p className="cx-meta text-navy-400">Active testers</p>
               </div>
             </div>
             <div className="cx-card flex items-center gap-3 p-4">
@@ -55,7 +55,7 @@ export default async function AdminOperatorsPage() {
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
                   {data.globalStats.totalReviews}
                 </p>
-                <p className="cx-meta text-navy-400">Total Reviews</p>
+                <p className="cx-meta text-navy-400">Scenarios assessed</p>
               </div>
             </div>
             <div className="cx-card flex items-center gap-3 p-4">
@@ -66,7 +66,7 @@ export default async function AdminOperatorsPage() {
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
                   {data.globalStats.totalCalibrationAttempts}
                 </p>
-                <p className="cx-meta text-navy-400">Calibration Attempts</p>
+                <p className="cx-meta text-navy-400">Calibration attempts</p>
               </div>
             </div>
             <div className="cx-card flex items-center gap-3 p-4">
@@ -77,7 +77,7 @@ export default async function AdminOperatorsPage() {
                 <p className="font-mono text-xl font-semibold tabular-nums text-navy-900">
                   {data.globalStats.avgReviewsPerOperator}
                 </p>
-                <p className="cx-meta text-navy-400">Avg Reviews / Reviewer</p>
+                <p className="cx-meta text-navy-400">Average per tester</p>
               </div>
             </div>
           </div>
