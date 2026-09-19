@@ -232,25 +232,28 @@ function computeProfileStrength(
   application: {
     location: string
     languages: unknown
-    dialect: string | null
-    academicBackground: string
-    englishProficiency: string
+    securityExperienceYears?: string | null
+    tools?: string | null
+    workSample?: string | null
+    portfolioUrl?: string | null
     availability: unknown
     experience: string | null
   } | null,
 ): number {
+  // Red team profile completeness. Legacy language-era fields no longer count.
   let filled = 0
   if (user.displayName) filled++
   if (application) {
     if (application.location) filled++
     if (Array.isArray(application.languages) && application.languages.length > 0) filled++
-    if (application.dialect) filled++
-    if (application.academicBackground) filled++
-    if (application.englishProficiency) filled++
-    if (Array.isArray(application.availability) && application.availability.length > 0) filled++
+    if (application.securityExperienceYears) filled++
     if (application.experience) filled++
+    if (application.tools) filled++
+    if (application.workSample) filled++
+    if (application.portfolioUrl) filled++
+    if (Array.isArray(application.availability) && application.availability.length > 0) filled++
   }
-  return Math.round((filled / 8) * 100)
+  return Math.round((filled / 9) * 100)
 }
 
 export async function getProfile(userId: string) {
