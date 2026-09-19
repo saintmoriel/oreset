@@ -76,8 +76,18 @@ Time: about 45 minutes the first time. Cost: roughly $5 to $10 a month at curren
 
 ## If something breaks
 
+Lessons from the first real deployment (19 September 2026), all hit and fixed:
+
+- **Variables must go on the API service, not the Postgres service.** Click the API box before Variables. A key saved on the database box is silently ignored; the symptom was "Resend's email list stays empty".
+- **Vercel shows "Needs Attention" on a variable** when the value has a trailing space or newline, which `openssl rand` output has. Re-paste the value with nothing after the last character.
+- **Railway did not always auto-redeploy after a push.** Deployments → ⋮ → Redeploy, or push any change under `apps/api/`.
+- **pnpm version is pinned** (`packageManager` in the root `package.json`, and the Dockerfile). Do not bump one without the other and the lockfile.
+- **Set `MAIL_FROM` to a real mailbox** you read, for example `Oreset <info@oreset.africa>`, so replies land somewhere.
+
 | Symptom | Likely cause |
 |---|---|
+| Green "Check your email" on the site but Resend's Emails list is empty | `RESEND_API_KEY` missing on the API service (check it is not on the Postgres box), or the reset was for an email that has no account |
+| Green panel, Resend shows the email with a red status | Domain not yet Verified in Resend; add its DNS records at Namecheap |
 | Site loads, sign-in says "Sign-in failed" with no detail | `CORS_ORIGINS` does not include the exact site origin, or `NEXT_PUBLIC_API_URL` is wrong |
 | Sign-in succeeds then bounces straight back to sign-in | `ACCESS_TOKEN_SECRET` differs between Vercel and Railway, or `COOKIE_DOMAIN` is wrong, or the API is not on `api.oreset.africa` |
 | Deploy log shows `Migration failed` | Read the message above it; usually `DATABASE_URL` reference missing |
