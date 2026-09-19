@@ -72,6 +72,40 @@ export const ROLE_DEFAULT_MODULES: Record<StaffRole, readonly AdminModule[]> = {
   qa_reviewer: [],
 }
 
+// An engagement is one scoped piece of work for one client. Scenarios
+// belong to an engagement; testers acknowledge its Rules of Engagement
+// before their first decision on it; the client sees its phase.
+export const ENGAGEMENT_TIERS = ['rapid', 'comprehensive', 'continuous'] as const
+export type EngagementTier = (typeof ENGAGEMENT_TIERS)[number]
+
+export const ENGAGEMENT_TIER_LABELS: Record<EngagementTier, string> = {
+  rapid: 'Rapid Agent Pentest',
+  comprehensive: 'Comprehensive Red Team',
+  continuous: 'Continuous',
+}
+
+export const ENGAGEMENT_PHASES = ['kickoff', 'testing', 'readout', 'retest', 'closed'] as const
+export type EngagementPhase = (typeof ENGAGEMENT_PHASES)[number]
+
+export const ENGAGEMENT_PHASE_LABELS: Record<EngagementPhase, string> = {
+  kickoff: 'Kickoff',
+  testing: 'Testing',
+  readout: 'Readout',
+  retest: 'Retest',
+  closed: 'Closed',
+}
+
+export const ENGAGEMENT_PHASE_DESCRIPTIONS: Record<EngagementPhase, string> = {
+  kickoff: 'Scope agreed, access being set up, scenarios being written. Nothing to act on yet.',
+  testing: 'The red team is working scenarios. Verified findings appear here as they land.',
+  readout: 'Testing has finished. Review every finding, ask questions, plan fixes.',
+  retest: 'Mark fixes as submitted and we re-run the original attacks for free.',
+  closed: 'This engagement is complete. Findings and exports stay available.',
+}
+
+// Phases in which testers may be assigned scenarios.
+export const ENGAGEMENT_LIVE_PHASES: readonly EngagementPhase[] = ['kickoff', 'testing', 'retest']
+
 export const ACCESS_REQUEST_STATUSES = ['pending', 'approved', 'denied'] as const
 export type AccessRequestStatus = (typeof ACCESS_REQUEST_STATUSES)[number]
 

@@ -2,6 +2,7 @@ import { and, eq, inArray, desc, gte, sql } from 'drizzle-orm'
 import { db } from '../../db/client'
 import { clientQueueItems, operatorReviewDecisions } from '../../db/schema'
 import { HttpError } from '../../middleware/error-handler'
+import { liveEngagementIdFor } from '../engagements/engagements.service'
 
 type TraceUnitInput = {
   clientName: string
@@ -10,9 +11,18 @@ type TraceUnitInput = {
   traceData?: Record<string, unknown>
   requiresDualSolve?: boolean
   submittedBy?: string
+  engagementId?: string | null
+}
+
+// A new scenario joins the client's live engagement unless one is named.
+async function resolveEngagement(input: TraceUnitInput): Promise<string | null> {
+  if (input.engagementId !== undefined) return input.engagementId
+  if (!input.submittedBy) return null
+  return liveEngagementIdFor(input.submittedBy)
 }
 
 export async function ingestSingle(input: TraceUnitInput) {
+  const engagementId = await resolveEngagement(input)
   const [item] = await db
     .insert(clientQueueItems)
     .values({
@@ -22,12 +32,14 @@ export async function ingestSingle(input: TraceUnitInput) {
       traceData: input.traceData ?? null,
       requiresDualSolve: input.requiresDualSolve ?? false,
       submittedBy: input.submittedBy ?? null,
+      engagementId,
     })
     .returning()
   return item
 }
 
 export async function ingestBatch(inputs: TraceUnitInput[], submittedBy?: string) {
+  const engagementId = submittedBy ? await liveEngagementIdFor(submittedBy) : null
   const items = await db
     .insert(clientQueueItems)
     .values(
@@ -38,6 +50,7 @@ export async function ingestBatch(inputs: TraceUnitInput[], submittedBy?: string
         traceData: input.traceData ?? null,
         requiresDualSolve: input.requiresDualSolve ?? false,
         submittedBy: submittedBy ?? null,
+        engagementId: input.engagementId ?? engagementId,
       })),
     )
     .returning()

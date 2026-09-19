@@ -5,10 +5,14 @@ import { isProduction } from '../config/env'
 export class HttpError extends Error {
   status: number
   code: string
-  constructor(status: number, code: string, message: string) {
+  // Optional structured context the client can act on (for example which
+  // engagement's rules must be acknowledged). Never put secrets here.
+  details?: Record<string, unknown>
+  constructor(status: number, code: string, message: string, details?: Record<string, unknown>) {
     super(message)
     this.status = status
     this.code = code
+    this.details = details
   }
 }
 
@@ -25,7 +29,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   }
 
   if (err instanceof HttpError) {
-    res.status(err.status).json({ error: { code: err.code, message: err.message } })
+    res.status(err.status).json({ error: { code: err.code, message: err.message, ...(err.details ? { details: err.details } : {}) } })
     return
   }
 

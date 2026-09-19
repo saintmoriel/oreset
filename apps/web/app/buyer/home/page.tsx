@@ -6,14 +6,18 @@ import { BuyerAppShell } from '@/components/buyer/buyer-app-shell'
 import { ResilienceSummary, NotStartedSummary } from '@/components/buyer/resilience-summary'
 import type { ClientFindingsResponse } from '@/lib/api/endpoints/findings'
 import type { BuyerCaseStats } from '@/lib/api/endpoints/buyer-cases'
+import type { MyEngagements } from '@/lib/api/endpoints/engagements'
+import { EngagementBanner } from '@/components/buyer/engagement-banner'
 
 export default async function BuyerHomePage() {
   let findings: ClientFindingsResponse
   let stats: BuyerCaseStats
+  let engagements: MyEngagements
   try {
-    ;[findings, stats] = await Promise.all([
+    ;[findings, stats, engagements] = await Promise.all([
       serverApiFetch<ClientFindingsResponse>('/api/v1/buyer/findings'),
       serverApiFetch<BuyerCaseStats>('/api/v1/buyer/cases/stats'),
+      serverApiFetch<MyEngagements>('/api/v1/buyer/engagements'),
     ])
   } catch (err) {
     redirectIfSignedOut(err, '/buyer')
@@ -32,6 +36,12 @@ export default async function BuyerHomePage() {
         Findings stream in as the red team confirms them and a lead auditor verifies them. Fix, mark
         fixed, and we retest for free. The score moves as findings close.
       </p>
+
+      {engagements.current && (
+        <div className="mt-6">
+          <EngagementBanner engagement={engagements.current} />
+        </div>
+      )}
 
       {/* No score until something has actually been assessed. */}
       <div className="mt-6">

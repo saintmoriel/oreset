@@ -7,6 +7,7 @@ import { ApiError } from '@/lib/api/client'
 import { toast } from '@/components/ui/toast'
 import { StatusTag } from '@/components/capture/status-tag'
 import { listClients, provisionClient, formatMoney } from '@/lib/api/endpoints/people'
+import { EngagementsPanel } from '@/components/admin/engagements-panel'
 import type { Client } from '@/lib/api/endpoints/people'
 
 function scoreTone(score: number) {
@@ -156,6 +157,7 @@ export function ClientsDirectory({ initialClients }: { initialClients: Client[] 
                   </p>
                 </div>
               </div>
+              <EngagementsPanel buyerId={c.id} />
             </div>
           ))}
         </div>

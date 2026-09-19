@@ -23,6 +23,7 @@ import { datasetsRouter } from './modules/datasets/datasets.routes'
 import { buyersRouter, buyersAdminRouter } from './modules/buyers/buyers.routes'
 import { ticketsRouter } from './modules/tickets/tickets.routes'
 import { adminRouter } from './modules/admin/admin.routes'
+import { engagementsAdminRouter, engagementsBuyerRouter, engagementsOperatorRouter } from './modules/engagements/engagements.routes'
 import { ingestionRouter } from './modules/ingestion/ingestion.routes'
 import { calibrationRouter } from './modules/calibration/calibration.routes'
 import { consensusRouter } from './modules/consensus/consensus.routes'
@@ -57,13 +58,16 @@ app.use('/api/v1/qa', qaRouter)
 app.use('/api/v1/campaigns', campaignsRouter)
 app.use('/api/v1/prompts', promptsRouter)
 app.use('/api/v1/operators', operatorsRouter)
+app.use('/api/v1/operator/engagements', engagementsOperatorRouter)
 app.use('/api/v1/operator', operatorRouter)
 app.use('/api/v1/payouts', payoutsRouter)
 app.use('/api/v1/me', meRouter)
 app.use('/api/v1/admin/retention', retentionRouter)
 app.use('/api/v1/admin/payouts', payoutsAdminRouter)
 app.use('/api/v1/buyer/api-tokens', apiTokensRouter)
+app.use('/api/v1/buyer/engagements', engagementsBuyerRouter)
 app.use('/api/v1/buyer', buyersRouter)
+app.use('/api/v1/admin/engagements', engagementsAdminRouter)
 app.use('/api/v1/admin/buyers', buyersAdminRouter)
 app.use('/api/v1/admin/datasets', datasetsRouter)
 app.use('/api/v1/admin/tickets', ticketsRouter)

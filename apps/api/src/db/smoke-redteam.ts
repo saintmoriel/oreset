@@ -56,6 +56,21 @@ async function main() {
   check('tester 1 exploit rate 50%', testerStats.exploitRate === 50, testerStats.exploitRate)
   check('tester 1 has 1 open escalation ticket', testerStats.openTicketsFromMe === 1, testerStats.openTicketsFromMe)
 
+  // Engagement object and Rules of Engagement gate
+  const eng = await import('../modules/engagements/engagements.service')
+  const mine = await eng.forClient(buyer.id)
+  check('client has a current engagement in testing phase', mine.current?.phase === 'testing', mine.current?.phase)
+  check('engagement carries all seeded scenarios', (mine.current?.scenarioCount ?? 0) >= 8, mine.current?.scenarioCount)
+  const rules = await eng.rulesForTester(mine.current!.id, tester1.id)
+  check('tester 1 has acknowledged the rules', rules.acknowledged === true, rules)
+  let roeBlocked = false
+  try {
+    await eng.assertAcknowledged(mine.current!.id, buyer.id) // the buyer never acknowledged; stands in for a new tester
+  } catch (e) {
+    roeBlocked = (e as { code?: string }).code === 'roe_required'
+  }
+  check('unacknowledged user is blocked with roe_required', roeBlocked, roeBlocked)
+
   // Admin operations console
   const admin = await import('../modules/admin/admin.service')
   // The user id only matters for roles without a dedicated view.

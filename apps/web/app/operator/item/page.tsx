@@ -10,9 +10,11 @@ import {
   type OperatorQueueItem,
   type DecisionInput,
 } from '@/lib/api/endpoints/operator'
-import { ApiError } from '@/lib/api/client'
+import { ApiError, describeError } from '@/lib/api/client'
 import { toast } from '@/components/ui/toast'
 import { VulnerabilityReviewWorkspace } from '@/components/reviewer/vulnerability-review-workspace'
+import { RulesOfEngagementPanel } from '@/components/operator/rules-of-engagement-panel'
+import { getEngagementRules } from '@/lib/api/endpoints/engagements'
 
 export default function OperatorItemPage() {
   const router = useRouter()
@@ -20,6 +22,9 @@ export default function OperatorItemPage() {
   const [items, setItems] = useState<OperatorQueueItem[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // Engagement whose Rules of Engagement must be acknowledged before the
+  // current scenario can be worked. Null when clear.
+  const [roeFor, setRoeFor] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -29,13 +34,22 @@ export default function OperatorItemPage() {
         return
       }
       setItems(res.items)
+      // Check the rules up front so the panel appears before any work, not
+      // after a rejected submission.
+      const first = res.items[0] as OperatorQueueItem & { engagementId?: string | null }
+      if (first.engagementId) {
+        const rules = await getEngagementRules(first.engagementId).catch(() => null)
+        setRoeFor(rules && !rules.acknowledged && rules.rules.trim() ? first.engagementId : null)
+      } else {
+        setRoeFor(null)
+      }
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
         // Not onboarded yet: the queue page explains the two remaining steps.
         router.push('/operator/queue')
         return
       }
-      setError(err instanceof ApiError ? err.message : 'Could not load the queue.')
+      setError(describeError(err, 'Could not load the queue.'))
     }
   }, [router])
 
@@ -56,7 +70,15 @@ export default function OperatorItemPage() {
       )
       await load()
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : 'Could not submit the finding.'
+      if (err instanceof ApiError && err.code === 'roe_required') {
+        const engagementId = (err.details as { engagementId?: string } | undefined)?.engagementId
+        if (engagementId) {
+          setRoeFor(engagementId)
+          toast.error('Rules of Engagement', 'Read and acknowledge them first; your work is kept.')
+          return
+        }
+      }
+      const message = describeError(err, 'Could not submit the finding.')
       setError(message)
       toast.error('Not submitted', message)
     } finally {
@@ -79,6 +101,14 @@ export default function OperatorItemPage() {
         <div className="flex justify-center p-16">
           <Loader2 className="size-8 animate-spin text-accent" />
         </div>
+      </OperatorAppShell>
+    )
+  }
+
+  if (roeFor) {
+    return (
+      <OperatorAppShell>
+        <RulesOfEngagementPanel engagementId={roeFor} onAcknowledged={() => setRoeFor(null)} />
       </OperatorAppShell>
     )
   }

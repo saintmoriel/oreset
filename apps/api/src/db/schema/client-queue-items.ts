@@ -11,6 +11,9 @@ export const clientQueueItems = pgTable('client_queue_items', {
   status: clientQueueItemStatusEnum('status').notNull().default('pending'),
   requiresDualSolve: boolean('requires_dual_solve').notNull().default(false),
   submittedBy: uuid('submitted_by').references(() => users.id, { onDelete: 'set null' }),
+  // The engagement this scenario belongs to. Null for legacy scenarios
+  // created before engagements existed; those carry no Rules of Engagement gate.
+  engagementId: uuid('engagement_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 

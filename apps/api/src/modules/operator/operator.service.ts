@@ -5,6 +5,7 @@ import { db } from '../../db/client'
 import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements, consensusPairs, calibrationAttempts } from '../../db/schema'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
+import { assertAcknowledged } from '../engagements/engagements.service'
 import { handleDualSolveDecision } from '../consensus/consensus.service'
 import { applyRetestOutcome } from '../findings/findings.service'
 import { fireWebhooksForItem } from '../../lib/webhooks'
@@ -152,6 +153,10 @@ export async function decide(input: {
 }) {
   const item = await db.query.clientQueueItems.findFirst({ where: eq(clientQueueItems.id, input.itemId) })
   if (!item) throw new HttpError(404, 'not_found', 'Queue item not found.')
+
+  // Rules of Engagement gate: no decision on an engagement's scenario until
+  // the tester has acknowledged the current rules for it.
+  if (item.engagementId) await assertAcknowledged(item.engagementId, input.operatorId)
 
   if (item.requiresDualSolve) {
     return handleDualSolveDecision(input)

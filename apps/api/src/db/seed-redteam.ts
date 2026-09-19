@@ -102,7 +102,42 @@ async function main() {
       await db.delete(schema.clientQueueItems).where(eq(schema.clientQueueItems.submittedBy, buyer.id))
       console.log(`Reset: removed ${refs.length} scenarios and their decisions, tickets, and findings.`)
     }
+    await db.delete(schema.engagements).where(eq(schema.engagements.buyerId, buyer.id))
   }
+
+  // The engagement every SafariPay scenario belongs to. Testers have
+  // acknowledged its Rules of Engagement so the demo queue is workable.
+  let engagement = await db.query.engagements.findFirst({ where: eq(schema.engagements.buyerId, buyer.id) })
+  if (!engagement) {
+    ;[engagement] = await db
+      .insert(schema.engagements)
+      .values({
+        buyerId: buyer.id,
+        name: 'SafariPay support agent, pre-launch',
+        agentName: CLIENT,
+        tier: 'comprehensive',
+        phase: 'testing',
+        scope: 'Customer support agent on web chat and WhatsApp. Tools: balance lookup, transaction list, open dispute, reverse transfer (after step-up verification). Languages: English, Nigerian Pidgin, Hausa. Judgement scenarios on refunds, disputes and identity step-up included.',
+        rules: [
+          'In scope: the staging support agent at the endpoint in your workspace, test accounts SP-TEST-01 to SP-TEST-06 only.',
+          'Out of scope: SafariPay production, any real customer account, SafariPay staff, infrastructure, the payment processor.',
+          'Proof of concept only. Demonstrate a weakness to the minimum extent that proves it. No bulk data pulls.',
+          'If you see real personal data, stop that line, record the category only, and escalate to the lead auditor.',
+          'All testing through the Oreset workspace. Test accounts only. No testing outside the window shown on the engagement.',
+          'Everything you learn here is confidential, indefinitely.',
+        ].join('\n'),
+        startsAt: new Date(Date.now() - 3 * 86_400_000),
+        endsAt: new Date(Date.now() + 11 * 86_400_000),
+        retestUntil: new Date(Date.now() + 101 * 86_400_000),
+        createdBy: admin.id,
+      })
+      .returning()
+    for (const t of [tester1, tester2]) {
+      await db.insert(schema.engagementAcknowledgements).values({ engagementId: engagement.id, userId: t.id, rulesVersion: engagement.rulesVersion })
+    }
+  }
+  if (!engagement) throw new Error('Engagement seed failed.')
+  const engagementId = engagement.id
 
   const already = await db.query.clientQueueItems.findFirst({
     where: eq(schema.clientQueueItems.submittedBy, buyer.id),
@@ -140,6 +175,7 @@ async function main() {
         externalRef: input.ref,
         content: input.content,
         submittedBy: buyer.id,
+        engagementId,
         requiresDualSolve: input.requiresDualSolve ?? false,
         status: input.status,
         traceData: {
