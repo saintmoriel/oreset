@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
+import { requireModule } from '../../middleware/modules'
 import * as controller from './operators.controller'
 import * as applications from './applications.controller'
 
@@ -14,7 +15,7 @@ operatorsRouter.post('/apply', asyncHandler(controller.apply))
 // Mounted at /api/v1/admin/operators
 export const operatorsAdminRouter = Router()
 
-const reviewers = requireRole('staff:admin', 'staff:reviewer_lead')
+const reviewers = requireModule('testers')
 
 operatorsAdminRouter.get('/applications', requireAuth, reviewers, asyncHandler(controller.listApplications))
 operatorsAdminRouter.post('/applications/:userId/approve', requireAuth, reviewers, asyncHandler(applications.approve))

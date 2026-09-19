@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
-import { requireRole } from '../../middleware/rbac'
+import { requireModule } from '../../middleware/modules'
 import * as controller from './audit.controller'
 
 export const auditRouter = Router()
@@ -10,4 +10,4 @@ export const auditRouter = Router()
 // the two roles the /admin prototype's Audit Log screen already reserves
 // this for (Admin, Compliance) — Reviewer Lead is rejected here for real,
 // not just hidden client-side.
-auditRouter.get('/', requireAuth, requireRole('staff:admin', 'staff:compliance'), asyncHandler(controller.list))
+auditRouter.get('/', requireAuth, requireModule('audit'), asyncHandler(controller.list))

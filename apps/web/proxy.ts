@@ -44,9 +44,9 @@ const GATES: RouteGate[] = [
   {
     matcher: '/admin',
     signInPath: '/admin',
-    isAllowed: (c) =>
-      c.role === 'staff' &&
-      (c.staffRole === 'admin' || c.staffRole === 'compliance' || c.staffRole === 'reviewer_lead'),
+    // Every staff role except the legacy QA reviewer. Which modules they
+    // see inside is decided by the API (role defaults plus grants).
+    isAllowed: (c) => c.role === 'staff' && c.staffRole !== 'qa_reviewer',
   },
   {
     matcher: '/buyer',

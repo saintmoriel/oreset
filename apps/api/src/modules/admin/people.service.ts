@@ -1,6 +1,8 @@
 import crypto from 'node:crypto'
 import { and, desc, eq, inArray, sql } from 'drizzle-orm'
 import type { RoleType, StaffRole, UserStatus } from '@oreset/shared'
+import { ROLE_DEFAULT_MODULES } from '@oreset/shared'
+import { activeGrantsByUser } from '../../middleware/modules'
 import { db } from '../../db/client'
 import {
   users,
@@ -42,6 +44,16 @@ export const ROLE_ACCESS: Record<string, { label: string; portal: string; reache
     label: 'Compliance',
     portal: '/admin',
     reaches: ['Audit log', 'Overview'],
+  },
+  'staff:engineer': {
+    label: 'Engineer',
+    portal: '/admin',
+    reaches: ['Home', 'Any module granted on request (system health and integrations desk to come)'],
+  },
+  'staff:sales': {
+    label: 'Sales and marketing',
+    portal: '/admin',
+    reaches: ['Leads inbox', 'Clients', 'Any module granted on request'],
   },
   'staff:qa_reviewer': {
     label: 'QA reviewer (legacy)',
@@ -98,16 +110,24 @@ export async function listPeople() {
     if (!cur || next === 'rejected' || (cur === 'pending' && next === 'verified')) verificationBy.set(v.userId, next)
   }
   const appBy = new Map(applications.map((a) => [a.userId, a]))
+  const grantsBy = await activeGrantsByUser(rows.filter((r) => r.role === 'staff').map((r) => r.id))
 
   return rows.map((u) => {
     const key = accessKey(u)
     const app = appBy.get(u.id)
+    const grants = grantsBy.get(u.id) ?? []
+    const modules =
+      u.role === 'staff'
+        ? [...new Set([...(u.staffRole ? ROLE_DEFAULT_MODULES[u.staffRole] ?? [] : []), ...grants.map((g) => g.module)])]
+        : null
     return {
       id: u.id,
       role: u.role,
       staffRole: u.staffRole,
       accessKey: key,
       accessLabel: ROLE_ACCESS[key]?.label ?? key,
+      modules,
+      grants: u.role === 'staff' ? grants.map((g) => ({ id: g.id, module: g.module, reason: g.reason, expiresAt: g.expiresAt?.toISOString() ?? null })) : null,
       email: u.email,
       phone: u.phone,
       displayName: u.displayName,

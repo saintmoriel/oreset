@@ -52,5 +52,10 @@ export function redirectIfSignedOut(err: unknown, signInPath: string): never {
   if (err instanceof ApiError && err.status === 401) {
     redirect(signInPath)
   }
+  // Staff console: a page for a module the person does not hold is not an
+  // error, it is a request waiting to be made. Send them to the Access page.
+  if (err instanceof ApiError && err.status === 403 && err.code === 'module_required' && signInPath === '/admin') {
+    redirect('/admin/access?denied=1')
+  }
   throw err
 }

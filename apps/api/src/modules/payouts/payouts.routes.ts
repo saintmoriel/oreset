@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
+import { requireModule } from '../../middleware/modules'
 import * as controller from './payouts.controller'
 
 // Mounted at /api/v1/payouts — contributor self-service, own data only
@@ -20,5 +21,5 @@ payoutsRouter.post(
 // same operational shape as retention.routes.ts.
 export const payoutsAdminRouter = Router()
 
-payoutsAdminRouter.post('/run', requireAuth, requireRole('staff:admin'), asyncHandler(controller.runBatch))
-payoutsAdminRouter.get('/', requireAuth, requireRole('staff:admin'), asyncHandler(controller.listAll))
+payoutsAdminRouter.post('/run', requireAuth, requireModule('payouts'), asyncHandler(controller.runBatch))
+payoutsAdminRouter.get('/', requireAuth, requireModule('payouts'), asyncHandler(controller.listAll))

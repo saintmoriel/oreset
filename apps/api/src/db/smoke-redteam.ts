@@ -58,7 +58,9 @@ async function main() {
 
   // Admin operations console
   const admin = await import('../modules/admin/admin.service')
-  const overview = await admin.getOverview('admin')
+  // The user id only matters for roles without a dedicated view.
+  const NIL_USER = '00000000-0000-0000-0000-000000000000'
+  const overview = await admin.getOverview(NIL_USER, 'admin')
   if (overview.role === 'admin') {
     check('admin overview: at least 1 finding awaiting verification', overview.findingsAwaitingVerification >= 1, overview.findingsAwaitingVerification)
     check('admin overview: at least 1 active client', overview.activeClients >= 1, overview.activeClients)
@@ -69,7 +71,7 @@ async function main() {
   } else {
     check('admin overview returns admin role', false, overview.role)
   }
-  const lead = await admin.getOverview('reviewer_lead')
+  const lead = await admin.getOverview(NIL_USER, 'reviewer_lead')
   check('reviewer lead overview has verification count', lead.role === 'reviewer_lead' && lead.findingsAwaitingVerification >= 1, lead)
 
   // Owner's console

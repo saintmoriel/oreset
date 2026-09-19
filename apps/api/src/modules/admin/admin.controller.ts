@@ -3,7 +3,7 @@ import * as adminService from './admin.service'
 import * as ingestionService from '../ingestion/ingestion.service'
 
 export async function overview(req: Request, res: Response) {
-  const result = await adminService.getOverview(req.user!.staffRole!)
+  const result = await adminService.getOverview(req.user!.sub, req.user!.staffRole!)
   res.status(200).json(result)
 }
 

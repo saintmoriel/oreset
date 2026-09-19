@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { ArrowRight, ShieldAlert, TriangleAlert, GitCompare, Users, Crosshair, RotateCcw, Inbox } from 'lucide-react'
+import { ArrowRight, ShieldAlert, TriangleAlert, GitCompare, Users, Crosshair, RotateCcw, Inbox, KeyRound } from 'lucide-react'
+import { ADMIN_MODULE_LABELS, STAFF_ROLE_LABELS, type AdminModule } from '@oreset/shared'
 import { AdminAppShell } from '@/components/admin/admin-app-shell'
 import { serverApiFetch, redirectIfSignedOut } from '@/lib/api/server'
 import type { AdminOverview } from '@/lib/api/endpoints/admin'
@@ -21,6 +22,7 @@ export default async function AdminHomePage() {
       {overview.role === 'admin' && <AdminOverviewView overview={overview} />}
       {overview.role === 'reviewer_lead' && <ReviewerLeadOverviewView overview={overview} />}
       {overview.role === 'compliance' && <ComplianceOverviewView overview={overview} />}
+      {overview.role === 'generic' && <GenericOverviewView overview={overview} />}
     </AdminAppShell>
   )
 }
@@ -74,16 +76,17 @@ function AdminOverviewView({ overview: o }: { overview: Extract<AdminOverview, {
           {o.needsAttention}
         </p>
         <p className="cx-meta mt-2 text-white/60">
-          New leads to answer, findings to verify, escalations to resolve, split assessments to adjudicate, testers to approve.
+          New leads to answer, findings to verify, escalations to resolve, split assessments to adjudicate, testers to approve, access to grant.
         </p>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <ActionTile href="/admin/leads" icon={Inbox} label="New leads" value={o.newLeads} tone="warning" />
         <ActionTile href="/admin/findings" icon={ShieldAlert} label="Findings awaiting verification" value={o.findingsAwaitingVerification} tone="destructive" />
         <ActionTile href="/admin/tickets" icon={TriangleAlert} label="Open escalations" value={o.openEscalations} tone="warning" />
         <ActionTile href="/admin/consensus" icon={GitCompare} label="Split assessments" value={o.consensusSplits} tone="warning" />
         <ActionTile href="/admin/applications" icon={Users} label="Tester applications" value={o.pendingTesterApplications} />
+        <ActionTile href="/admin/access" icon={KeyRound} label="Access requests" value={o.pendingAccessRequests} tone={o.pendingAccessRequests > 0 ? 'warning' : 'neutral'} />
       </div>
 
       <div className="mt-8">
@@ -164,6 +167,55 @@ function ComplianceOverviewView({ overview: o }: { overview: Extract<AdminOvervi
       <RecentActivity entries={o.recentAuditEntries} />
     </div>
   )
+}
+
+// Engineers, sales, and any role without a dedicated view: show them the
+// modules they hold and where to ask for more.
+function GenericOverviewView({ overview: o }: { overview: Extract<AdminOverview, { role: 'generic' }> }) {
+  return (
+    <div className="mt-6 space-y-6">
+      <div className="cx-card p-6">
+        <p className="cx-label text-navy-400">You are signed in as</p>
+        <p className="cx-title mt-1 text-navy-900">{STAFF_ROLE_LABELS[o.staffRole]}</p>
+        <p className="cx-body mt-2 text-navy-500">
+          {o.modules.length === 0
+            ? 'Your role has no console modules yet. Ask for the ones your work needs under Access.'
+            : 'These are the modules you hold. Anything else can be requested under Access.'}
+        </p>
+      </div>
+      {o.modules.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {o.modules.map((m) => (
+            <Link key={m} href={MODULE_HREFS[m]} className="cx-card flex items-center justify-between gap-3 p-4 hover:bg-navy-50/60">
+              <span className="cx-body font-medium text-navy-900">{ADMIN_MODULE_LABELS[m]}</span>
+              <ArrowRight className="size-4 shrink-0 text-navy-300" />
+            </Link>
+          ))}
+        </div>
+      )}
+      <Link href="/admin/access" className="cx-card flex items-center justify-between gap-4 border-accent/30 bg-accent/5 p-5 hover:bg-accent/10">
+        <div>
+          <p className="cx-label text-accent">Access</p>
+          <p className="cx-body mt-0.5 text-navy-800">Request a module with a reason. The owner decides.</p>
+        </div>
+        <KeyRound className="size-5 shrink-0 text-accent" />
+      </Link>
+    </div>
+  )
+}
+
+const MODULE_HREFS: Record<AdminModule, string> = {
+  leads: '/admin/leads',
+  findings: '/admin/findings',
+  escalations: '/admin/tickets',
+  consensus: '/admin/consensus',
+  calibration: '/admin/calibration',
+  regressions: '/admin/regressions',
+  testers: '/admin/testers',
+  clients: '/admin/clients',
+  people: '/admin/people',
+  payouts: '/admin/payouts',
+  audit: '/admin/audit-log',
 }
 
 function RecentActivity({ entries }: { entries: AdminOverviewAudit }) {

@@ -18,6 +18,8 @@ import { getVerificationQueue, getVerificationStats } from '../findings/findings
 import { getBusinessNumbers } from './people.service'
 import { countNewLeads } from '../leads/leads.service'
 import { listAuditLog } from '../audit/audit.service'
+import { countPendingRequests as countPendingAccessRequests } from '../access/access.service'
+import { effectiveModules } from '../../middleware/modules'
 
 // ---------------------------------------------------------------------------
 // Overview: the engagement operations console. Everything here is a number
@@ -104,6 +106,7 @@ async function getAdminOverview() {
     business,
     newLeads,
     recentAuditEntries,
+    pendingAccessRequests,
   ] = await Promise.all([
     getVerificationQueue(),
     getVerificationStats(),
@@ -118,14 +121,16 @@ async function getAdminOverview() {
     getBusinessNumbers(),
     countNewLeads(),
     listAuditLog({ limit: 8 }),
+    countPendingAccessRequests(),
   ])
 
   const findingsAwaitingVerification = verificationQueue.length
 
   return {
     role: 'admin' as const,
-    needsAttention: findingsAwaitingVerification + openEscalations + consensusSplits + pendingTesterApplications + newLeads,
+    needsAttention: findingsAwaitingVerification + openEscalations + consensusSplits + pendingTesterApplications + newLeads + pendingAccessRequests,
     newLeads,
+    pendingAccessRequests,
     findingsAwaitingVerification,
     openEscalations,
     consensusSplits,
@@ -165,10 +170,18 @@ async function getComplianceOverview() {
   return { role: 'compliance' as const, recentAuditEntries }
 }
 
-export async function getOverview(staffRole: StaffRole) {
+// Roles without a dedicated view (engineer, sales, and anything new) get
+// their module list so the home page can show them where to go.
+async function getGenericOverview(userId: string, staffRole: StaffRole) {
+  const modules = await effectiveModules(userId, staffRole)
+  return { role: 'generic' as const, staffRole, modules }
+}
+
+export async function getOverview(userId: string, staffRole: StaffRole) {
   if (staffRole === 'admin') return getAdminOverview()
   if (staffRole === 'reviewer_lead') return getReviewerLeadOverview()
-  return getComplianceOverview()
+  if (staffRole === 'compliance') return getComplianceOverview()
+  return getGenericOverview(userId, staffRole)
 }
 
 // ---------------------------------------------------------------------------

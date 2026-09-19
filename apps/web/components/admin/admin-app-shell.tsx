@@ -4,33 +4,30 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users, ShieldAlert, Building2, UserCog, Inbox } from 'lucide-react'
+import { LayoutDashboard, ScrollText, TriangleAlert, Wallet, Menu, X, FlaskConical, Target, GitCompare, Users, ShieldAlert, Building2, UserCog, Inbox, KeyRound } from 'lucide-react'
 import { SignOutButton } from '@/components/shared/sign-out-button'
 import { Avatar } from '@/components/capture/avatar'
 import { getMe } from '@/lib/api/endpoints/auth'
+import { getMyAccess } from '@/lib/api/endpoints/access'
 import { cn } from '@/lib/utils'
-import type { AuthUser, StaffRole } from '@oreset/shared'
+import { STAFF_ROLE_LABELS, type AdminModule, type AuthUser } from '@oreset/shared'
 
-const ROLE_LABELS: Record<StaffRole, string> = {
-  admin: 'Admin',
-  compliance: 'Compliance Officer',
-  reviewer_lead: 'Reviewer Lead',
-  qa_reviewer: 'QA Reviewer',
-}
-
-const NAV_ITEMS = [
+// Each item names the module that unlocks it. Items with no module are
+// visible to every staff member.
+const NAV_ITEMS: { label: string; href: string; icon: typeof LayoutDashboard; module?: AdminModule }[] = [
   { label: 'Home', href: '/admin/home', icon: LayoutDashboard },
-  { label: 'Leads', href: '/admin/leads', icon: Inbox },
-  { label: 'Findings', href: '/admin/findings', icon: ShieldAlert },
-  { label: 'Escalations', href: '/admin/tickets', icon: TriangleAlert },
-  { label: 'Consensus', href: '/admin/consensus', icon: GitCompare },
-  { label: 'Calibration', href: '/admin/calibration', icon: Target },
-  { label: 'Regressions', href: '/admin/regressions', icon: FlaskConical },
-  { label: 'Testers', href: '/admin/testers', icon: Users },
-  { label: 'Clients', href: '/admin/clients', icon: Building2 },
-  { label: 'People', href: '/admin/people', icon: UserCog },
-  { label: 'Payouts', href: '/admin/payouts', icon: Wallet },
-  { label: 'Audit Log', href: '/admin/audit-log', icon: ScrollText },
+  { label: 'Leads', href: '/admin/leads', icon: Inbox, module: 'leads' },
+  { label: 'Findings', href: '/admin/findings', icon: ShieldAlert, module: 'findings' },
+  { label: 'Escalations', href: '/admin/tickets', icon: TriangleAlert, module: 'escalations' },
+  { label: 'Consensus', href: '/admin/consensus', icon: GitCompare, module: 'consensus' },
+  { label: 'Calibration', href: '/admin/calibration', icon: Target, module: 'calibration' },
+  { label: 'Regressions', href: '/admin/regressions', icon: FlaskConical, module: 'regressions' },
+  { label: 'Testers', href: '/admin/testers', icon: Users, module: 'testers' },
+  { label: 'Clients', href: '/admin/clients', icon: Building2, module: 'clients' },
+  { label: 'People', href: '/admin/people', icon: UserCog, module: 'people' },
+  { label: 'Payouts', href: '/admin/payouts', icon: Wallet, module: 'payouts' },
+  { label: 'Audit Log', href: '/admin/audit-log', icon: ScrollText, module: 'audit' },
+  { label: 'Access', href: '/admin/access', icon: KeyRound },
 ]
 
 function useActiveNavItem() {
@@ -75,7 +72,7 @@ function IdentityBlock({ user, className }: { user: AuthUser | null; className?:
           {user?.displayName ?? 'Staff'}
         </span>
         <span className="cx-meta block truncate text-navy-400">
-          {user?.staffRole ? ROLE_LABELS[user.staffRole] : ' '}
+          {user?.staffRole ? STAFF_ROLE_LABELS[user.staffRole] : ' '}
         </span>
       </span>
     </div>
@@ -85,12 +82,19 @@ function IdentityBlock({ user, className }: { user: AuthUser | null; className?:
 function SidebarContent({
   activeHref,
   user,
+  modules,
   onNavigate,
 }: {
   activeHref: string | undefined
   user: AuthUser | null
+  modules: AdminModule[] | null
   onNavigate?: () => void
 }) {
+  // Until access loads, show only the always-visible items so nothing
+  // flashes and then disappears.
+  const visible = NAV_ITEMS.filter((item) => !item.module || (modules ?? []).includes(item.module))
+  const hiddenCount = NAV_ITEMS.length - visible.length
+
   return (
     <div className="flex h-full flex-col">
       <Link href="/admin/home" className="flex items-center gap-2 px-4 py-4" aria-label="Oreset home">
@@ -101,7 +105,7 @@ function SidebarContent({
       </Link>
 
       <nav className="flex flex-1 flex-col gap-0.5 px-2">
-        {NAV_ITEMS.map((item) => (
+        {visible.map((item) => (
           <NavLink
             key={item.href}
             href={item.href}
@@ -111,6 +115,11 @@ function SidebarContent({
             onNavigate={onNavigate}
           />
         ))}
+        {modules && hiddenCount > 0 && (
+          <p className="cx-meta mt-2 px-3 text-navy-400">
+            {hiddenCount} more {hiddenCount === 1 ? 'module' : 'modules'} can be requested under Access.
+          </p>
+        )}
       </nav>
 
       <div className="border-t border-border px-2 py-3">
@@ -127,13 +136,16 @@ function SidebarContent({
 export function AdminAppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [user, setUser] = useState<AuthUser | null>(null)
+  const [modules, setModules] = useState<AdminModule[] | null>(null)
   const activeItem = useActiveNavItem()
 
   useEffect(() => {
     getMe()
       .then((res) => setUser(res.user))
-      .catch(() => {}) // Header identity is a nicety, not load-bearing — the
-    // page's own server-side fetch already gates real content.
+      .catch(() => {}) // Header identity is a nicety; the page's own fetch gates content.
+    getMyAccess()
+      .then((res) => setModules(res.modules))
+      .catch(() => setModules([]))
   }, [])
 
   return (
@@ -177,7 +189,7 @@ export function AdminAppShell({ children }: { children: React.ReactNode }) {
                 <X className="size-5" />
               </button>
             </div>
-            <SidebarContent activeHref={activeItem?.href} user={user} onNavigate={() => setMobileOpen(false)} />
+            <SidebarContent activeHref={activeItem?.href} user={user} modules={modules} onNavigate={() => setMobileOpen(false)} />
           </div>
         </div>
       )}
@@ -186,7 +198,7 @@ export function AdminAppShell({ children }: { children: React.ReactNode }) {
         {/* Desktop sidebar */}
         <aside className="hidden w-56 shrink-0 border-r border-border bg-navy-50 lg:block">
           <div className="sticky top-0 h-svh">
-            <SidebarContent activeHref={activeItem?.href} user={user} />
+            <SidebarContent activeHref={activeItem?.href} user={user} modules={modules} />
           </div>
         </aside>
 

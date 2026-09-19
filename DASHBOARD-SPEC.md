@@ -20,6 +20,7 @@
 | Webhooks | New events `finding.verified`, `finding.closed`, `finding.reopened`. | `apps/api/src/lib/webhooks.ts` |
 | Admin, operations | Home is an engagement ops console: findings awaiting verification, escalations, split assessments, tester applications, queue and retest counts, weekly exploit rate, auditor false positive rate. Tickets, adjudication, performance table on the new taxonomy. Data-collection nav hidden. | `apps/api/src/modules/admin/admin.service.ts`, `apps/web/app/admin/home/page.tsx` |
 | Admin, owner's console | `/admin/people`: every account, role, status, last sign-in, what each role reaches; create staff, change role, suspend (kills sessions), reactivate, force password reset (temporary password shown once). `/admin/clients`: per-client scenarios, findings by lifecycle, resilience score, payments, provisioning. Business strip on home. Admin role only. Migration 0018 adds `users.last_login_at`; suspended accounts are refused at login. | `apps/api/src/modules/admin/people.*`, `apps/web/app/admin/{people,clients}/page.tsx`, `apps/web/components/admin/{people,clients}-directory.tsx` |
+| Module access (desks) | The staff console is split into modules (`ADMIN_MODULES` in shared: leads, findings, escalations, consensus, calibration, regressions, testers, clients, people, payouts, audit). A staff role is a default bundle (`ROLE_DEFAULT_MODULES`); new roles `engineer` (no defaults) and `sales` (leads, clients). Anyone can request a module with a reason at `/admin/access`; whoever holds `people` approves or declines, optionally with an expiry; approved grants appear in the requester's nav immediately and can be revoked. Every API route for a module is guarded by `requireModule('x')` (role default or active grant), the nav only shows held modules, and a page for a module you lack redirects to Access instead of erroring. Requests and decisions email and audit-log. Migration 0023 adds `module_grants`, `module_access_requests`, and the two enum values. | `packages/shared/src/enums.ts`, `apps/api/src/middleware/modules.ts`, `apps/api/src/modules/access/*`, `apps/web/app/admin/access/page.tsx`, `apps/web/components/admin/{access-center,admin-app-shell}.tsx` |
 | Demo data | SafariPay engagement with every lifecycle state, three gold calibration cases. Smoke script asserts the dashboard numbers. | `apps/api/src/db/seed-redteam.ts`, `smoke-redteam.ts` |
 | Landing site | Eight-block page, finding showcase, platform section, `/cases`, `/pricing`, `/trust`, `/company`. | `apps/web/app/*`, `apps/web/components/*` |
 
@@ -28,9 +29,9 @@
 ```bash
 pnpm install
 pnpm --filter @oreset/shared build          # drizzle and the web app read the built enums
-pnpm --filter @oreset/api db:migrate         # applies 0016 through 0020 (taxonomy, lifecycle, last login, leads, password resets)
+pnpm --filter @oreset/api db:migrate         # applies 0016 through 0023 (taxonomy, lifecycle, last login, leads, password resets, api tokens, red team application, module access)
 pnpm --filter @oreset/api db:seed:redteam    # SafariPay demo engagement, skips if present; add --reset to start over
-pnpm --filter @oreset/api exec tsx src/db/smoke-redteam.ts   # 37 checks, all should pass on a fresh seed
+pnpm --filter @oreset/api exec tsx src/db/smoke-redteam.ts   # 41 checks, all should pass on a fresh seed
 pnpm dev
 ```
 
@@ -38,14 +39,19 @@ Demo logins (all `dev-password`): `client@safaripay.demo` (client), `tester-1@or
 
 Typecheck: `npx tsc --noEmit -p tsconfig.json` in `apps/api` and `apps/web`. The web check reports stale `.next/dev/types` errors for the deleted `/solutions/*` pages until the next `pnpm dev`; everything else is clean.
 
-### Not done, in priority order
+### Not done, in priority order (agreed with the founder, 19 September 2026)
 
-1. **Engagement phase** (Step 5.3). Client home should show Kickoff / Testing / Readout / Retest. Needs a decision: new `engagements` table (recommended, a client will have more than one engagement) or a field on the buyer user. **George decides.**
-2. **Executive summary export.** One button on the client home, generated from `getBuyerFindings` output. Score, open by severity, top three fixes, retest status. HTML or PDF, no separate authoring.
-3. **Retest queue priority.** Retest scenarios should sort ahead of fresh ones in `operator.service.getQueue`. Small change.
-4. **Real screenshots** for the landing page platform section, replacing the rendered panels in `platform-showcase.tsx`.
-5. **Resources page** with the founder's first post, and possibly one more public incident on `/cases`.
-6. **Slack notifications.** Not before five paying clients.
+The company documents in `Desktop\Oreset Documents` (Roles and Access, Tester Standard, Security Policy) are the spec for items 2 to 7; each names the section it comes from.
+
+1. ~~Modules, roles and request-approve access.~~ Done (see the Module access row above).
+2. **Backups and 2FA on the platform.** Managed Postgres with backups (Neon) or nightly encrypted `pg_dump`; TOTP 2FA for staff accounts first, testers next. Security Policy 3.1 and 7.2. Required before the first paying client.
+3. **Engagement object** (`engagements` table: client, tier, scope, RoE text, window, phase) with tester acknowledgement of the Rules of Engagement before the first scenario, and the phase banner on the client home. Step 5.3; Tester Standard 2; MSA Schedule 2.
+4. **Tester profile and My findings.** Photo, required fields, editable name and username; every submitted finding with its verdict and reasoning. Agreements v2: five acceptances with stored text, version, timestamp, IP; re-acceptance on version change. Tester Standard 3 and 10.
+5. **Vetting desk.** Application form: CV upload, mandatory verifiable link, mandatory reference, identity consent; rubric scoring with two graders; identity verification (manual upload first, provider integration behind an interface); masked storage with logged unmask. Tester Standard 2.1 to 2.3.
+6. **Earnings and payout queue.** Per-scenario, per-finding and retest amounts from the Payout Rates Schedule; monthly batch; verifier cannot approve their own batch. Tester Standard 7.
+7. **Sessions and devices.** Per-session device and location, sign out everywhere, anomaly flags feeding a Trust and Safety ticket. Tester Standard 9.
+8. **Favour's track, in parallel:** sandbox target agent for the vetting practical; then the regression runner that replays closed findings on each release for Continuous clients. Human verdicts only; AI suggestions logged separately.
+9. Comments on findings, correctable verdicts, executive summary export, client teammates, retest queue priority, Slack notifications (not before five paying clients).
 
 ### Known rough edges
 

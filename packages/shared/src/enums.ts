@@ -5,8 +5,75 @@
 export const ROLE_TYPES = ['contributor', 'operator', 'staff', 'buyer'] as const
 export type RoleType = (typeof ROLE_TYPES)[number]
 
-export const STAFF_ROLES = ['qa_reviewer', 'admin', 'compliance', 'reviewer_lead'] as const
+export const STAFF_ROLES = ['qa_reviewer', 'admin', 'compliance', 'reviewer_lead', 'engineer', 'sales'] as const
 export type StaffRole = (typeof STAFF_ROLES)[number]
+
+export const STAFF_ROLE_LABELS: Record<StaffRole, string> = {
+  admin: 'Owner',
+  reviewer_lead: 'Lead auditor',
+  compliance: 'Compliance',
+  engineer: 'Engineer',
+  sales: 'Sales and marketing',
+  qa_reviewer: 'QA reviewer (legacy)',
+}
+
+// Modules of the staff console. A role is a default bundle of modules; a
+// person can be granted extra modules (with a reason, optionally expiring)
+// through an approved access request. Home is always visible to staff.
+export const ADMIN_MODULES = [
+  'leads',
+  'findings',
+  'escalations',
+  'consensus',
+  'calibration',
+  'regressions',
+  'testers',
+  'clients',
+  'people',
+  'payouts',
+  'audit',
+] as const
+export type AdminModule = (typeof ADMIN_MODULES)[number]
+
+export const ADMIN_MODULE_LABELS: Record<AdminModule, string> = {
+  leads: 'Leads',
+  findings: 'Findings verification',
+  escalations: 'Escalations',
+  consensus: 'Consensus adjudication',
+  calibration: 'Calibration cases',
+  regressions: 'Regression exports',
+  testers: 'Testers and applications',
+  clients: 'Clients',
+  people: 'People and access',
+  payouts: 'Payouts',
+  audit: 'Audit log',
+}
+
+export const ADMIN_MODULE_DESCRIPTIONS: Record<AdminModule, string> = {
+  leads: 'Early access requests and contact form messages. Who wants to talk to us.',
+  findings: 'Verify, reject or re-grade tester findings before clients see them.',
+  escalations: 'Tickets testers raised on scenarios that need a lead decision.',
+  consensus: 'Split assessments between testers waiting for adjudication.',
+  calibration: 'Known-answer scenarios testers must pass. Create and retire them.',
+  regressions: 'Export closed and open findings as regression suites.',
+  testers: 'Tester applications, approvals, performance and tiers.',
+  clients: 'Client accounts, engagements and resilience scores.',
+  people: 'Every account, its role and access. Create staff, suspend, reset passwords, approve access requests.',
+  payouts: 'Tester payout batches and history.',
+  audit: 'Every security-relevant action, who did it and when.',
+}
+
+export const ROLE_DEFAULT_MODULES: Record<StaffRole, readonly AdminModule[]> = {
+  admin: ADMIN_MODULES,
+  reviewer_lead: ['findings', 'escalations', 'consensus', 'calibration', 'regressions', 'testers'],
+  compliance: ['audit'],
+  engineer: [],
+  sales: ['leads', 'clients'],
+  qa_reviewer: [],
+}
+
+export const ACCESS_REQUEST_STATUSES = ['pending', 'approved', 'denied'] as const
+export type AccessRequestStatus = (typeof ACCESS_REQUEST_STATUSES)[number]
 
 export const USER_STATUSES = ['active', 'suspended', 'pending'] as const
 export type UserStatus = (typeof USER_STATUSES)[number]

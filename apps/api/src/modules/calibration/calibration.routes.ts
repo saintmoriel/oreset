@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
+import { requireModule } from '../../middleware/modules'
 import * as controller from './calibration.controller'
 
 export const calibrationRouter = Router()
@@ -10,28 +11,28 @@ export const calibrationRouter = Router()
 calibrationRouter.post(
   '/cases',
   requireAuth,
-  requireRole('staff:admin', 'staff:reviewer_lead'),
+  requireModule('calibration'),
   asyncHandler(controller.createCase),
 )
 
 calibrationRouter.get(
   '/cases',
   requireAuth,
-  requireRole('staff:admin', 'staff:reviewer_lead'),
+  requireModule('calibration'),
   asyncHandler(controller.listCases),
 )
 
 calibrationRouter.post(
   '/cases/:id/retire',
   requireAuth,
-  requireRole('staff:admin', 'staff:reviewer_lead'),
+  requireModule('calibration'),
   asyncHandler(controller.retireCase),
 )
 
 calibrationRouter.get(
   '/stats',
   requireAuth,
-  requireRole('staff:admin', 'staff:reviewer_lead'),
+  requireModule('calibration'),
   asyncHandler(controller.stats),
 )
 

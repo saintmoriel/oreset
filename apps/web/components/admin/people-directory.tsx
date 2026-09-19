@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp, KeyRound, Loader2, ShieldCheck, UserPlus, UserX, UserCheck, Copy } from 'lucide-react'
-import { STAFF_ROLES } from '@oreset/shared'
+import { STAFF_ROLES, STAFF_ROLE_LABELS } from '@oreset/shared'
 import type { StaffRole } from '@oreset/shared'
 import { cn } from '@/lib/utils'
 import { ApiError } from '@/lib/api/client'
@@ -11,12 +11,7 @@ import { StatusTag } from '@/components/capture/status-tag'
 import { listPeople, createStaff, updateUser, resetUserPassword } from '@/lib/api/endpoints/people'
 import type { Person, RoleAccess } from '@/lib/api/endpoints/people'
 
-const STAFF_ROLE_LABEL: Record<StaffRole, string> = {
-  admin: 'Admin',
-  reviewer_lead: 'Lead auditor',
-  compliance: 'Compliance',
-  qa_reviewer: 'QA reviewer (legacy)',
-}
+const STAFF_ROLE_LABEL = STAFF_ROLE_LABELS
 
 type Group = 'all' | 'staff' | 'operator' | 'buyer'
 const GROUPS: { key: Group; label: string }[] = [

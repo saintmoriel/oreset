@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { asyncHandler } from '../../lib/async-handler'
 import { requireAuth } from '../../middleware/auth'
 import { requireRole } from '../../middleware/rbac'
+import { requireModule } from '../../middleware/modules'
 import * as controller from './tickets.controller'
 
 // Mounted at /api/v1/admin/tickets — the real destination for an
@@ -13,12 +14,12 @@ export const ticketsRouter = Router()
 ticketsRouter.get(
   '/',
   requireAuth,
-  requireRole('staff:admin', 'staff:reviewer_lead'),
+  requireModule('escalations'),
   asyncHandler(controller.list),
 )
 ticketsRouter.post(
   '/:id/resolve',
   requireAuth,
-  requireRole('staff:admin', 'staff:reviewer_lead'),
+  requireModule('escalations'),
   asyncHandler(controller.resolve),
 )
