@@ -42,3 +42,5 @@ EXPOSE 4000
 CMD ["sh", "-c", "node dist/db/migrate.js && node dist/db/bootstrap-admin.js && node dist/index.js"]
 
 # deploy trigger: 2026-09-18T15:00Z
+
+# deploy trigger: 2026-09-19 tester form + validation messages
