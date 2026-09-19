@@ -236,8 +236,19 @@ export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number]
 export const DOCUMENT_TYPES = ['government_id', 'education_certificate', 'resume', 'other'] as const
 export type DocumentType = (typeof DOCUMENT_TYPES)[number]
 
-export const AGREEMENT_TYPES = ['nda', 'code_of_conduct', 'data_handling'] as const
+// The five acceptances every tester records before client work (Tester
+// Standard section 3). Texts and versions live in the API; the platform
+// stores the exact text accepted, so a dispute years later can see it.
+export const AGREEMENT_TYPES = ['tester_agreement', 'nda', 'code_of_conduct', 'data_handling', 'identity_account'] as const
 export type AgreementType = (typeof AGREEMENT_TYPES)[number]
+
+export const AGREEMENT_TYPE_LABELS: Record<AgreementType, string> = {
+  tester_agreement: 'Tester Agreement',
+  nda: 'Confidentiality',
+  code_of_conduct: 'Code of Conduct',
+  data_handling: 'Data Handling Undertaking',
+  identity_account: 'Identity and Account Undertaking',
+}
 
 export const CONSENSUS_STATUSES = ['awaiting_reviews', 'agreed', 'disagreed', 'adjudicated'] as const
 export type ConsensusStatus = (typeof CONSENSUS_STATUSES)[number]

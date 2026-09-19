@@ -54,17 +54,21 @@ export async function decide(req: Request, res: Response) {
 // ---------------------------------------------------------------------------
 
 const updateProfileSchema = z.object({
-  displayName: z.string().min(1).max(100).optional(),
-  location: z.string().min(1).max(200).optional(),
+  displayName: z.string().trim().min(1).max(100).optional(),
+  username: z.string().trim().min(3).max(24).optional(),
+  avatarDataUrl: z.string().max(130_000).nullable().optional(),
+  phone: z.string().trim().min(8).max(40).optional(),
+  location: z.string().trim().min(1).max(200).optional(),
   languages: z
     .array(z.object({ language: z.string(), fluency: z.string() }))
     .min(1)
     .optional(),
   dialect: z.string().max(200).optional(),
-  academicBackground: z.string().min(1).optional(),
-  englishProficiency: z.string().min(1).optional(),
+  securityExperienceYears: z.enum(['none', 'under_2', '2_to_5', 'over_5']).optional(),
+  tools: z.string().max(1000).optional(),
+  portfolioUrl: z.string().trim().url().max(300).optional().or(z.literal('')),
   availability: z.array(z.string()).optional(),
-  experience: z.string().max(2000).optional(),
+  experience: z.string().max(4000).optional(),
 })
 
 export async function getProfile(req: Request, res: Response) {

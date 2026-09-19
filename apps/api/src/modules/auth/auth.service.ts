@@ -46,6 +46,7 @@ export function toAuthUser(user: User): AuthUser {
     email: user.email,
     createdAt: user.createdAt.toISOString(),
     twoFactorEnabled: user.totpEnabledAt !== null && user.totpEnabledAt !== undefined,
+    avatarDataUrl: user.avatarDataUrl ?? null,
   }
 }
 

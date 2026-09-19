@@ -1,12 +1,15 @@
 import { User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+// Photo when there is one, initials when there is a name, icon otherwise.
 export function Avatar({
   displayName,
+  src,
   className,
   iconClassName,
 }: {
   displayName?: string | null
+  src?: string | null
   className?: string
   iconClassName?: string
 }) {
@@ -19,6 +22,15 @@ export function Avatar({
         .join('')
         .toUpperCase()
     : null
+
+  if (src) {
+    return (
+      <span className={cn('flex shrink-0 overflow-hidden rounded-full bg-navy-100', className)}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={displayName ?? 'Profile photo'} className="size-full object-cover" />
+      </span>
+    )
+  }
 
   return (
     <span

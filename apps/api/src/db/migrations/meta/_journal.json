@@ -183,6 +183,13 @@
       "when": 1790000000000,
       "tag": "0025_engagements",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1790100000000,
+      "tag": "0026_profile_and_agreements_v2",
+      "breakpoints": true
     }
   ]
 }

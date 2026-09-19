@@ -55,7 +55,7 @@ function NavLink({
 function IdentityBlock({ user, className }: { user: AuthUser | null; className?: string }) {
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
-      <Avatar displayName={user?.displayName} className="size-8 text-xs" iconClassName="size-4" />
+      <Avatar displayName={user?.displayName} src={user?.avatarDataUrl} className="size-8 text-xs" iconClassName="size-4" />
       <span className="min-w-0">
         <span className="cx-body block truncate font-medium text-navy-900">
           {user?.displayName ?? 'Tester'}
@@ -140,7 +140,7 @@ export function OperatorAppShell({ children }: { children: React.ReactNode }) {
           <span className="cx-title text-navy-800">Oreset</span>
         </Link>
         <div className="flex items-center gap-2">
-          <Avatar displayName={user?.displayName} className="size-8 text-xs" iconClassName="size-4" />
+          <Avatar displayName={user?.displayName} src={user?.avatarDataUrl} className="size-8 text-xs" iconClassName="size-4" />
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"

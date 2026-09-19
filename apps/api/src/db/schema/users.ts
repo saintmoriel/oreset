@@ -18,6 +18,12 @@ export const users = pgTable(
     // Human-readable operator id, e.g. "OP-4471"
     operatorCode: text('operator_code'),
     displayName: text('display_name'),
+    // Public handle, lowercase letters, digits and underscores. Testers appear
+    // to each other and in leaderboards by this, never by legal name.
+    username: text('username'),
+    // Small square photo, resized in the browser, stored inline as a data URL
+    // (tens of kilobytes). Moves to object storage when volume justifies it.
+    avatarDataUrl: text('avatar_data_url'),
     // e.g. {type:'mobile_money', provider, accountNumber} — contributor-set,
     // required before a payout can be initiated for them.
     payoutDetails: jsonb('payout_details'),
@@ -38,6 +44,7 @@ export const users = pgTable(
     phoneUnique: uniqueIndex('users_phone_unique').on(table.phone),
     emailUnique: uniqueIndex('users_email_unique').on(table.email),
     operatorCodeUnique: uniqueIndex('users_operator_code_unique').on(table.operatorCode),
+    usernameUnique: uniqueIndex('users_username_unique').on(table.username),
   }),
 )
 

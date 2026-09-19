@@ -10,6 +10,10 @@ export const operatorAgreements = pgTable('operator_agreements', {
   signedAt: timestamp('signed_at', { withTimezone: true }).notNull().defaultNow(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
+  // The exact text shown and accepted, and its sha256, so what was agreed
+  // is provable even after the document changes.
+  acceptedText: text('accepted_text'),
+  textHash: text('text_hash'),
 })
 
 export type OperatorAgreement = typeof operatorAgreements.$inferSelect

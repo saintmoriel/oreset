@@ -65,6 +65,15 @@ export type OperatorDecisionRecord = {
   clientItemId: string
   clientItemSnapshot: { content?: string; clientName?: string } | null
   ticket: { status: TicketStatus; resolvedAt: string | null } | null
+  // The lead auditor's verdict on this decision, when one has been recorded.
+  verdict: {
+    verdict: 'verified' | 'false_positive' | 'severity_adjusted'
+    adjustedSeverity: Severity | null
+    auditorNotes: string | null
+    status: string
+    verifiedAt: string
+    closedAt: string | null
+  } | null
 }
 
 export function getOperatorQueue() {
@@ -99,11 +108,16 @@ export function getMyOperatorDecisions() {
 
 export type OperatorLanguage = { language: string; fluency: string }
 
+export type SecurityExperienceYears = 'none' | 'under_2' | '2_to_5' | 'over_5'
+
 export type OperatorProfile = {
   user: {
     id: string
     displayName: string | null
+    username: string | null
+    avatarDataUrl: string | null
     email: string | null
+    phone: string | null
     status: string
     operatorCode: string | null
     createdAt: string
@@ -112,21 +126,28 @@ export type OperatorProfile = {
     location: string
     languages: OperatorLanguage[]
     dialect: string | null
-    academicBackground: string
-    englishProficiency: string
+    securityExperienceYears: SecurityExperienceYears | null
+    tools: string | null
+    portfolioUrl: string | null
     availability: string[] | null
     experience: string | null
   } | null
   profileStrength: number
+  missingRequired: { key: string; label: string }[]
+  fields: { key: string; label: string; required: boolean; filled: boolean }[]
 }
 
 export type ProfileUpdateInput = {
   displayName?: string
+  username?: string
+  avatarDataUrl?: string | null
+  phone?: string
   location?: string
   languages?: OperatorLanguage[]
   dialect?: string
-  academicBackground?: string
-  englishProficiency?: string
+  securityExperienceYears?: SecurityExperienceYears
+  tools?: string
+  portfolioUrl?: string
   availability?: string[]
   experience?: string
 }
@@ -207,7 +228,7 @@ export function updatePayoutDetails(data: {
   })
 }
 
-export type AgreementType = 'nda' | 'code_of_conduct' | 'data_handling'
+export type AgreementType = 'tester_agreement' | 'nda' | 'code_of_conduct' | 'data_handling' | 'identity_account'
 
 export type OperatorAgreement = {
   id: string
@@ -215,19 +236,26 @@ export type OperatorAgreement = {
   version: string
   signedAt: string
   ipAddress: string | null
+  textHash: string | null
   userAgent: string | null
 }
 
 export type RequiredAgreement = {
   type: AgreementType
   label: string
+  version: string
+  summary: string
+  text: string
   signed: boolean
   signedAt: string | null
+  outdated: boolean
+  previousVersion: string | null
 }
 
 export type AgreementsResponse = {
   agreements: OperatorAgreement[]
   required: RequiredAgreement[]
+  complete: boolean
 }
 
 export function getAgreements() {

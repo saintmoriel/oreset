@@ -24,6 +24,8 @@ export type AuthUser = {
   createdAt: string
   // Authenticator app two-factor is confirmed on this account.
   twoFactorEnabled: boolean
+  // Small square profile photo as a data URL, or null. Testers must have one.
+  avatarDataUrl: string | null
 }
 
 // Claims embedded in the oreset_at access token — kept minimal so the

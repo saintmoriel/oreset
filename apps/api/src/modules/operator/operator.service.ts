@@ -1,8 +1,9 @@
-import { and, asc, count, desc, eq, sql, notInArray, avg } from 'drizzle-orm'
+import { and, asc, count, desc, eq, sql, notInArray, inArray, avg } from 'drizzle-orm'
 import type { AgreementType, VulnTag, ExploitStatus, OperatorDecision, RoleType, Severity } from '@oreset/shared'
 import { VULN_TAGS } from '@oreset/shared'
 import { db } from '../../db/client'
-import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements, consensusPairs, calibrationAttempts } from '../../db/schema'
+import { clientQueueItems, operatorReviewDecisions, clientTickets, users, operatorApplications, identityVerifications, operatorAgreements, consensusPairs, calibrationAttempts, verifiedFindings, type User } from '../../db/schema'
+import { AGREEMENT_DOCUMENTS, AGREEMENT_ORDER, hashAgreementText } from './agreement-texts'
 import { writeAuditLog } from '../../lib/audit'
 import { HttpError } from '../../middleware/error-handler'
 import { assertAcknowledged } from '../engagements/engagements.service'
@@ -93,12 +94,36 @@ export async function getQueueCount(): Promise<number> {
   return row?.value ?? 0
 }
 
+// A tester's own decisions, each with the auditor's verdict when one exists.
+// Verdicts are how testers learn; hiding them helps nobody.
 export async function getMyDecisions(operatorId: string) {
-  return db.query.operatorReviewDecisions.findMany({
+  const decisions = await db.query.operatorReviewDecisions.findMany({
     where: eq(operatorReviewDecisions.operatorId, operatorId),
     orderBy: desc(operatorReviewDecisions.createdAt),
-    limit: 50,
+    limit: 100,
     with: { ticket: true },
+  })
+  if (decisions.length === 0) return []
+  const verdicts = await db.query.verifiedFindings.findMany({
+    where: inArray(verifiedFindings.reviewDecisionId, decisions.map((d) => d.id)),
+    columns: { reviewDecisionId: true, verdict: true, adjustedSeverity: true, auditorNotes: true, status: true, verifiedAt: true, closedAt: true },
+  })
+  const byDecision = new Map(verdicts.map((v) => [v.reviewDecisionId, v]))
+  return decisions.map((d) => {
+    const v = byDecision.get(d.id)
+    return {
+      ...d,
+      verdict: v
+        ? {
+            verdict: v.verdict,
+            adjustedSeverity: v.adjustedSeverity,
+            auditorNotes: v.auditorNotes,
+            status: v.status,
+            verifiedAt: v.verifiedAt.toISOString(),
+            closedAt: v.closedAt?.toISOString() ?? null,
+          }
+        : null,
+    }
   })
 }
 
@@ -232,34 +257,35 @@ export async function decide(input: {
 // Profile
 // ---------------------------------------------------------------------------
 
-function computeProfileStrength(
-  user: { displayName: string | null },
-  application: {
-    location: string
-    languages: unknown
-    securityExperienceYears?: string | null
-    tools?: string | null
-    workSample?: string | null
-    portfolioUrl?: string | null
-    availability: unknown
-    experience: string | null
-  } | null,
-): number {
-  // Red team profile completeness. Legacy language-era fields no longer count.
-  let filled = 0
-  if (user.displayName) filled++
-  if (application) {
-    if (application.location) filled++
-    if (Array.isArray(application.languages) && application.languages.length > 0) filled++
-    if (application.securityExperienceYears) filled++
-    if (application.experience) filled++
-    if (application.tools) filled++
-    if (application.workSample) filled++
-    if (application.portfolioUrl) filled++
-    if (Array.isArray(application.availability) && application.availability.length > 0) filled++
+// What a complete tester profile contains. Required fields gate nothing yet
+// but are named so the profile page can say exactly what is missing.
+const PROFILE_FIELDS: { key: string; label: string; required: boolean; filled: (u: User, a: Record<string, unknown> | null) => boolean }[] = [
+  { key: 'avatar', label: 'Profile photo', required: true, filled: (u) => !!u.avatarDataUrl },
+  { key: 'displayName', label: 'Full name', required: true, filled: (u) => !!u.displayName?.trim() },
+  { key: 'username', label: 'Username', required: true, filled: (u) => !!u.username },
+  { key: 'phone', label: 'Phone or WhatsApp', required: true, filled: (u) => !!u.phone },
+  { key: 'location', label: 'Location', required: true, filled: (_u, a) => !!a?.location },
+  { key: 'languages', label: 'Languages', required: true, filled: (_u, a) => Array.isArray(a?.languages) && (a!.languages as unknown[]).length > 0 },
+  { key: 'securityExperienceYears', label: 'Years of security testing', required: true, filled: (_u, a) => !!a?.securityExperienceYears },
+  { key: 'experience', label: 'Experience', required: true, filled: (_u, a) => !!a?.experience },
+  { key: 'availability', label: 'Availability', required: false, filled: (_u, a) => Array.isArray(a?.availability) && (a!.availability as unknown[]).length > 0 },
+  { key: 'tools', label: 'Tools', required: false, filled: (_u, a) => !!a?.tools },
+  { key: 'portfolioUrl', label: 'Portfolio link', required: false, filled: (_u, a) => !!a?.portfolioUrl },
+]
+
+function profileCompleteness(user: User, application: Record<string, unknown> | null) {
+  const rows = PROFILE_FIELDS.map((f) => ({ key: f.key, label: f.label, required: f.required, filled: f.filled(user, application) }))
+  const filled = rows.filter((r) => r.filled).length
+  return {
+    strength: Math.round((filled / rows.length) * 100),
+    missingRequired: rows.filter((r) => r.required && !r.filled).map((r) => ({ key: r.key, label: r.label })),
+    fields: rows,
   }
-  return Math.round((filled / 9) * 100)
 }
+
+const USERNAME_RE = /^[a-z0-9_]{3,24}$/
+const AVATAR_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/
+const AVATAR_MAX_CHARS = 120_000 // about 90 KB of image
 
 export async function getProfile(userId: string) {
   const user = await db.query.users.findFirst({
@@ -271,13 +297,16 @@ export async function getProfile(userId: string) {
     where: eq(operatorApplications.userId, userId),
   })
 
-  const profileStrength = computeProfileStrength(user, application ?? null)
+  const completeness = profileCompleteness(user, (application as Record<string, unknown> | null) ?? null)
 
   return {
     user: {
       id: user.id,
       displayName: user.displayName,
+      username: user.username,
+      avatarDataUrl: user.avatarDataUrl,
       email: user.email,
+      phone: user.phone,
       status: user.status,
       operatorCode: user.operatorCode,
       createdAt: user.createdAt,
@@ -287,13 +316,16 @@ export async function getProfile(userId: string) {
           location: application.location,
           languages: application.languages,
           dialect: application.dialect,
-          academicBackground: application.academicBackground,
-          englishProficiency: application.englishProficiency,
+          securityExperienceYears: application.securityExperienceYears,
+          tools: application.tools,
+          portfolioUrl: application.portfolioUrl,
           availability: application.availability,
           experience: application.experience,
         }
       : null,
-    profileStrength,
+    profileStrength: completeness.strength,
+    missingRequired: completeness.missingRequired,
+    fields: completeness.fields,
   }
 }
 
@@ -301,30 +333,51 @@ export async function updateProfile(
   userId: string,
   data: {
     displayName?: string
+    username?: string
+    avatarDataUrl?: string | null
+    phone?: string
     location?: string
     languages?: { language: string; fluency: string }[]
     dialect?: string
-    academicBackground?: string
-    englishProficiency?: string
+    securityExperienceYears?: string
+    tools?: string
+    portfolioUrl?: string
     availability?: string[]
     experience?: string
   },
 ) {
-  // Update users table if displayName is provided
-  if (data.displayName !== undefined) {
-    await db.update(users).set({ displayName: data.displayName }).where(eq(users.id, userId))
+  const userUpdate: Partial<typeof users.$inferInsert> = {}
+  if (data.displayName !== undefined) userUpdate.displayName = data.displayName.trim()
+  if (data.phone !== undefined) userUpdate.phone = data.phone.trim()
+  if (data.username !== undefined) {
+    const username = data.username.trim().toLowerCase()
+    if (!USERNAME_RE.test(username)) throw new HttpError(400, 'bad_username', 'Usernames are 3 to 24 characters: lowercase letters, digits and underscores.')
+    const taken = await db.query.users.findFirst({ where: and(eq(users.username, username), sql`${users.id} <> ${userId}`), columns: { id: true } })
+    if (taken) throw new HttpError(409, 'username_taken', 'That username is taken. Try another.')
+    userUpdate.username = username
+  }
+  if (data.avatarDataUrl !== undefined) {
+    if (data.avatarDataUrl === null) userUpdate.avatarDataUrl = null
+    else {
+      if (data.avatarDataUrl.length > AVATAR_MAX_CHARS || !AVATAR_RE.test(data.avatarDataUrl)) {
+        throw new HttpError(400, 'bad_avatar', 'The photo must be a JPEG, PNG or WebP under about 90 KB. The page resizes it for you; try a different image.')
+      }
+      userUpdate.avatarDataUrl = data.avatarDataUrl
+    }
+  }
+  if (Object.keys(userUpdate).length > 0) {
+    await db.update(users).set({ ...userUpdate, updatedAt: new Date() }).where(eq(users.id, userId))
   }
 
-  // Update operator_applications table for the remaining fields
-  const { displayName: _, ...appFields } = data
   const appUpdate: Record<string, unknown> = {}
-  if (appFields.location !== undefined) appUpdate.location = appFields.location
-  if (appFields.languages !== undefined) appUpdate.languages = appFields.languages
-  if (appFields.dialect !== undefined) appUpdate.dialect = appFields.dialect
-  if (appFields.academicBackground !== undefined) appUpdate.academicBackground = appFields.academicBackground
-  if (appFields.englishProficiency !== undefined) appUpdate.englishProficiency = appFields.englishProficiency
-  if (appFields.availability !== undefined) appUpdate.availability = appFields.availability
-  if (appFields.experience !== undefined) appUpdate.experience = appFields.experience
+  if (data.location !== undefined) appUpdate.location = data.location
+  if (data.languages !== undefined) appUpdate.languages = data.languages
+  if (data.dialect !== undefined) appUpdate.dialect = data.dialect
+  if (data.securityExperienceYears !== undefined) appUpdate.securityExperienceYears = data.securityExperienceYears
+  if (data.tools !== undefined) appUpdate.tools = data.tools
+  if (data.portfolioUrl !== undefined) appUpdate.portfolioUrl = data.portfolioUrl
+  if (data.availability !== undefined) appUpdate.availability = data.availability
+  if (data.experience !== undefined) appUpdate.experience = data.experience
 
   if (Object.keys(appUpdate).length > 0) {
     await db.update(operatorApplications).set(appUpdate).where(eq(operatorApplications.userId, userId))
@@ -409,40 +462,61 @@ export async function getPayoutDetails(userId: string) {
 // Agreements
 // ---------------------------------------------------------------------------
 
-const REQUIRED_AGREEMENTS: { type: AgreementType; label: string }[] = [
-  { type: 'nda', label: 'Non-Disclosure Agreement' },
-  { type: 'code_of_conduct', label: 'Reviewer Code of Conduct' },
-  { type: 'data_handling', label: 'Data Handling Policy' },
-]
-
+// Five acceptances, each at its current version. An older acceptance still
+// shows in history but does not count; the tester re-accepts the new text.
 export async function getAgreements(userId: string) {
   const agreements = await db.query.operatorAgreements.findMany({
     where: eq(operatorAgreements.userId, userId),
     orderBy: desc(operatorAgreements.signedAt),
   })
 
-  const required = REQUIRED_AGREEMENTS.map((r) => {
-    const signed = agreements.find((a) => a.agreementType === r.type)
+  const required = AGREEMENT_ORDER.map((type) => {
+    const doc = AGREEMENT_DOCUMENTS[type]
+    const current = agreements.find((a) => a.agreementType === type && a.version === doc.version)
+    const older = agreements.find((a) => a.agreementType === type && a.version !== doc.version)
     return {
-      type: r.type,
-      label: r.label,
-      signed: Boolean(signed),
-      signedAt: signed?.signedAt?.toISOString() ?? null,
+      type,
+      label: doc.label,
+      version: doc.version,
+      summary: doc.summary,
+      text: doc.text,
+      signed: Boolean(current),
+      signedAt: current?.signedAt?.toISOString() ?? null,
+      outdated: !current && Boolean(older),
+      previousVersion: older?.version ?? null,
     }
   })
 
-  return { agreements, required }
+  return {
+    agreements: agreements.map((a) => ({
+      id: a.id,
+      agreementType: a.agreementType,
+      version: a.version,
+      signedAt: a.signedAt.toISOString(),
+      ipAddress: a.ipAddress,
+      textHash: a.textHash,
+    })),
+    required,
+    complete: required.every((r) => r.signed),
+  }
 }
 
 export async function signAgreement(
   userId: string,
   data: { agreementType: AgreementType; ipAddress?: string; userAgent?: string },
 ) {
+  const doc = AGREEMENT_DOCUMENTS[data.agreementType]
+  if (!doc) throw new HttpError(400, 'unknown_agreement', 'Unknown agreement.')
+
   const existing = await db.query.operatorAgreements.findFirst({
-    where: and(eq(operatorAgreements.userId, userId), eq(operatorAgreements.agreementType, data.agreementType)),
+    where: and(
+      eq(operatorAgreements.userId, userId),
+      eq(operatorAgreements.agreementType, data.agreementType),
+      eq(operatorAgreements.version, doc.version),
+    ),
   })
   if (existing) {
-    throw new HttpError(409, 'already_signed', 'You have already signed this agreement.')
+    throw new HttpError(409, 'already_signed', 'You have already accepted the current version of this agreement.')
   }
 
   const [agreement] = await db
@@ -450,12 +524,22 @@ export async function signAgreement(
     .values({
       userId,
       agreementType: data.agreementType,
+      version: doc.version,
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
+      acceptedText: doc.text,
+      textHash: hashAgreementText(doc.text),
     })
     .returning()
 
-  return agreement
+  return {
+    id: agreement.id,
+    agreementType: agreement.agreementType,
+    version: agreement.version,
+    signedAt: agreement.signedAt.toISOString(),
+    ipAddress: agreement.ipAddress,
+    textHash: agreement.textHash,
+  }
 }
 
 export async function updatePayoutDetails(

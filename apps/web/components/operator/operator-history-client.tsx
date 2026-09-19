@@ -117,6 +117,38 @@ export function OperatorHistoryClient({ decisions }: { decisions: OperatorDecisi
               </div>
               {d.vulnTag && <p className="cx-meta text-navy-500">{VULN_TAG_LABELS[d.vulnTag]}</p>}
               {d.notes && <p className="cx-meta text-navy-400">{d.notes}</p>}
+              {/* The auditor's verdict is how a tester learns what "verified" means here. */}
+              {d.decision === 'exploited' && (
+                <div
+                  className={cn(
+                    'mt-1.5 rounded-md border px-3 py-2',
+                    !d.verdict
+                      ? 'border-border bg-navy-50/60'
+                      : d.verdict.verdict === 'false_positive'
+                        ? 'border-destructive/30 bg-destructive/5'
+                        : d.verdict.verdict === 'severity_adjusted'
+                          ? 'border-warning/40 bg-warning/5'
+                          : 'border-success/30 bg-success/5',
+                  )}
+                >
+                  {!d.verdict ? (
+                    <p className="cx-meta text-navy-500">Awaiting a lead auditor's verdict.</p>
+                  ) : (
+                    <>
+                      <p className="cx-meta font-medium text-navy-900">
+                        {d.verdict.verdict === 'verified' && 'Verified by a lead auditor.'}
+                        {d.verdict.verdict === 'false_positive' && 'Marked a false positive.'}
+                        {d.verdict.verdict === 'severity_adjusted' && `Verified, severity adjusted to ${d.verdict.adjustedSeverity ?? ''}.`}
+                        <span className="ml-2 font-normal text-navy-400">{new Date(d.verdict.verifiedAt).toLocaleDateString()}</span>
+                        {d.verdict.verdict !== 'false_positive' && (
+                          <span className="ml-2 font-normal text-navy-400">Status: {d.verdict.status.replace('_', ' ')}</span>
+                        )}
+                      </p>
+                      {d.verdict.auditorNotes && <p className="cx-meta mt-1 text-navy-600">{d.verdict.auditorNotes}</p>}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { eq, inArray } from 'drizzle-orm'
 import argon2 from 'argon2'
 import * as schema from './schema'
+import { AGREEMENT_DOCUMENTS, AGREEMENT_ORDER, hashAgreementText } from '../modules/operator/agreement-texts'
 
 // Demo red-team engagement: one fintech client, a handful of scenarios in
 // every lifecycle state, so all three portals have something real to show.
@@ -407,10 +408,19 @@ async function main() {
   const goldCases = await db.query.calibrationCases.findMany({ columns: { id: true, expectedDecision: true, expectedVulnTag: true, expectedSeverity: true, expectedExploitStatus: true } })
   for (const tester of [tester1, tester2]) {
     const signed = await db.query.operatorAgreements.findMany({ where: eq(schema.operatorAgreements.userId, tester.id) })
-    const have = new Set(signed.map((a) => a.agreementType))
-    const missing = (['nda', 'code_of_conduct', 'data_handling'] as const).filter((t) => !have.has(t))
+    const missing = AGREEMENT_ORDER.filter((t) => !signed.some((a) => a.agreementType === t && a.version === AGREEMENT_DOCUMENTS[t].version))
     if (missing.length > 0) {
-      await db.insert(schema.operatorAgreements).values(missing.map((agreementType) => ({ userId: tester.id, agreementType, ipAddress: '127.0.0.1', userAgent: 'seed' })))
+      await db.insert(schema.operatorAgreements).values(
+        missing.map((agreementType) => ({
+          userId: tester.id,
+          agreementType,
+          version: AGREEMENT_DOCUMENTS[agreementType].version,
+          ipAddress: '127.0.0.1',
+          userAgent: 'seed',
+          acceptedText: AGREEMENT_DOCUMENTS[agreementType].text,
+          textHash: hashAgreementText(AGREEMENT_DOCUMENTS[agreementType].text),
+        })),
+      )
     }
     const attempts = await db.query.calibrationAttempts.findMany({ where: eq(schema.calibrationAttempts.operatorId, tester.id) })
     if (attempts.length === 0 && goldCases.length >= 2) {
